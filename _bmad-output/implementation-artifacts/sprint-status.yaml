@@ -1,0 +1,127 @@
+# generated: 2026-04-12T00:00:00Z
+# last_updated: 2026-04-12T00:00:00Z
+# project: chapt003
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: d:\opt\traswork\chapt003\_bmad-output\implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog -> in-progress: Automatically when first story is created (via create-story)
+#   - in-progress -> done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-04-12T00:00:00Z
+last_updated: 2026-04-12T12:00:00Z
+project: chapt003
+project_key: NOKEY
+tracking_system: file-system
+story_location: d:\opt\traswork\chapt003\_bmad-output\implementation-artifacts
+
+development_status:
+  # Epic 1: 用户认证与个人资料
+  epic-1: in-progress
+  1-1-user-registration: done
+  1-2-user-login: done
+  1-3-wechat-authorization-login: done
+  1-4-password-reset: done
+  1-5-personal-info-view-update: done
+  1-6-user-account-management: backlog
+  epic-1-retrospective: optional
+  
+  # Epic 2: 学生信息档案
+  epic-2: backlog
+  2-1-student-basic-info-input: backlog
+  2-2-academic-score-input: backlog
+  2-3-region-info-input: backlog
+  epic-2-retrospective: optional
+  
+  # Epic 3: 学校信息浏览与搜索
+  epic-3: backlog
+  3-1-school-list-view: backlog
+  3-2-school-detail-view: backlog
+  3-3-school-search: backlog
+  3-4-school-filter: backlog
+  3-5-school-data-import: backlog
+  3-6-school-data-export: backlog
+  3-7-school-info-edit: backlog
+  epic-3-retrospective: optional
+  
+  # Epic 4: 志愿填报与模拟
+  epic-4: backlog
+  4-1-volunteer-application-form-create: backlog
+  4-2-add-school-to-volunteer: backlog
+  4-3-adjust-volunteer-order: backlog
+  4-4-delete-volunteer: backlog
+  4-5-volunteer-simulation: backlog
+  4-6-view-application-history: backlog
+  epic-4-retrospective: optional
+  
+  # Epic 5: 录取预测与智能推荐
+  epic-5: backlog
+  5-1-admission-probability-calculation: backlog
+  5-2-smart-school-recommendation: backlog
+  5-3-recommendation-filter-sort: backlog
+  5-4-recommendation-history: backlog
+  epic-5-retrospective: optional
+  
+  # Epic 6: 系统内容与用户服务
+  epic-6: backlog
+  6-1-help-doc-browse: backlog
+  6-2-faq-search-view: backlog
+  6-3-user-feedback-submit: backlog
+  6-4-customer-service-online: backlog
+  6-5-system-announcement-view: backlog
+  6-6-user-guide-tutorial: backlog
+  epic-6-retrospective: optional
+  
+  # Epic 7: 管理后台与系统管理
+  epic-7: backlog
+  7-1-historical-admission-data-import: backlog
+  7-2-system-data-export: backlog
+  7-3-system-data-backup: backlog
+  7-4-system-data-restore: backlog
+  7-5-user-account-management: backlog
+  7-6-system-parameter-config: backlog
+  7-7-system-operation-log-view: backlog
+  7-8-system-performance-monitor: backlog
+  7-9-content-management: backlog
+  7-10-user-feedback-management: backlog
+  epic-7-retrospective: optional
+  
+  # Epic 8: 系统可访问性与性能优化
+  epic-8: backlog
+  8-1-performance-metric-monitor: backlog
+  8-2-responsive-design-implementation: backlog
+  8-3-accessibility-feature-implementation: backlog
+  8-4-api-doc-integration: backlog
+  8-5-third-party-monitor-integration: backlog
+  8-6-design-system-component-library: backlog
+  8-7-common-component-development: backlog
+  8-8-cache-strategy-optimization: backlog
+  8-9-development-environment-config: backlog
+  8-10-project-initialization-structure: backlog
+  epic-8-retrospective: optional

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API集成测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loading {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .api-url {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>API集成测试</h1>
+    
+    <div class="test-card">
+        <h2>后端API测试</h2>
+        <div class="api-url">API地址: http://localhost:8080/api/health</div>
+        <button onclick="testHealth()">健康检查</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>前端API代理测试</h2>
+        <div class="api-url">代理地址: /api/health (通过 http://localhost:5173)</div>
+        <button onclick="testProxy()">代理测试</button>
+        <div id="proxy-result"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>CORS测试</h2>
+        <button onclick="testCors()">CORS检查</button>
+        <div id="cors-result"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>认证API测试</h2>
+        <div class="api-url">注册: http://localhost:8080/api/auth/register</div>
+        <button onclick="testRegister()">用户注册</button>
+        <div id="register-result"></div>
+    </div>
+
+    <div class="test-card">
+        <h2>前端完整性测试</h2>
+        <button onclick="testFrontend()">前端资源检查</button>
+        <div id="frontend-result"></div>
+    </div>
+
+    <script>
+        function showLoading(elementId, message) {
+            document.getElementById(elementId).innerHTML = 
+                `<div class="test-result loading">${message}</div>`;
+        }
+
+        function showSuccess(elementId, message) {
+            document.getElementById(elementId).innerHTML = 
+                `<div class="test-result success">${message}</div>`;
+        }
+
+        function showError(elementId, message) {
+            document.getElementById(elementId).innerHTML = 
+                `<div class="test-result error">${message}</div>`;
+        }
+
+        async function testHealth() {
+            showLoading('health-result', '正在检查后端健康状态...');
+            try {
+                const response = await fetch('http://localhost:8080/api/health');
+                const data = await response.json();
+                showSuccess('health-result', `✅ 后端正常运行: ${data.message || 'OK'}`);
+            } catch (error) {
+                showError('health-result', `❌ 后端连接失败: ${error.message}`);
+            }
+        }
+
+        async function testProxy() {
+            showLoading('proxy-result', '正在测试前端API代理...');
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                showSuccess('proxy-result', `✅ 代理工作正常: ${data.message || 'OK'}`);
+            } catch (error) {
+                showError('proxy-result', `❌ 代理测试失败: ${error.message}`);
+            }
+        }
+
+        async function testCors() {
+            showLoading('cors-result', '正在测试CORS配置...');
+            try {
+                const response = await fetch('http://localhost:8080/api/health');
+                const corsHeaders = response.headers;
+                const corsSupported = corsHeaders.get('access-control-allow-origin') !== null;
+                
+                if (corsSupported) {
+                    showSuccess('cors-result', '✅ CORS配置正常');
+                } else {
+                    showError('cors-result', '⚠️ CORS头未检测到');
+                }
+            } catch (error) {
+                showError('cors-result', `❌ CORS测试失败: ${error.message}`);
+            }
+        }
+
+        async function testRegister() {
+            showLoading('register-result', '正在测试用户注册API...');
+            try {
+                const testData = {
+                    username: 'testuser',
+                    email: 'test@example.com',
+                    password: 'testpass123',
+                    code: '123456'
+                };
+                
+                const response = await fetch('http://localhost:8080/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const data = await response.json();
+                showSuccess('register-result', `✅ 注册API响应正常: ${data.message || 'OK'}`);
+            } catch (error) {
+                showError('register-result', `❌ 注册API测试失败: ${error.message}`);
+            }
+        }
+
+        function testFrontend() {
+            showLoading('frontend-result', '正在检查前端资源...');
+            
+            // 检查Vue3应用是否正常加载
+            const app = document.querySelector('#app');
+            if (app) {
+                showSuccess('frontend-result', '✅ Vue3应用正常加载');
+            } else {
+                showError('frontend-result', '❌ Vue3应用未找到');
+            }
+        }
+
+        // 页面加载时自动运行部分测试
+        window.onload = function() {
+            console.log('页面已加载，可以开始测试');
+            // 可以在这里添加自动测试
+        };
+    </script>
+</body>
+</html>

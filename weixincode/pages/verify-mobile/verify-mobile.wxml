@@ -1,0 +1,18 @@
+<view class="container">
+  <view class="header">
+    <text class="title">手机号验证</text>
+  </view>
+  
+  <view class="content">
+    <text class="info">验证码已发送至您的手机</text>
+    <text class="phone">138****8888</text>
+    
+    <view class="verify-form">
+      <view class="form-item">
+        <input class="input" placeholder="请输入验证码" type="text" />
+      </view>
+      
+      <button class="verify-btn">验证</button>
+    </view>
+  </view>
+</view>

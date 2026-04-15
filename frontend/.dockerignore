@@ -1,0 +1,38 @@
+# Docker ignore files for frontend
+node_modules/
+dist/
+build/
+.npm/
+.eslintcache
+.vite/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Coverage reports
+coverage/
+.nyc_output/
+
+# Testing
+.jest/
+.playwright-report/
+.playwright/

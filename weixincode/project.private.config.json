@@ -1,0 +1,26 @@
+{
+  "description": "志愿汇 - 志愿者管理系统小程序（私有配置）",
+  "setting": {
+    "compileHotReLoad": true
+  },
+  "condition": {
+    "search": {
+      "list": []
+    },
+    "conversation": {
+      "list": []
+    },
+    "game": {
+      "list": []
+    },
+    "plugin": {
+      "list": []
+    },
+    "gamePlugin": {
+      "list": []
+    },
+    "miniprogram": {
+      "list": []
+    }
+  }
+}

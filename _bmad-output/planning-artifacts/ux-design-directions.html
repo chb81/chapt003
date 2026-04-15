@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Design Directions - 学生志愿填报智能推荐系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1989FA;
+            --secondary-color: #07C160;
+            --background-color: #F7F8FA;
+            --text-color: #323233;
+            --text-secondary: #969799;
+            --border-color: #EbedF0;
+            --white: #FFFFFF;
+            --warning: #FF976A;
+            --error: #EE0A24;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .directions-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .direction-btn {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .direction-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .direction-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .direction-container {
+            display: none;
+        }
+
+        .direction-container.active {
+            display: block;
+        }
+
+        .direction-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--primary-color);
+        }
+
+        .direction-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .mockup-frame {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .phone-mockup {
+            width: 375px;
+            height: 667px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 20px;
+            border: 8px solid #333;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone-notch {
+            width: 150px;
+            height: 30px;
+            background: #333;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .phone-content {
+            height: 100%;
+            overflow-y: auto;
+            padding: 40px 16px 16px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .pros, .cons {
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .pros {
+            background: #f0f9ff;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .cons {
+            background: #fff5f5;
+            border-left: 4px solid var(--error);
+        }
+
+        .pros h4, .cons h4 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .pros h4 {
+            color: var(--secondary-color);
+        }
+
+        .cons h4 {
+            color: var(--error);
+        }
+
+        .pros ul, .cons ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .pros li, .cons li {
+            font-size: 14px;
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .pros li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+        }
+
+        .cons li::before {
+            content: "✗";
+            position: absolute;
+            left: 0;
+            color: var(--error);
+        }
+
+        .evaluation-criteria {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+
+        .evaluation-criteria h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--primary-color);
+        }
+
+        .criteria-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: var(--background-color);
+            border-radius: 8px;
+        }
+
+        .criteria-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            margin-top: 2px;
+        }
+
+        .criteria-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .criteria-content p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Direction 1: Minimal Card */
+        .direction-1 .phone-content {
+            background: var(--background-color);
+        }
+
+        .direction-1 .hero-card {
+            background: linear-gradient(135deg, var(--primary-color), #4facfe);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .direction-1 .hero-card h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .direction-1 .hero-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .direction-1 .action-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .direction-1 .action-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .direction-1 .action-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .direction-1 .primary-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        /* Direction 2: Chat Form */
+        .direction-2 .phone-content {
+            background: #f5f5f5;
+        }
+
+        .direction-2 .chat-container {
+            padding: 16px;
+        }
+
+        .direction-2 .chat-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .direction-2 .chat-bubble.system {
+            background: white;
+            color: var(--text-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        .direction-2 .chat-bubble.user {
+            background: var(--primary-color);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .direction-2 .chat-input {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .direction-2 .chat-input input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .direction-2 .chat-input button {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Direction 3: Data Visualization */
+        .direction-3 .phone-content {
+            background: var(--background-color);
+        }
+
+        .direction-3 .data-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .direction-3 .data-card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .direction-3 .probability-bar {
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .direction-3 .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .direction-3 .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .direction-3 .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: var(--background-color);
+            border-radius: 8px;
+        }
+
+        .direction-3 .stat-item .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .direction-3 .stat-item .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Direction 4: Progressive Disclosure */
+        .direction-4 .phone-content {
+            background: white;
+        }
+
+        .direction-4 .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .direction-4 .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-color);
+            margin: 0 6px;
+        }
+
+        .direction-4 .step-dot.active {
+            background: var(--primary-color);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .direction-4 .step-content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .direction-4 .step-content h2 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .direction-4 .step-content p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .direction-4 .step-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .direction-4 .step-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .direction-4 .step-nav {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .direction-4 .step-nav button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .direction-4 .step-nav .prev {
+            background: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .direction-4 .step-nav .next {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Direction 5: List-Dense */
+        .direction-5 .phone-content {
+            background: var(--background-color);
+        }
+
+        .direction-5 .search-bar {
+            background: white;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 40px;
+            z-index: 5;
+        }
+
+        .direction-5 .search-bar input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23967979"><path d="M21.71 20.29l-5.01-5.01C17.54 13.68 18 11.91 18 10c0-4.41-3.59-8-8-8S2 5.59 2 10s3.59 8 8 8c1.91 0 3.68-.46 5.28-1.3l5.01 5.01c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>') no-repeat 12px center;
+            background-size: 16px;
+        }
+
+        .direction-5 .school-list {
+            padding: 8px;
+        }
+
+        .direction-5 .school-item {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .direction-5 .school-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .direction-5 .school-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .direction-5 .school-badge {
+            padding: 4px 12px;
+            background: #e3f2fd;
+            color: var(--primary-color);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Direction 6: Visual-Guided */
+        .direction-6 .phone-content {
+            background: linear-gradient(180deg, #f0f9ff 0%, var(--background-color) 100%);
+        }
+
+        .direction-6 .icon-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .direction-6 .icon-card {
+            background: white;
+            padding: 24px 16px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .direction-6 .icon-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .direction-6 .icon-card .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .direction-6 .icon-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .direction-6 .icon-card p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .direction-6 .visual-tip {
+            background: white;
+            margin: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .direction-6 .visual-tip .tip-icon {
+            font-size: 24px;
+        }
+
+        .direction-6 .visual-tip .tip-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .direction-6 .visual-tip .tip-content p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>UX Design Directions</h1>
+            <p>学生志愿填报智能推荐系统 - 设计方向探索</p>
+        </div>
+
+        <div class="directions-nav">
+            <button class="direction-btn active" data-direction="1">方向 1: 极简卡片</button>
+            <button class="direction-btn" data-direction="2">方向 2: 聊天式表单</button>
+            <button class="direction-btn" data-direction="3">方向 3: 数据可视化</button>
+            <button class="direction-btn" data-direction="4">方向 4: 渐进式披露</button>
+            <button class="direction-btn" data-direction="5">方向 5: 列表密集型</button>
+            <button class="direction-btn" data-direction="6">方向 6: 视觉引导型</button>
+        </div>
+
+        <div class="evaluation-criteria">
+            <h3>📊 设计评估标准</h3>
+            <div class="criteria-item">
+                <span class="criteria-icon">📐</span>
+                <div class="criteria-content">
+                    <h4>布局直观性</h4>
+                    <p>哪种信息层级最符合您的优先级？用户能否快速理解界面结构？</p>
+                </div>
+            </div>
+            <div class="criteria-item">
+                <span class="criteria-icon">👆</span>
+                <div class="criteria-content">
+                    <h4>交互风格</h4>
+                    <p>哪种交互风格最符合您的核心体验？用户是否感到自然流畅？</p>
+                </div>
+            </div>
+            <div class="criteria-item">
+                <span class="criteria-icon">🎨</span>
+                <div class="criteria-content">
+                    <h4>视觉权重</h4>
+                    <p>哪种视觉密度最适合您的品牌？信息是否过载或过于稀疏？</p>
+                </div>
+            </div>
+            <div class="criteria-item">
+                <span class="criteria-icon">🧭</span>
+                <div class="criteria-content">
+                    <h4>导航方法</h4>
+                    <p>哪种导航模式最符合用户期望？用户是否知道下一步该做什么？</p>
+                </div>
+            </div>
+            <div class="criteria-item">
+                <span class="criteria-icon">🎯</span>
+                <div class="criteria-content">
+                    <h4>组件使用</h4>
+                    <p>组件如何支持您的用户旅程？是否能降低认知负荷？</p>
+                </div>
+            </div>
+            <div class="criteria-item">
+                <span class="criteria-icon">💚</span>
+                <div class="criteria-content">
+                    <h4>品牌一致性</h4>
+                    <p>哪种方向最能支持您的情感目标？是否传达了正确的品牌形象？</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 1: Minimal Card -->
+        <div class="direction-container direction-1 active" id="direction-1">
+            <h2 class="direction-title">方向 1: 极简卡片式</h2>
+            <p class="direction-description">强调简洁和清晰，每个功能模块都是独立的卡片，信息层次分明。适合低技术熟练度用户，降低认知负荷，符合"极简主义"原则。</p>
+            
+            <div class="mockup-frame">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-content">
+                        <div class="hero-card">
+                            <h2>智能志愿推荐</h2>
+                            <p>输入学生信息，3秒获取最适合的学校推荐</p>
+                        </div>
+                        
+                        <div class="action-card">
+                            <h3>📊 成绩分析</h3>
+                            <p>查看学生成绩排名和录取概率</p>
+                        </div>
+                        
+                        <div class="action-card">
+                            <h3>🎯 智能推荐</h3>
+                            <p>基于大数据的个性化学校推荐</p>
+                        </div>
+                        
+                        <div class="action-card">
+                            <h3>📝 志愿填报</h3>
+                            <p>一键生成志愿填报方案</p>
+                        </div>
+                        
+                        <button class="primary-btn">开始智能推荐</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✓ 优点</h4>
+                    <ul>
+                        <li>信息层次清晰，易于理解</li>
+                        <li>降低认知负荷，适合低技术用户</li>
+                        <li>视觉简洁，符合极简主义</li>
+                        <li>模块化设计，易于维护</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>✗ 缺点</h4>
+                    <ul>
+                        <li>可能显得过于简单</li>
+                        <li>卡片过多时可能显得重复</li>
+                        <li>信息密度较低</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 2: Chat Form -->
+        <div class="direction-container direction-2" id="direction-2">
+            <h2 class="direction-title">方向 2: 聊天式表单</h2>
+            <p class="direction-description">采用对话式界面，像聊天一样逐步收集学生信息。提供友好的交互体验，让用户感到轻松自然，降低填写压力。</p>
+            
+            <div class="mockup-frame">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-content">
+                        <div class="chat-container">
+                            <div class="chat-bubble system">
+                                👋 您好！欢迎使用智能志愿推荐系统
+                            </div>
+                            <div class="chat-bubble system">
+                                请告诉我学生的姓名？
+                            </div>
+                            <div class="chat-bubble user">
+                                张三
+                            </div>
+                            <div class="chat-bubble system">
+                                很好！张三同学现在读几年级？
+                            </div>
+                            <div class="chat-bubble user">
+                                高三
+                            </div>
+                            <div class="chat-bubble system">
+                                明白了！请问最近的模考分数是多少？
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input">
+                            <input type="text" placeholder="输入您的答案...">
+                            <button>发送</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✓ 优点</h4>
+                    <ul>
+                        <li>交互自然，降低填写压力</li>
+                        <li>逐步引导，不会感到信息过载</li>
+                        <li>对话式体验，用户感到亲切</li>
+                        <li>适合移动端，操作简单</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>✗ 缺点</h4>
+                    <ul>
+                        <li>填写速度可能较慢</li>
+                        <li>难以快速回看和修改</li>
+                        <li>可能不适合快速浏览信息</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 3: Data Visualization -->
+        <div class="direction-container direction-3" id="direction-3">
+            <h2 class="direction-title">方向 3: 数据可视化</h2>
+            <p class="direction-description">强调数据展示和可视化，用直观的图表和进度条展示录取概率、分数对比等关键信息。让数据说话，增强可信度和说服力。</p>
+            
+            <div class="mockup-frame">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-content">
+                        <div class="data-card">
+                            <h3>📊 您的排名分析</h3>
+                            <div class="stat-grid">
+                                <div class="stat-item">
+                                    <div class="value">680</div>
+                                    <div class="label">总分</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="value">1,234</div>
+                                    <div class="label">全区排名</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="data-card">
+                            <h3>🎯 推荐学校录取概率</h3>
+                            <div style="margin-bottom: 12px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                                    <span>清华大学</span>
+                                    <span>85%</span>
+                                </div>
+                                <div class="probability-bar">
+                                    <div class="probability-fill" style="width: 85%;"></div>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                                    <span>北京大学</span>
+                                    <span>78%</span>
+                                </div>
+                                <div class="probability-bar">
+                                    <div class="probability-fill" style="width: 78%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                                    <span>复旦大学</span>
+                                    <span>92%</span>
+                                </div>
+                                <div class="probability-bar">
+                                    <div class="probability-fill" style="width: 92%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="data-card">
+                            <h3>📈 历年数据对比</h3>
+                            <p style="font-size: 13px; color: var(--text-secondary);">您的分数比去年录取线高 45 分</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✓ 优点</h4>
+                    <ul>
+                        <li>数据直观，一目了然</li>
+                        <li>增强可信度和说服力</li>
+                        <li>帮助用户快速理解复杂信息</li>
+                        <li>视觉效果好，印象深刻</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>✗ 缺点</h4>
+                    <ul>
+                        <li>可能显得过于复杂</li>
+                        <li>需要用户有一定的数据理解能力</li>
+                        <li>图表设计需要精心考虑</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 4: Progressive Disclosure -->
+        <div class="direction-container direction-4" id="direction-4">
+            <h2 class="direction-title">方向 4: 渐进式披露</h2>
+            <p class="direction-description">采用分步骤引导的方式，每次只显示一个问题或任务，完成后再显示下一个。降低认知负荷，让用户专注于当前任务。</p>
+            
+            <div class="mockup-frame">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-content">
+                        <div class="step-indicator">
+                            <div class="step-dot active"></div>
+                            <div class="step-dot"></div>
+                            <div class="step-dot"></div>
+                            <div class="step-dot"></div>
+                            <div class="step-dot"></div>
+                        </div>
+
+                        <div class="step-content">
+                            <h2>第 1 步：学生姓名</h2>
+                            <p>请输入学生的真实姓名</p>
+                            <input type="text" class="step-input" placeholder="例如：张三">
+                            
+                            <div class="step-nav">
+                                <button class="prev">上一步</button>
+                                <button class="next">下一步</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✓ 优点</h4>
+                    <ul>
+                        <li>降低认知负荷，专注当前任务</li>
+                        <li>进度清晰，用户有掌控感</li>
+                        <li>适合复杂流程的分解</li>
+                        <li>减少错误，逐步验证</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>✗ 缺点</h4>
+                    <ul>
+                        <li>可能感觉步骤过多</li>
+                        <li>难以快速回看和修改</li>
+                        <li>可能影响填写效率</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 5: List-Dense -->
+        <div class="direction-container direction-5" id="direction-5">
+            <h2 class="direction-title">方向 5: 列表密集型</h2>
+            <p class="direction-description">信息密度高，适合快速浏览和比较。学校列表清晰展示关键信息，支持搜索和筛选，适合需要查看大量信息的场景。</p>
+            
+            <div class="mockup-frame">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-content">
+                        <div class="search-bar">
+                            <input type="text" placeholder="搜索学校名称...">
+                        </div>
+
+                        <div class="school-list">
+                            <div class="school-item">
+                                <div class="school-info">
+                                    <h3>清华大学</h3>
+                                    <p>北京 · 985 · 双一流</p>
+                                </div>
+                                <div class="school-badge">92% 概率</div>
+                            </div>
+
+                            <div class="school-item">
+                                <div class="school-info">
+                                    <h3>北京大学</h3>
+                                    <p>北京 · 985 · 双一流</p>
+                                </div>
+                                <div class="school-badge">88% 概率</div>
+                            </div>
+
+                            <div class="school-item">
+                                <div class="school-info">
+                                    <h3>复旦大学</h3>
+                                    <p>上海 · 985 · 双一流</p>
+                                </div>
+                                <div class="school-badge">95% 概率</div>
+                            </div>
+
+                            <div class="school-item">
+                                <div class="school-info">
+                                    <h3>上海交通大学</h3>
+                                    <p>上海 · 985 · 双一流</p>
+                                </div>
+                                <div class="school-badge">90% 概率</div>
+                            </div>
+
+                            <div class="school-item">
+                                <div class="school-info">
+                                    <h3>浙江大学</h3>
+                                    <p>杭州 · 985 · 双一流</p>
+                                </div>
+                                <div class="school-badge">87% 概率</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✓ 优点</h4>
+                    <ul>
+                        <li>信息密度高，适合快速浏览</li>
+                        <li>支持搜索和筛选，效率高</li>
+                        <li>关键信息一目了然</li>
+                        <li>适合比较多个选项</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>✗ 缺点</h4>
+                    <ul>
+                        <li>可能显得信息过载</li>
+                        <li>视觉上可能不够吸引人</li>
+                        <li>对低技术用户可能有压力</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 6: Visual-Guided -->
+        <div class="direction-container direction-6" id="direction-6">
+            <h2 class="direction-title">方向 6: 视觉引导型</h2>
+            <p class="direction-description">使用大图标和视觉提示引导用户，降低文字依赖。适合视觉型学习者，让界面更加生动有趣，提升用户体验。</p>
+            
+            <div class="mockup-frame">
+                <div class="phone-mockup">
+                    <div class="phone-notch"></div>
+                    <div class="phone-content">
+                        <h2 style="text-align: center; margin: 20px 0; font-size: 18px;">请选择您需要的服务</h2>
+
+                        <div class="icon-grid">
+                            <div class="icon-card">
+                                <div class="icon">📊</div>
+                                <h3>成绩分析</h3>
+                                <p>查看排名和概率</p>
+                            </div>
+
+                            <div class="icon-card">
+                                <div class="icon">🎯</div>
+                                <h3>智能推荐</h3>
+                                <p>个性化学校推荐</p>
+                            </div>
+
+                            <div class="icon-card">
+                                <div class="icon">📝</div>
+                                <h3>志愿填报</h3>
+                                <p>一键生成方案</p>
+                            </div>
+
+                            <div class="icon-card">
+                                <div class="icon">📚</div>
+                                <h3>学校详情</h3>
+                                <p>了解学校信息</p>
+                            </div>
+                        </div>
+
+                        <div class="visual-tip">
+                            <div class="tip-icon">💡</div>
+                            <div class="tip-content">
+                                <h4>小提示</h4>
+                                <p>先进行成绩分析，可以获得更准确的推荐结果</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✓ 优点</h4>
+                    <ul>
+                        <li>视觉吸引力强，界面生动</li>
+                        <li>降低文字依赖，易于理解</li>
+                        <li>适合视觉型学习者</li>
+                        <li>操作直观，点击即可</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>✗ 缺点</h4>
+                    <ul>
+                        <li>图标可能不够准确</li>
+                        <li>需要额外的设计资源</li>
+                        <li>可能显得不够专业</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.direction-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const direction = this.getAttribute('data-direction');
+                
+                document.querySelectorAll('.direction-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.direction-container').forEach(c => c.classList.remove('active'));
+                
+                this.classList.add('active');
+                document.getElementById('direction-' + direction).classList.add('active');
+            });
+        });
+    </script>
+
+    <div class="evaluation-criteria" style="margin-top: 50px;">
+        <h3>👥 用户焦点小组分析</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">基于真实用户 personas 的设计方向反馈和偏好分析</p>
+        
+        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--primary-color);">📋 用户 Personas</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+                <div style="padding: 16px; background: var(--background-color); border-radius: 8px;">
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">👦 小明（高三学生，18岁）</div>
+                    <ul style="font-size: 13px; color: var(--text-secondary); padding-left: 20px;">
+                        <li>熟悉智能手机，喜欢简洁直观的界面</li>
+                        <li>对专业信息了解有限，需要引导</li>
+                        <li>担心选择错误，希望得到权威建议</li>
+                        <li>时间紧张，需要高效完成填报</li>
+                    </ul>
+                </div>
+                <div style="padding: 16px; background: var(--background-color); border-radius: 8px;">
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">👩 王女士（小明的妈妈，45岁）</div>
+                    <ul style="font-size: 13px; color: var(--text-secondary); padding-left: 20px;">
+                        <li>对志愿填报非常重视，希望参与决策</li>
+                        <li>对专业和学校了解有限，依赖数据</li>
+                        <li>担心信息不完整，希望看到全面的数据</li>
+                        <li>喜欢清晰的对比和排名</li>
+                    </ul>
+                </div>
+                <div style="padding: 16px; background: var(--background-color); border-radius: 8px;">
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">👨‍🏫 李老师（高三班主任，35岁）</div>
+                    <ul style="font-size: 13px; color: var(--text-secondary); padding-left: 20px;">
+                        <li>有多年志愿填报指导经验</li>
+                        <li>熟悉各种数据指标和录取规则</li>
+                        <li>需要快速了解学生情况，给出建议</li>
+                        <li>希望系统能辅助而非替代专业判断</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--primary-color);">💬 各方向用户反馈</h4>
+            
+            <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+                <h5 style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">🎯 方向 1：极简卡片式</h5>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>小明</strong>：看起来很干净，一下子就能看到重点。但信息可能不够详细，需要更多关于专业的信息。</div>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>王女士</strong>：太简单了！看不到往年的录取分数线、就业率这些重要数据。</div>
+                <div style="font-size: 13px;"><strong>李老师</strong>：对于初步浏览还可以，但作为决策工具信息量不够。建议可以点击卡片展开更多详细信息。</div>
+                <div style="margin-top: 12px; padding: 8px 12px; background: #fff3e0; border-radius: 6px; font-size: 13px;"><strong>总体评价</strong>：适合快速浏览，但缺乏深度信息支持决策。</div>
+            </div>
+
+            <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+                <h5 style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">💬 方向 2：聊天式表单</h5>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>小明</strong>：很有趣！像和朋友聊天一样，不会觉得压力很大。但有时候想直接跳到某个步骤。</div>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>王女士</strong>：这种方式太慢了！想直接看到所有信息，而不是一个一个问题地问。</div>
+                <div style="font-size: 13px;"><strong>李老师</strong>：对于不熟悉系统的用户可能友好，但对于需要快速查看多个学校和专业的情况效率太低。</div>
+                <div style="margin-top: 12px; padding: 8px 12px; background: #fff3e0; border-radius: 6px; font-size: 13px;"><strong>总体评价</strong>：交互自然，但效率较低，适合引导但不适合快速决策。</div>
+            </div>
+
+            <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+                <h5 style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">📊 方向 3：数据可视化</h5>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>小明</strong>：图表看起来很专业，但有时候看不太懂。如果能解释一下这些数据代表什么就好了。</div>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>王女士</strong>：这个太好了！可以清楚地看到录取分数线的趋势、就业率的数据。</div>
+                <div style="font-size: 13px;"><strong>李老师</strong>：数据展示很清晰，但需要确保数据的准确性和及时性。建议增加数据来源说明和解读提示。</div>
+                <div style="margin-top: 12px; padding: 8px 12px; background: #e8f5e9; border-radius: 6px; font-size: 13px;"><strong>总体评价</strong>：数据支持强，适合信息密集型决策，但需要考虑用户的数据理解能力。</div>
+            </div>
+
+            <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+                <h5 style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">🪜 方向 4：渐进式披露</h5>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>小明</strong>：这个很好！一步一步来，不会一下子被那么多信息吓到。而且可以随时回退修改。</div>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>王女士</strong>：流程很合理，但担心如果我想跳过某些步骤或者快速查看后面的内容怎么办？</div>
+                <div style="font-size: 13px;"><strong>李老师</strong>：非常适合复杂的志愿填报流程，可以降低认知负担。建议在每一步都提供"跳过"或"稍后填写"的选项。</div>
+                <div style="margin-top: 12px; padding: 8px 12px; background: #e8f5e9; border-radius: 6px; font-size: 13px;"><strong>总体评价</strong>：流程清晰，降低认知负担，但需要平衡灵活性和引导性。</div>
+            </div>
+
+            <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+                <h5 style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">📋 方向 5：列表密集型</h5>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>小明</strong>：信息太多了，看得我眼花缭乱。如果能筛选一下或者按照重要性排序就好了。</div>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>王女士</strong>：信息量很足，可以看到所有学校和专业。但界面有点拥挤，希望能优化一下布局。</div>
+                <div style="font-size: 13px;"><strong>李老师</strong>：适合有明确目标的用户，可以快速浏览和比较。但需要强大的搜索和筛选功能。</div>
+                <div style="margin-top: 12px; padding: 8px 12px; background: #fff3e0; border-radius: 6px; font-size: 13px;"><strong>总体评价</strong>：信息全面，适合有经验的用户，但需要良好的导航和筛选功能。</div>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <h5 style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">🎨 方向 6：视觉引导型</h5>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>小明</strong>：界面很漂亮，图标也很有趣，用起来很开心。但有时候图标的意思不太明确。</div>
+                <div style="font-size: 13px; margin-bottom: 8px;"><strong>王女士</strong>：看起来很专业，但担心图标会不会不够准确？更希望看到清晰的文字说明。</div>
+                <div style="font-size: 13px;"><strong>李老师</strong>：视觉吸引力强，可以降低学习成本。但需要确保图标的准确性和一致性，避免误导用户。</div>
+                <div style="margin-top: 12px; padding: 8px 12px; background: #fff3e0; border-radius: 6px; font-size: 13px;"><strong>总体评价</strong>：用户体验好，视觉吸引力强，但需要注意图标的准确性和专业性。</div>
+            </div>
+        </div>
+
+        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 24px;">
+            <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--primary-color);">🔍 关键发现</h4>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+                <div style="padding: 16px; background: #e3f2fd; border-radius: 8px;">
+                    <h5 style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">👦 学生（小明）的偏好</h5>
+                    <p style="font-size: 13px; margin-bottom: 4px;">✅ 最喜欢：方向 4（渐进式披露）- 清晰的流程，降低压力</p>
+                    <p style="font-size: 13px; margin-bottom: 4px;">✅ 其次喜欢：方向 1（极简卡片式）- 简洁直观</p>
+                    <p style="font-size: 13px;">⚠️ 担心：方向 5（列表密集型）- 信息过载</p>
+                </div>
+                
+                <div style="padding: 16px; background: #fce4ec; border-radius: 8px;">
+                    <h5 style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">👩 家长（王女士）的偏好</h5>
+                    <p style="font-size: 13px; margin-bottom: 4px;">✅ 最喜欢：方向 3（数据可视化）- 数据充分，决策有依据</p>
+                    <p style="font-size: 13px; margin-bottom: 4px;">✅ 其次喜欢：方向 5（列表密集型）- 信息全面</p>
+                    <p style="font-size: 13px;">⚠️ 担心：方向 2（聊天式表单）- 效率太低</p>
+                </div>
+                
+                <div style="padding: 16px; background: #f3e5f5; border-radius: 8px;">
+                    <h5 style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">👨‍🏫 老师（李老师）的偏好</h5>
+                    <p style="font-size: 13px; margin-bottom: 4px;">✅ 最喜欢：方向 4（渐进式披露）- 适合复杂流程</p>
+                    <p style="font-size: 13px; margin-bottom: 4px;">✅ 其次喜欢：方向 3（数据可视化）- 数据支持决策</p>
+                    <p style="font-size: 13px;">⚠️ 担心：方向 2（聊天式表单）- 不适合快速查看</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); padding: 24px; border-radius: 12px; color: white;">
+            <h4 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">💡 综合建议：混合方案</h4>
+            
+            <div style="margin-bottom: 16px;">
+                <div style="font-size: 15px; font-weight: 600; margin-bottom: 8px;">🎯 推荐的核心组合：</div>
+                <ol style="font-size: 14px; line-height: 1.8; padding-left: 24px;">
+                    <li><strong>核心流程</strong>采用<strong>方向 4（渐进式披露）</strong> - 降低认知负担，适合复杂流程</li>
+                    <li><strong>数据展示</strong>采用<strong>方向 3（数据可视化）</strong> - 提供充分的数据支持决策</li>
+                    <li><strong>信息浏览</strong>采用<strong>方向 1（极简卡片式）</strong> - 简洁直观，适合快速浏览</li>
+                    <li><strong>提供选项</strong>让用户在<strong>聊天式</strong>和<strong>传统表单</strong>之间切换</li>
+                </ol>
+            </div>
+            
+            <div>
+                <div style="font-size: 15px; font-weight: 600; margin-bottom: 8px;">🔑 关键优先级：</div>
+                <ol style="font-size: 14px; line-height: 1.8; padding-left: 24px;">
+                    <li><strong>数据准确性和完整性</strong> - 所有 personas 都关注</li>
+                    <li><strong>流程清晰度</strong> - 学生和家长最关注</li>
+                    <li><strong>信息展示的可理解性</strong> - 学生需要，老师关注专业性</li>
+                    <li><strong>灵活性和效率</strong> - 老师强调</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
