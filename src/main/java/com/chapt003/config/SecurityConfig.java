@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .antMatchers("/v1/auth/**").permitAll()
                 .antMatchers("/v1/user/**").authenticated()
                 .antMatchers("/v1/admin/**").hasRole("ADMIN")
+                .antMatchers("/v1/schools/**").permitAll()
                 .antMatchers("/health").permitAll()
                 .anyRequest().authenticated()
             )

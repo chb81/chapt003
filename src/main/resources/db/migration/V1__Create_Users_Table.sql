@@ -1,12 +1,21 @@
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    mobile VARCHAR(20) NOT NULL UNIQUE,
+    username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    mobile VARCHAR(20) UNIQUE,
+    wechat_open_id VARCHAR(255) UNIQUE,
+    role VARCHAR(20) NOT NULL DEFAULT 'USER',
     status VARCHAR(20) NOT NULL DEFAULT 'UNVERIFIED',
+    email_verified TINYINT(1) NOT NULL DEFAULT 0,
+    mobile_verified TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    last_login_at TIMESTAMP NULL,
+    deleted_at TIMESTAMP NULL,
+    INDEX idx_username (username),
     INDEX idx_email (email),
     INDEX idx_mobile (mobile),
+    INDEX idx_wechat_openid (wechat_open_id),
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

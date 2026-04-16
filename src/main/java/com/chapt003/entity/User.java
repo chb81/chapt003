@@ -47,10 +47,10 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 20)
     private UserStatus status = UserStatus.UNVERIFIED;
 
-    @Column(name = "email_verified")
+    @Column(name = "email_verified",nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean emailVerified = false;
 
-    @Column(name = "mobile_verified")
+    @Column(name = "mobile_verified", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private Boolean mobileVerified = false;
 
     @Column(name = "created_at", nullable = false, updatable = false)
