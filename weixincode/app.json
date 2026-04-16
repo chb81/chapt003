@@ -1,0 +1,58 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/projects/projects",
+    "pages/applications/applications",
+    "pages/profile/profile",
+    "pages/settings/settings",
+    "pages/help/help",
+    "pages/edit-profile/edit-profile",
+    "pages/login/login",
+    "pages/register/register",
+    "pages/verify/verify",
+    "pages/password-reset-request/password-reset-request",
+    "pages/password-reset-verify/password-reset-verify",
+    "pages/verify-mobile/verify-mobile",
+    "pages/verify-email/verify-email"
+  ],
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1989fa",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/projects/projects",
+        "text": "项目",
+        "iconPath": "images/project.png",
+        "selectedIconPath": "images/project-active.png"
+      },
+      {
+        "pagePath": "pages/applications/applications",
+        "text": "申请",
+        "iconPath": "images/application.png",
+        "selectedIconPath": "images/application-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png"
+      }
+    ]
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1989fa",
+    "navigationBarTitleText": "志愿者管理系统",
+    "navigationBarTextStyle": "white"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

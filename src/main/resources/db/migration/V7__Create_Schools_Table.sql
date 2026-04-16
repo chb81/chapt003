@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS schools (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    type VARCHAR(30) NOT NULL,
+    city VARCHAR(50),
+    district VARCHAR(50),
+    admission_score_year1 DECIMAL(5,2),
+    admission_score_year2 DECIMAL(5,2),
+    admission_score_year3 DECIMAL(5,2),
+    description TEXT,
+    features TEXT,
+    enrollment_quota INT,
+    phone VARCHAR(20),
+    address VARCHAR(200),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT(1) NOT NULL DEFAULT 0,
+    INDEX idx_name (name),
+    INDEX idx_city (city),
+    INDEX idx_district (district),
+    INDEX idx_type (type),
+    INDEX idx_deleted (deleted)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

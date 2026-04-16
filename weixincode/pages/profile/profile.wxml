@@ -1,0 +1,62 @@
+<view class="container">
+  <view class="header-section">
+    <view class="user-info-card" wx:if="{{isLoggedIn}}">
+      <view class="user-avatar" bindtap="handleEditProfile">
+        <image src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <view class="edit-icon">✏️</view>
+      </view>
+      <view class="user-details">
+        <view class="user-name">{{userInfo.nickname || '志愿者'}}</view>
+        <view class="user-phone" wx:if="{{userInfo.phone}}">{{userInfo.phone}}</view>
+        <view class="user-id">ID: {{userInfo.id || ''}}</view>
+      </view>
+      <view class="logout-btn" bindtap="handleLogout">退出</view>
+    </view>
+    
+    <view class="login-card" wx:else bindtap="handleLogin">
+      <view class="login-icon">👤</view>
+      <view class="login-text">点击登录</view>
+      <view class="login-tip">登录后享受更多服务</view>
+    </view>
+  </view>
+
+  <view class="stats-card" wx:if="{{isLoggedIn}}">
+    <view class="stat-item">
+      <view class="stat-value">{{stats.totalHours}}</view>
+      <view class="stat-label">志愿时长</view>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <view class="stat-value">{{stats.projectCount}}</view>
+      <view class="stat-label">参与项目</view>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <view class="stat-value">{{stats.creditScore}}</view>
+      <view class="stat-label">信用积分</view>
+    </view>
+  </view>
+
+  <view class="menu-section" wx:if="{{isLoggedIn}}">
+    <view class="menu-title">我的服务</view>
+    <view class="menu-list">
+      <view class="menu-item" wx:for="{{menuItems}}" wx:key="title" bindtap="handleMenuClick" data-path="{{item.path}}">
+        <view class="menu-icon">{{item.icon}}</view>
+        <view class="menu-text">{{item.title}}</view>
+        <view class="menu-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="guest-section" wx:else>
+    <view class="guest-tip">
+      <view class="tip-icon">💡</view>
+      <view class="tip-text">登录后可以申请志愿服务、查看志愿证书、记录志愿时长</view>
+    </view>
+  </view>
+
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <view class="loading-text">加载中...</view>
+  </view>
+</view>

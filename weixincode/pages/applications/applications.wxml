@@ -1,0 +1,158 @@
+<view class="applications-container">
+  <!-- 标签栏 -->
+  <view class="tabs-section">
+    <scroll-view class="tabs-scroll" scroll-x enable-flex>
+      <view 
+        wx:for="{{tabs}}" 
+        wx:key="key"
+        class="tab-item {{activeTab === item.key ? 'active' : ''}}" 
+        bindtap="onTabChange"
+        data-key="{{item.key}}"
+      >
+        {{item.label}}
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 申请列表 -->
+  <view class="applications-list">
+    <view 
+      wx:for="{{applications}}" 
+      wx:key="id" 
+      class="application-card"
+      bindtap="showApplicationDetail"
+      data-id="{{item.id}}"
+    >
+      <view class="card-header">
+        <view class="project-title">{{item.project_title}}</view>
+        <view 
+          class="status-badge" 
+          style="background: {{getStatusBgColor(item.status)}}; color: {{getStatusColor(item.status)}}"
+        >
+          {{getStatusLabel(item.status)}}
+        </view>
+      </view>
+      
+      <view class="card-body">
+        <view class="info-row">
+          <text class="info-label">申请时间</text>
+          <text class="info-value">{{formatDate(item.created_at)}}</text>
+        </view>
+        
+        <view wx:if="{{item.reviewed_at}}" class="info-row">
+          <text class="info-label">审核时间</text>
+          <text class="info-value">{{formatDate(item.reviewed_at)}}</text>
+        </view>
+        
+        <view wx:if="{{item.approved_at}}" class="info-row">
+          <text class="info-label">通过时间</text>
+          <text class="info-value">{{formatDate(item.approved_at)}}</text>
+        </view>
+      </view>
+      
+      <view wx:if="{{item.status === 'pending'}}" class="card-footer">
+        <view 
+          class="cancel-btn" 
+          catchtap="cancelApplication"
+          data-id="{{item.id}}"
+        >
+          取消申请
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view wx:if="{{applications.length === 0 && !loading}}" class="empty-state">
+      <image class="empty-image" src="/images/empty.png" mode="aspectFit"></image>
+      <view class="empty-text">暂无申请记录</view>
+      <view class="empty-hint">去申请志愿项目吧</view>
+    </view>
+
+    <!-- 加载状态 -->
+    <view wx:if="{{loading}}" class="loading-state">
+      <view class="loading-spinner"></view>
+      <view class="loading-text">加载中...</view>
+    </view>
+  </view>
+</view>
+
+<!-- 申请详情模态框 -->
+<view wx:if="{{showDetailModal}}" class="modal-mask" bindtap="hideDetailModal">
+  <view class="detail-modal" catchtap="stopPropagation">
+    <view class="modal-header">
+      <view class="modal-title">申请详情</view>
+      <icon class="close-icon" type="clear" size="20" bindtap="hideDetailModal"></icon>
+    </view>
+    
+    <scroll-view class="modal-body" scroll-y>
+      <view class="detail-section">
+        <view class="detail-label">项目名称</view>
+        <view class="detail-content">{{currentApplication.project_title}}</view>
+      </view>
+      
+      <view class="detail-section">
+        <view class="detail-label">申请状态</view>
+        <view 
+          class="detail-status"
+          style="background: {{getStatusBgColor(currentApplication.status)}}; color: {{getStatusColor(currentApplication.status)}}"
+        >
+          {{getStatusLabel(currentApplication.status)}}
+        </view>
+      </view>
+      
+      <view class="detail-section">
+        <view class="detail-label">申请动机</view>
+        <view class="detail-content">{{currentApplication.motivation}}</view>
+      </view>
+      
+      <view class="detail-section">
+        <view class="detail-label">相关经验</view>
+        <view class="detail-content">{{currentApplication.experience}}</view>
+      </view>
+      
+      <view wx:if="{{currentApplication.availability}}" class="detail-section">
+        <view class="detail-label">可用时间</view>
+        <view class="detail-content">{{currentApplication.availability}}</view>
+      </view>
+      
+      <view class="detail-grid">
+        <view class="detail-item">
+          <text class="item-label">申请时间</text>
+          <text class="item-value">{{formatDate(currentApplication.created_at)}}</text>
+        </view>
+        
+        <view wx:if="{{currentApplication.reviewed_at}}" class="detail-item">
+          <text class="item-label">审核时间</text>
+          <text class="item-value">{{formatDate(currentApplication.reviewed_at)}}</text>
+        </view>
+        
+        <view wx:if="{{currentApplication.approved_at}}" class="detail-item">
+          <text class="item-label">通过时间</text>
+          <text class="item-value">{{formatDate(currentApplication.approved_at)}}</text>
+        </view>
+        
+        <view wx:if="{{currentApplication.completed_at}}" class="detail-item">
+          <text class="item-label">完成时间</text>
+          <text class="item-value">{{formatDate(currentApplication.completed_at)}}</text>
+        </view>
+      </view>
+      
+      <view wx:if="{{currentApplication.review_comment}}" class="detail-section">
+        <view class="detail-label">审核意见</view>
+        <view class="detail-content">{{currentApplication.review_comment}}</view>
+      </view>
+      
+      <view wx:if="{{currentApplication.reject_reason}}" class="detail-section">
+        <view class="detail-label">拒绝原因</view>
+        <view class="detail-content reject-reason">{{currentApplication.reject_reason}}</view>
+      </view>
+    </scroll-view>
+    
+    <view class="modal-footer">
+      <view wx:if="{{currentApplication.status === 'pending'}}" class="modal-btn danger" bindtap="cancelApplication" data-id="{{currentApplication.id}}">
+        取消申请
+      </view>
+      <view class="modal-btn" bindtap="hideDetailModal">关闭</view>
+    </view>
+  </view>
+</view>

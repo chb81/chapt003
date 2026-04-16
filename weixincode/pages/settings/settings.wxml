@@ -1,0 +1,65 @@
+<view class="container">
+  <view class="header">
+    <view class="title">设置</view>
+  </view>
+
+  <view class="settings-section">
+    <view class="section-title">通知设置</view>
+    <view class="setting-item">
+      <view class="setting-label">接收通知</view>
+      <switch checked="{{settings.notificationEnabled}}" bindchange="handleNotificationChange" color="#1989fa"></switch>
+    </view>
+    <view class="setting-item">
+      <view class="setting-label">接收消息</view>
+      <switch checked="{{settings.messageEnabled}}" bindchange="handleMessageChange" color="#1989fa"></switch>
+    </view>
+  </view>
+
+  <view class="settings-section">
+    <view class="section-title">外观设置</view>
+    <view class="setting-item">
+      <view class="setting-label">深色模式</view>
+      <switch checked="{{settings.darkMode}}" bindchange="handleDarkModeChange" color="#1989fa"></switch>
+    </view>
+    <view class="setting-item" bindtap="handleLanguageChange">
+      <view class="setting-label">语言</view>
+      <view class="setting-value">{{getLanguageLabel(settings.language)}} ›</view>
+    </view>
+  </view>
+
+  <view class="settings-section">
+    <view class="section-title">数据管理</view>
+    <view class="setting-item" bindtap="handleClearCache">
+      <view class="setting-label">清除缓存</view>
+      <view class="setting-value">›</view>
+    </view>
+    <view class="setting-item" bindtap="handleClearAllCache">
+      <view class="setting-label">清除全部数据</view>
+      <view class="setting-value">›</view>
+    </view>
+  </view>
+
+  <view class="settings-section">
+    <view class="section-title">关于</view>
+    <view class="setting-item" bindtap="handleAbout">
+      <view class="setting-label">关于志愿汇</view>
+      <view class="setting-value">v{{version}} ›</view>
+    </view>
+    <view class="setting-item" bindtap="handlePrivacy">
+      <view class="setting-label">隐私政策</view>
+      <view class="setting-value">›</view>
+    </view>
+    <view class="setting-item" bindtap="handleTerms">
+      <view class="setting-label">用户协议</view>
+      <view class="setting-value">›</view>
+    </view>
+    <view class="setting-item" bindtap="handleFeedback">
+      <view class="setting-label">帮助与反馈</view>
+      <view class="setting-value">›</view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <view class="footer-text">志愿汇小程序 v{{version}}</view>
+  </view>
+</view>
