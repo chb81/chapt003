@@ -60,13 +60,13 @@
           <el-timeline v-if="userDetail?.loginHistory && userDetail.loginHistory.length > 0">
             <el-timeline-item
               v-for="item in userDetail.loginHistory"
-              :key="item.id"
+              :key="item.loginTime"
               :timestamp="formatDate(item.loginTime)"
             >
               <div class="timeline-item">
-                <div><strong>IP地址:</strong> {{ item.ipAddress }}</div>
+                <div><strong>IP地址:</strong> {{ item.ipAddress || '-' }}</div>
                 <div><strong>登录方式:</strong> {{ item.loginMethod === 'WECHAT' ? '微信' : '密码' }}</div>
-                <div><strong>设备:</strong> {{ item.userAgent }}</div>
+                <div><strong>设备:</strong> {{ item.userAgent || '-' }}</div>
               </div>
             </el-timeline-item>
           </el-timeline>
@@ -78,16 +78,12 @@
             <el-timeline-item
               v-for="item in userDetail.auditLogs"
               :key="item.id"
-              :timestamp="formatDate(item.timestamp)"
+              :timestamp="formatDate(item.createdAt)"
             >
               <div class="timeline-item">
                 <div><strong>操作:</strong> {{ item.action }}</div>
-                <div v-if="item.entityType"><strong>实体类型:</strong> {{ item.entityType }}</div>
-                <div v-if="item.oldValue && item.newValue">
-                  <strong>变更:</strong> {{ item.oldValue }} → {{ item.newValue }}
-                </div>
-                <div><strong>操作人:</strong> {{ item.adminEmail }} (ID: {{ item.adminId }})</div>
-                <div v-if="item.ipAddress"><strong>IP地址:</strong> {{ item.ipAddress }}</div>
+                <div v-if="item.details"><strong>详情:</strong> {{ item.details }}</div>
+                <div v-if="item.operatorName"><strong>操作人:</strong> {{ item.operatorName }}</div>
               </div>
             </el-timeline-item>
           </el-timeline>
@@ -122,29 +118,20 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getUserDetail, updateUserRole, updateUserStatus, deleteUser, getLoginHistory, getAuditLogs } from '@/api/user'
-import type { UserDetail, UserRole, UserStatus } from '@/types'
+import { getUserDetail, updateUserRole, updateUserStatus, deleteUser } from '@/api/user'
 
 const route = useRoute()
 const router = useRouter()
 const activeTab = ref('basic')
-const userDetail = ref<UserDetail | null>(null)
+const userDetail = ref<any>(null)
 const roleDialogVisible = ref(false)
-const selectedRole = ref<UserRole>('USER')
+const selectedRole = ref<string>('USER')
 
 const loadUserDetail = async () => {
   const userId = Number(route.params.id)
   try {
-    const [detailRes, loginHistoryRes, auditLogsRes] = await Promise.all([
-      getUserDetail(userId),
-      getLoginHistory(userId, 10),
-      getAuditLogs(userId, 20)
-    ])
-    userDetail.value = {
-      ...detailRes,
-      loginHistory: loginHistoryRes,
-      auditLogs: auditLogsRes
-    }
+    const res = await getUserDetail(userId)
+    userDetail.value = res.data || res
   } catch (error: any) {
     ElMessage.error(error.message || '加载用户详情失败')
   }
@@ -174,7 +161,7 @@ const handleUpdateRole = async () => {
 const toggleUserStatus = async () => {
   const userId = Number(route.params.id)
   const currentStatus = userDetail.value?.status
-  const newStatus: UserStatus = currentStatus === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'
+  const newStatus: string = currentStatus === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'
   const actionText = newStatus === 'DISABLED' ? '禁用' : '启用'
 
   try {

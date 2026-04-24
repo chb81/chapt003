@@ -53,7 +53,7 @@ spring:
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:}
+    password: ${REDIS_PASSWORD:chb12345}
     database: 0
     timeout: 2000
     lettuce:
@@ -68,8 +68,8 @@ jwt:
   expiration: ${JWT_EXPIRATION:86400000}
 
 wechat:
-  appid: ${WECHAT_APPID:your-wechat-mini-program-appid}
-  secret: ${WECHAT_SECRET:your-wechat-mini-program-secret}
+  appid: ${WECHAT_APPID:wxc82ce01ef7c7f4f5}
+  secret: ${WECHAT_SECRET:d697666d44ff1e48f683f2e8adb5416c}
 
 app:
   mail:
@@ -82,6 +82,34 @@ aliyun:
     access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET:1234567890}
     sign-name: ${ALIYUN_SMS_SIGN_NAME:1234567890}
     template-code: ${ALIYUN_SMS_TEMPLATE_CODE:1234567890}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    doc-expansion: none
+  packages-to-scan: com.chapt003.controller
+  default-flat-param-object: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,beans,loggers
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true
 
 logging:
   level:

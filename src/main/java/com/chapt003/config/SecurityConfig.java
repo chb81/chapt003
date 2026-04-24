@@ -41,7 +41,19 @@ public class SecurityConfig {
                 .antMatchers("/v1/user/**").authenticated()
                 .antMatchers("/v1/admin/**").hasRole("ADMIN")
                 .antMatchers("/v1/schools/**").permitAll()
+                .antMatchers("/v1/student/**").authenticated()
+                .antMatchers("/v1/volunteer-applications/**").authenticated()
+                .antMatchers("/v1/admission-probability/**").authenticated()
+                .antMatchers("/v1/smart-recommendation/**").authenticated()
+                .antMatchers("/v1/recommendation-preferences/**").authenticated()
+                .antMatchers("/v1/announcements/**").authenticated()
+                .antMatchers("/v1/help-documents/**").authenticated()
+                .antMatchers("/v1/customer-service/**").authenticated()
+                .antMatchers("/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .antMatchers("/v3/api-docs/**").permitAll()
+                .antMatchers("/actuator/**").hasRole("ADMIN")
                 .antMatchers("/health").permitAll()
+                .antMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -62,7 +74,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

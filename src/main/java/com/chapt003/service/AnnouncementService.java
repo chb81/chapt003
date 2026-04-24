@@ -4,12 +4,14 @@ import com.chapt003.dto.AnnouncementDTO;
 import com.chapt003.dto.AnnouncementDetailDTO;
 import com.chapt003.entity.Announcement;
 import com.chapt003.entity.User;
+import com.chapt003.entity.UserAnnouncementRead;
 import com.chapt003.entity.enums.AnnouncementType;
 import com.chapt003.repository.AnnouncementRepository;
 import com.chapt003.repository.UserAnnouncementReadRepository;
 import com.chapt003.repository.UserRepository;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,7 @@ public class AnnouncementService {
     private UserRepository userRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "announcements", key = "'all-' + #userId")
     public List<AnnouncementDTO> getAllAnnouncements(Long userId) {
         LocalDateTime now = LocalDateTime.now();
         List<Announcement> announcements = announcementRepository

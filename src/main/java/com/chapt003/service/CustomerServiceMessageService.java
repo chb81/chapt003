@@ -36,16 +36,14 @@ public class CustomerServiceMessageService {
                 .orElseThrow(() -> new RuntimeException("会话不存在"));
         
         // 验证用户权限
-        if (!session.getUser().getId().equals(userId) && !isCustomerServiceAgent(userId)) {
-            throw new RuntimeException("无权限在此会话中发送消息");
-        }
+        validateUserPermission(userId, session);
         
         User sender = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("用户不存在"));
         
         CustomerServiceMessage message = new CustomerServiceMessage(
                 session, sender, 
-                getUserRole(sender.getRole()).name() + "_MESSAGE",
+                getUserRole(sender.getRole()) + "_MESSAGE",
                 request.getContent());
         
         if (request.getAttachmentUrl() != null) {
@@ -67,9 +65,7 @@ public class CustomerServiceMessageService {
                 .orElseThrow(() -> new RuntimeException("会话不存在"));
         
         // 验证用户权限
-        if (!session.getUser().getId().equals(userId) && !isCustomerServiceAgent(userId)) {
-            throw new RuntimeException("无权限访问此会话的消息");
-        }
+        validateUserPermission(userId, session);
         
         // 标记消息为已读
         if (session.getUser().getId().equals(userId)) {
@@ -91,9 +87,7 @@ public class CustomerServiceMessageService {
                 .orElseThrow(() -> new RuntimeException("会话不存在"));
         
         // 验证用户权限
-        if (!session.getUser().getId().equals(userId) && !isCustomerServiceAgent(userId)) {
-            throw new RuntimeException("无权限访问此会话的消息");
-        }
+        validateUserPermission(userId, session);
         
         // 获取最后一条消息的时间
         LocalDateTime lastMessageTime = messageRepository.findById(lastMessageId)
@@ -110,12 +104,19 @@ public class CustomerServiceMessageService {
      * 标记消息为已读
      */
     public void markMessageAsRead(Long messageId, Long userId) {
+        // 验证用户存在
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("用户不存在"));
+        
         CustomerServiceMessage message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new RuntimeException("消息不存在"));
         
         // 验证用户权限
+        validateUserPermission(userId, message.getSession());
+        
+        // 只有消息发送者才能标记为已读
         if (!message.getSender().getId().equals(userId)) {
-            throw new RuntimeException("无权限标记此消息为已读");
+            throw new RuntimeException("只有消息发送者才能标记消息为已读");
         }
         
         message.markAsRead();
@@ -151,11 +152,30 @@ public class CustomerServiceMessageService {
     }
     
     /**
+     * 验证用户权限
+     */
+    private void validateUserPermission(Long userId, CustomerServiceSession session) {
+        // 用户可以访问自己的会话
+        if (session.getUser().getId().equals(userId)) {
+            return;
+        }
+        
+        // 客服人员只能访问分配给自己的会话
+        if (isCustomerServiceAgent(userId) && session.getAgentId() != null && session.getAgentId().equals(userId)) {
+            return;
+        }
+        
+        throw new RuntimeException("无权限访问此会话");
+    }
+    
+    /**
      * 标记会话消息为已读
      */
     private void markSessionMessagesAsRead(Long sessionId, Long userId) {
         CustomerServiceSession session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("会话不存在"));
+        
+        validateUserPermission(userId, session);
         
         if (session.getUser().getId().equals(userId)) {
             messageRepository.markAllMessagesAsRead(sessionId, LocalDateTime.now());
@@ -177,7 +197,7 @@ public class CustomerServiceMessageService {
      */
     private boolean isCustomerServiceAgent(Long userId) {
         return userRepository.findById(userId)
-                .map(user -> "CUSTOMER_SERVICE".equals(user.getRole()))
+                .map(user -> UserRole.ADMIN.equals(user.getRole()))
                 .orElse(false);
     }
 }

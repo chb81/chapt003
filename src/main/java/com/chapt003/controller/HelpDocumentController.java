@@ -7,6 +7,7 @@ import com.chapt003.entity.enums.HelpDocumentCategory;
 import com.chapt003.repository.UserRepository;
 import com.chapt003.response.ApiResponse;
 import com.chapt003.service.HelpDocumentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/help-documents")
+@Tag(name = "帮助文档", description = "帮助文档浏览、搜索、收藏、反馈等接口")
 public class HelpDocumentController {
 
     @Autowired
@@ -31,6 +33,13 @@ public class HelpDocumentController {
             Principal principal) {
         Long userId = getUserIdFromPrincipal(principal);
         List<HelpDocumentDTO> documents = helpDocumentService.getDocumentsByCategory(category, userId);
+        return ResponseEntity.ok(ApiResponse.success(documents));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<HelpDocumentDTO>>> getAllDocuments(Principal principal) {
+        Long userId = getUserIdFromPrincipal(principal);
+        List<HelpDocumentDTO> documents = helpDocumentService.searchDocuments(null, userId);
         return ResponseEntity.ok(ApiResponse.success(documents));
     }
 

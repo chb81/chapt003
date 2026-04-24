@@ -9,6 +9,8 @@ import com.chapt003.entity.enums.SchoolType;
 import com.chapt003.exception.BusinessException;
 import com.chapt003.repository.SchoolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,21 +54,32 @@ public class SchoolService {
                 .build();
     }
 
+    @Cacheable(value = "schoolDetail", key = "#id")
     public SchoolResponse getSchoolById(Long id) {
         School school = schoolRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(404, "学校不存在"));
         return convertToResponse(school);
     }
 
+    @Cacheable(value = "cities")
     public List<String> getAllCities() {
         return schoolRepository.findAllCities();
     }
 
+    @Cacheable(value = "districts", key = "#city")
     public List<String> getDistrictsByCity(String city) {
         return schoolRepository.findDistrictsByCity(city);
     }
 
+    @Transactional(readOnly = true)
+    public List<SchoolResponse> exportAllSchools() {
+        return schoolRepository.findAll().stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
+    @CacheEvict(value = {"schools", "schoolDetail", "cities", "districts"}, allEntries = true)
     public SchoolResponse createSchool(SchoolRequest request) {
         if (schoolRepository.existsByName(request.getName())) {
             throw new BusinessException(400, "学校名称已存在");
@@ -92,6 +105,7 @@ public class SchoolService {
     }
 
     @Transactional
+    @CacheEvict(value = {"schools", "schoolDetail", "cities", "districts"}, allEntries = true)
     public SchoolResponse updateSchool(Long id, SchoolRequest request) {
         School school = schoolRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(404, "学校不存在"));
@@ -118,6 +132,7 @@ public class SchoolService {
     }
 
     @Transactional
+    @CacheEvict(value = {"schools", "schoolDetail", "cities", "districts"}, allEntries = true)
     public void deleteSchool(Long id) {
         if (!schoolRepository.existsById(id)) {
             throw new BusinessException(404, "学校不存在");
@@ -126,6 +141,7 @@ public class SchoolService {
     }
 
     @Transactional
+    @CacheEvict(value = {"schools", "schoolDetail", "cities", "districts"}, allEntries = true)
     public void importSchools(List<SchoolRequest> schoolRequests) {
         for (SchoolRequest request : schoolRequests) {
             if (!schoolRepository.existsByName(request.getName())) {

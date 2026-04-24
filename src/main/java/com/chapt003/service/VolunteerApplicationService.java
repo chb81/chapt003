@@ -118,6 +118,7 @@ public class VolunteerApplicationService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public VolunteerApplicationListResponse getSimulationsByUser(String email, int page, int size) {
         User user = getUserByEmail(email);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -137,6 +138,7 @@ public class VolunteerApplicationService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<VolunteerApplicationResponse> getApplicationHistory(String email) {
         User user = getUserByEmail(email);
         List<VolunteerApplication> applications = volunteerApplicationRepository

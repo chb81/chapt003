@@ -10,7 +10,7 @@
       <el-form :inline="true" :model="queryParams" class="search-form">
         <el-form-item label="搜索">
           <el-input
-            v-model="queryParams.keyword"
+            v-model="queryParams.search"
             placeholder="用户名/邮箱/手机号"
             clearable
             @keyup.enter="handleSearch"
@@ -103,31 +103,32 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { getUserList } from '@/api/user'
-import type { User, UserListParams } from '@/types'
 
 const router = useRouter()
 const loading = ref(false)
-const userList = ref<User[]>([])
+const userList = ref<any[]>([])
 const total = ref(0)
 
-const queryParams = reactive<UserListParams>({
+const queryParams = reactive({
   page: 0,
-  size: 20,
-  keyword: '',
-  role: undefined,
-  status: undefined,
-  sortBy: 'createdAt',
-  sortDirection: 'desc'
+  size: 10,
+  search: '',
+  role: undefined as string | undefined,
+  status: undefined as string | undefined
 })
 
 const loadUserList = async () => {
   loading.value = true
   try {
     const res = await getUserList(queryParams)
-    userList.value = res.content
-    total.value = res.totalElements
+    const data = res.data || res
+    userList.value = data.content || []
+    total.value = data.totalElements || 0
   } catch (error: any) {
+    console.error('加载用户列表失败:', error)
     ElMessage.error(error.message || '加载用户列表失败')
+    userList.value = []
+    total.value = 0
   } finally {
     loading.value = false
   }
@@ -139,7 +140,7 @@ const handleSearch = () => {
 }
 
 const handleReset = () => {
-  queryParams.keyword = ''
+  queryParams.search = ''
   queryParams.role = undefined
   queryParams.status = undefined
   queryParams.page = 0

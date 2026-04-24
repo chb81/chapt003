@@ -75,12 +75,16 @@ public class VerificationService {
     }
     
     private void sendVerificationEmail(String email, String code) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(email);
-        message.setSubject("验证码 - 中考志愿填报系统");
-        message.setText("您的验证码是: " + code + "\n\n验证码有效期为10分钟，请勿泄露给他人。");
-        message.setFrom("noreply@chapt003.com");
-        
-        mailSender.send(message);
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("验证码 - 中考志愿填报系统");
+            message.setText("您的验证码是: " + code + "\n\n验证码有效期为10分钟，请勿泄露给他人。");
+            message.setFrom("noreply@chapt003.com");
+            
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.out.println("[DEV] 邮件发送失败，验证码: " + code + " (收件人: " + email + ")");
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.chapt003.entity.enums.UserRole;
 import com.chapt003.entity.enums.UserStatus;
 import com.chapt003.response.ApiResponse;
 import com.chapt003.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/v1/admin/users")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "管理员-用户管理", description = "管理员用户列表、角色管理、状态管理等接口")
 public class AdminUserController {
 
     @Autowired

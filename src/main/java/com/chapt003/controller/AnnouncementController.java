@@ -8,6 +8,7 @@ import com.chapt003.entity.enums.AnnouncementType;
 import com.chapt003.repository.UserRepository;
 import com.chapt003.response.ApiResponse;
 import com.chapt003.service.AnnouncementService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/announcements")
+@Tag(name = "系统公告", description = "系统公告列表查看、详情、标记已读等接口")
 public class AnnouncementController {
 
     @Autowired

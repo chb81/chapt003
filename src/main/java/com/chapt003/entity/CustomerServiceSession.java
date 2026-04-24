@@ -1,5 +1,6 @@
 package com.chapt003.entity;
 
+import com.chapt003.entity.enums.SessionStatus;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,7 +21,8 @@ public class CustomerServiceSession {
     private User user;
     
     @Column(name = "session_status", nullable = false)
-    private String sessionStatus = "ACTIVE"; // ACTIVE, CLOSED, RESOLVED
+    @Enumerated(EnumType.STRING)
+    private SessionStatus sessionStatus = SessionStatus.ACTIVE;
     
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
@@ -60,17 +62,39 @@ public class CustomerServiceSession {
     }
     
     // 关闭会话
-    public void closeSession(String resolutionNote) {
-        this.sessionStatus = "CLOSED";
+    public synchronized void closeSession(String resolutionNote) {
+        if (this.sessionStatus != SessionStatus.ACTIVE) {
+            throw new IllegalStateException("只能在活跃状态下关闭会话");
+        }
+        this.sessionStatus = SessionStatus.CLOSED;
         this.endTime = LocalDateTime.now();
         this.resolutionNote = resolutionNote;
     }
     
     // 解决会话
-    public void resolveSession(String resolutionNote) {
-        this.sessionStatus = "RESOLVED";
+    public synchronized void resolveSession(String resolutionNote) {
+        if (this.sessionStatus != SessionStatus.ACTIVE) {
+            throw new IllegalStateException("只能在活跃状态下解决会话");
+        }
+        this.sessionStatus = SessionStatus.RESOLVED;
         this.endTime = LocalDateTime.now();
         this.resolutionNote = resolutionNote;
+    }
+    
+    // 分配客服人员
+    public synchronized void assignAgent(Long agentId) {
+        if (this.sessionStatus != SessionStatus.ACTIVE) {
+            throw new IllegalStateException("只能在活跃状态下分配客服");
+        }
+        if (this.agentId != null) {
+            throw new IllegalStateException("会话已经分配给其他客服");
+        }
+        this.agentId = agentId;
+    }
+    
+    // 检查是否可以分配客服
+    public synchronized boolean canAssignAgent() {
+        return this.sessionStatus == SessionStatus.ACTIVE && this.agentId == null;
     }
     
     // Getters and Setters
@@ -80,8 +104,8 @@ public class CustomerServiceSession {
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
     
-    public String getSessionStatus() { return sessionStatus; }
-    public void setSessionStatus(String sessionStatus) { this.sessionStatus = sessionStatus; }
+    public SessionStatus getSessionStatus() { return sessionStatus; }
+    public void setSessionStatus(SessionStatus sessionStatus) { this.sessionStatus = sessionStatus; }
     
     public LocalDateTime getStartTime() { return startTime; }
     public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }

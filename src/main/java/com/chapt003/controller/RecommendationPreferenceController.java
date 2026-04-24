@@ -5,6 +5,7 @@ import com.chapt003.entity.User;
 import com.chapt003.repository.RecommendationPreferenceRepository;
 import com.chapt003.repository.UserRepository;
 import com.chapt003.response.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/v1/recommendation-preferences")
+@Tag(name = "推荐偏好", description = "用户推荐偏好设置和管理")
 public class RecommendationPreferenceController {
 
     @Autowired

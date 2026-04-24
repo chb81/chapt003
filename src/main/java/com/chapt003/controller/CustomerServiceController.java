@@ -2,165 +2,163 @@ package com.chapt003.controller;
 
 import com.chapt003.dto.*;
 import com.chapt003.entity.User;
+import com.chapt003.repository.UserRepository;
+import com.chapt003.response.ApiResponse;
 import com.chapt003.service.CustomerServiceSessionService;
 import com.chapt003.service.CustomerServiceMessageService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
-/**
- * 客服控制器
- */
 @RestController
-@RequestMapping("/api/customer-service")
-@CrossOrigin(origins = "*")
+@RequestMapping("/v1/customer-service")
+@Tag(name = "在线客服", description = "在线客服会话创建、消息发送、会话管理等接口")
 public class CustomerServiceController {
-    
+
     @Autowired
     private CustomerServiceSessionService sessionService;
-    
+
     @Autowired
     private CustomerServiceMessageService messageService;
-    
-    /**
-     * 创建客服会话
-     */
+
+    @Autowired
+    private UserRepository userRepository;
+
     @PostMapping("/sessions")
-    public ResponseEntity<CustomerServiceSessionDTO> createSession(
-            @AuthenticationPrincipal User user,
+    public ResponseEntity<ApiResponse<CustomerServiceSessionDTO>> createSession(
+            Principal principal,
             @RequestBody CreateSessionRequest request) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "请先登录"));
+        }
+        User user = getUser(principal);
         CustomerServiceSessionDTO session = sessionService.createSession(user.getId(), request);
-        return ResponseEntity.ok(session);
+        return ResponseEntity.ok(ApiResponse.success("创建会话成功", session));
     }
-    
-    /**
-     * 获取用户的会话列表
-     */
+
     @GetMapping("/sessions")
-    public ResponseEntity<List<CustomerServiceSessionDTO>> getUserSessions(
-            @AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse<List<CustomerServiceSessionDTO>>> getUserSessions(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "请先登录"));
+        }
+        User user = getUser(principal);
         List<CustomerServiceSessionDTO> sessions = sessionService.getUserSessions(user.getId());
-        return ResponseEntity.ok(sessions);
+        return ResponseEntity.ok(ApiResponse.success(sessions));
     }
-    
-    /**
-     * 获取用户的活跃会话
-     */
+
     @GetMapping("/sessions/active")
-    public ResponseEntity<List<CustomerServiceSessionDTO>> getUserActiveSessions(
-            @AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse<List<CustomerServiceSessionDTO>>> getUserActiveSessions(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "请先登录"));
+        }
+        User user = getUser(principal);
         List<CustomerServiceSessionDTO> sessions = sessionService.getUserActiveSessions(user.getId());
-        return ResponseEntity.ok(sessions);
+        return ResponseEntity.ok(ApiResponse.success(sessions));
     }
-    
-    /**
-     * 获取会话详情
-     */
+
     @GetMapping("/sessions/{sessionId}")
-    public ResponseEntity<CustomerServiceSessionDTO> getSessionDetail(
+    public ResponseEntity<ApiResponse<CustomerServiceSessionDTO>> getSessionDetail(
             @PathVariable Long sessionId,
-            @AuthenticationPrincipal User user) {
+            Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "请先登录"));
+        }
+        User user = getUser(principal);
         CustomerServiceSessionDTO session = sessionService.getSessionDetail(sessionId, user.getId());
-        return ResponseEntity.ok(session);
+        return ResponseEntity.ok(ApiResponse.success(session));
     }
-    
-    /**
-     * 获取待处理会话列表（供客服人员使用）
-     */
-    @GetMapping("/sessions/pending")
-    public ResponseEntity<List<CustomerServiceSessionDTO>> getPendingSessions(
-            @AuthenticationPrincipal User user) {
-        if (!"CUSTOMER_SERVICE".equals(user.getRole())) {
-            return ResponseEntity.status(403).build();
-        }
-        
-        List<CustomerServiceSessionDTO> sessions = sessionService.getPendingSessions();
-        return ResponseEntity.ok(sessions);
-    }
-    
-    /**
-     * 获取客服人员的会话列表
-     */
-    @GetMapping("/sessions/agent")
-    public ResponseEntity<List<CustomerServiceSessionDTO>> getAgentSessions(
-            @AuthenticationPrincipal User user) {
-        if (!"CUSTOMER_SERVICE".equals(user.getRole())) {
-            return ResponseEntity.status(403).build();
-        }
-        
-        List<CustomerServiceSessionDTO> sessions = sessionService.getAgentSessions(user.getId());
-        return ResponseEntity.ok(sessions);
-    }
-    
-    /**
-     * 更新会话状态
-     */
+
     @PutMapping("/sessions/{sessionId}")
-    public ResponseEntity<CustomerServiceSessionDTO> updateSession(
+    public ResponseEntity<ApiResponse<CustomerServiceSessionDTO>> updateSession(
             @PathVariable Long sessionId,
-            @AuthenticationPrincipal User user,
+            Principal principal,
             @RequestBody UpdateSessionRequest request) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "请先登录"));
+        }
+        User user = getUser(principal);
         CustomerServiceSessionDTO session = sessionService.updateSession(sessionId, user.getId(), request);
-        return ResponseEntity.ok(session);
+        return ResponseEntity.ok(ApiResponse.success("更新成功", session));
     }
-    
-    /**
-     * 发送消息
-     */
+
     @PostMapping("/sessions/{sessionId}/messages")
-    public ResponseEntity<CustomerServiceMessageDTO> sendMessage(
+    public ResponseEntity<ApiResponse<CustomerServiceMessageDTO>> sendMessage(
             @PathVariable Long sessionId,
-            @AuthenticationPrincipal User user,
+            Principal principal,
             @RequestBody SendMessageRequest request) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "请先登录"));
+        }
+        User user = getUser(principal);
         CustomerServiceMessageDTO message = messageService.sendMessage(sessionId, user.getId(), request);
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(ApiResponse.success("发送成功", message));
     }
-    
-    /**
-     * 获取会话消息列表
-     */
+
     @GetMapping("/sessions/{sessionId}/messages")
-    public ResponseEntity<List<CustomerServiceMessageDTO>> getSessionMessages(
+    public ResponseEntity<ApiResponse<List<CustomerServiceMessageDTO>>> getSessionMessages(
             @PathVariable Long sessionId,
-            @AuthenticationPrincipal User user) {
+            Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "请先登录"));
+        }
+        User user = getUser(principal);
         List<CustomerServiceMessageDTO> messages = messageService.getSessionMessages(sessionId, user.getId());
-        return ResponseEntity.ok(messages);
+        return ResponseEntity.ok(ApiResponse.success(messages));
     }
-    
-    /**
-     * 获取会话中的新消息
-     */
+
     @GetMapping("/sessions/{sessionId}/messages/new")
-    public ResponseEntity<List<CustomerServiceMessageDTO>> getNewMessages(
+    public ResponseEntity<ApiResponse<List<CustomerServiceMessageDTO>>> getNewMessages(
             @PathVariable Long sessionId,
             @RequestParam(required = false) Long lastMessageId,
-            @AuthenticationPrincipal User user) {
+            Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "请先登录"));
+        }
+        User user = getUser(principal);
         Long lastMsgId = lastMessageId != null ? lastMessageId : 0L;
         List<CustomerServiceMessageDTO> messages = messageService.getNewMessages(sessionId, user.getId(), lastMsgId);
-        return ResponseEntity.ok(messages);
+        return ResponseEntity.ok(ApiResponse.success(messages));
     }
-    
-    /**
-     * 标记消息为已读
-     */
+
     @PutMapping("/messages/{messageId}/read")
-    public ResponseEntity<Void> markMessageAsRead(
+    public ResponseEntity<ApiResponse<Void>> markMessageAsRead(
             @PathVariable Long messageId,
-            @AuthenticationPrincipal User user) {
+            Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "请先登录"));
+        }
+        User user = getUser(principal);
         messageService.markMessageAsRead(messageId, user.getId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
-    
-    /**
-     * 获取用户未读消息数量
-     */
+
     @GetMapping("/messages/unread-count")
-    public ResponseEntity<Long> getUnreadMessageCount(
-            @AuthenticationPrincipal User user) {
+    public ResponseEntity<ApiResponse<Long>> getUnreadMessageCount(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "请先登录"));
+        }
+        User user = getUser(principal);
         long count = messageService.getUnreadMessageCount(user.getId());
-        return ResponseEntity.ok(count);
+        return ResponseEntity.ok(ApiResponse.success(count));
+    }
+
+    private User getUser(Principal principal) {
+        return userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("用户不存在"));
     }
 }
