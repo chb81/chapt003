@@ -198,7 +198,7 @@ Page({
     wx.showLoading({ title: '保存中...' })
     
     try {
-      const response = await auth.updateProfile(this.data.form)
+      const response = await auth.updateUserProfile(this.data.form)
       
       if (response.code === 200) {
         const updatedUserInfo = response.data

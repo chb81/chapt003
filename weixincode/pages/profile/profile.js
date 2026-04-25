@@ -5,31 +5,17 @@ Page({
   data: {
     userInfo: null,
     isLoggedIn: false,
-    stats: {
-      totalHours: 0,
-      projectCount: 0,
-      creditScore: 0
-    },
+    loading: false,
     menuItems: [
       {
         icon: '📋',
-        title: '我的申请',
+        title: '我的志愿',
         path: '/pages/applications/applications'
       },
       {
-        icon: '⭐',
-        title: '收藏的项目',
-        path: '/pages/favorites/favorites'
-      },
-      {
         icon: '📊',
-        title: '志愿统计',
-        path: '/pages/statistics/statistics'
-      },
-      {
-        icon: '📜',
-        title: '志愿证书',
-        path: '/pages/certificates/certificates'
+        title: '录取概率',
+        path: '/pages/projects/projects'
       },
       {
         icon: '⚙️',
@@ -41,8 +27,7 @@ Page({
         title: '帮助与反馈',
         path: '/pages/help/help'
       }
-    ],
-    loading: false
+    ]
   },
 
   onLoad() {
@@ -58,7 +43,7 @@ Page({
   checkLoginStatus() {
     const token = wx.getStorageSync('token')
     const userInfo = wx.getStorageSync('userInfo')
-    
+
     if (token && userInfo) {
       this.setData({
         isLoggedIn: true,
@@ -70,49 +55,21 @@ Page({
 
   async loadUserData() {
     if (this.data.loading) return
-    
+
     this.setData({ loading: true })
-    
+
     try {
-      const [userResponse, statsResponse] = await Promise.all([
-        auth.getUserInfo(),
-        this.loadStats()
-      ])
-      
-      if (userResponse.code === 200) {
-        this.setData({
-          userInfo: userResponse.data,
-          stats: statsResponse
-        })
-        
-        wx.setStorageSync('userInfo', userResponse.data)
+      const response = await auth.getUserProfile()
+      const data = response.data || response
+
+      if (data) {
+        this.setData({ userInfo: data })
+        wx.setStorageSync('userInfo', data)
       }
     } catch (error) {
       console.error('加载用户数据失败:', error)
-      wx.showToast({
-        title: '加载失败',
-        icon: 'error'
-      })
     } finally {
       this.setData({ loading: false })
-    }
-  },
-
-  async loadStats() {
-    try {
-      const response = await volunteer.getUserStats()
-      return {
-        totalHours: response.data?.totalHours || 0,
-        projectCount: response.data?.projectCount || 0,
-        creditScore: response.data?.creditScore || 0
-      }
-    } catch (error) {
-      console.error('加载统计数据失败:', error)
-      return {
-        totalHours: 0,
-        projectCount: 0,
-        creditScore: 0
-      }
     }
   },
 
@@ -130,17 +87,13 @@ Page({
         if (res.confirm) {
           wx.removeStorageSync('token')
           wx.removeStorageSync('userInfo')
-          
+          wx.removeStorageSync('loginTime')
+
           this.setData({
             isLoggedIn: false,
-            userInfo: null,
-            stats: {
-              totalHours: 0,
-              projectCount: 0,
-              creditScore: 0
-            }
+            userInfo: null
           })
-          
+
           wx.showToast({
             title: '已退出登录',
             icon: 'success'
@@ -152,7 +105,7 @@ Page({
 
   handleMenuClick(e) {
     const { path } = e.currentTarget.dataset
-    
+
     if (path) {
       wx.navigateTo({
         url: path,
@@ -172,18 +125,10 @@ Page({
     })
   },
 
-  handleShare() {
+  onShareAppMessage() {
     return {
-      title: '志愿汇 - 让爱心传递',
+      title: '中考志愿填报系统',
       path: '/pages/index/index'
     }
-  },
-
-  onShareAppMessage() {
-    return this.handleShare()
-  },
-
-  onShareTimeline() {
-    return this.handleShare()
   }
 })

@@ -1,100 +1,181 @@
 const { request } = require('../utils/request')
 
-function getVolunteerProjects(params) {
+function getSchoolList(params) {
   return request({
-    url: '/volunteer/projects',
+    url: '/schools',
     method: 'GET',
     data: params || {}
   })
 }
 
-function getVolunteerProjectDetail(id) {
+function getSchoolDetail(id) {
   return request({
-    url: '/volunteer/projects/' + id,
+    url: '/schools/' + id,
     method: 'GET'
   })
 }
 
-function applyForProject(data) {
+function getCities() {
   return request({
-    url: '/volunteer/applications',
+    url: '/schools/cities',
+    method: 'GET'
+  })
+}
+
+function getDistricts(city) {
+  return request({
+    url: '/schools/districts?city=' + encodeURIComponent(city),
+    method: 'GET'
+  })
+}
+
+function getVolunteerApplications(params) {
+  return request({
+    url: '/volunteer-applications',
+    method: 'GET',
+    data: params || {}
+  })
+}
+
+function getVolunteerApplicationDetail(id) {
+  return request({
+    url: '/volunteer-applications/' + id,
+    method: 'GET'
+  })
+}
+
+function createVolunteerApplication(data) {
+  return request({
+    url: '/volunteer-applications',
     method: 'POST',
     data: data
   })
 }
 
-function getUserApplications(params) {
+function submitVolunteerApplication(id) {
   return request({
-    url: '/volunteer/applications',
-    method: 'GET',
-    data: params || {}
+    url: '/volunteer-applications/' + id + '/submit',
+    method: 'POST'
   })
 }
 
-function updateApplicationStatus(data) {
+function deleteVolunteerApplication(id) {
   return request({
-    url: '/volunteer/applications/' + data.id + '/status',
+    url: '/volunteer-applications/' + id,
+    method: 'DELETE'
+  })
+}
+
+function addVolunteerItem(id, data) {
+  return request({
+    url: '/volunteer-applications/' + id + '/items',
+    method: 'POST',
+    data: data
+  })
+}
+
+function removeVolunteerItem(id, schoolId) {
+  return request({
+    url: '/volunteer-applications/' + id + '/items/' + schoolId,
+    method: 'DELETE'
+  })
+}
+
+function reorderVolunteerItems(id, data) {
+  return request({
+    url: '/volunteer-applications/' + id + '/items/reorder',
     method: 'PUT',
     data: data
   })
 }
 
-function getActivityRecords(params) {
+function getSimulations(params) {
   return request({
-    url: '/volunteer/activities',
+    url: '/volunteer-applications/simulations',
     method: 'GET',
     data: params || {}
   })
 }
 
-function recordActivity(data) {
+function createSimulation(data) {
   return request({
-    url: '/volunteer/activities',
+    url: '/volunteer-applications/simulations',
     method: 'POST',
     data: data
   })
 }
 
-function uploadActivityProof(data) {
+function getApplicationHistory() {
   return request({
-    url: '/volunteer/proofs',
-    method: 'POST',
-    data: data
-  })
-}
-
-function getVolunteerStats() {
-  return request({
-    url: '/volunteer/stats',
+    url: '/volunteer-applications/history',
     method: 'GET'
   })
 }
 
-function getCertificates() {
+function calculateAdmissionProbability(schoolId) {
   return request({
-    url: '/volunteer/certificates',
+    url: '/admission-probability/calculate?schoolId=' + schoolId,
     method: 'GET'
   })
 }
 
-function applyCertificate(data) {
+function generateSmartRecommendation(data) {
   return request({
-    url: '/volunteer/certificates',
+    url: '/smart-recommendation/generate',
     method: 'POST',
     data: data
+  })
+}
+
+function getRecommendationPreferences() {
+  return request({
+    url: '/recommendation-preferences',
+    method: 'GET'
+  })
+}
+
+function saveRecommendationPreferences(data) {
+  return request({
+    url: '/recommendation-preferences',
+    method: 'POST',
+    data: data
+  })
+}
+
+function getAnnouncements() {
+  return request({
+    url: '/announcements',
+    method: 'GET'
+  })
+}
+
+function getHelpDocuments(category) {
+  return request({
+    url: category ? '/help-documents/category/' + category : '/help-documents',
+    method: 'GET'
   })
 }
 
 module.exports = {
-  getVolunteerProjects,
-  getVolunteerProjectDetail,
-  applyForProject,
-  getUserApplications,
-  updateApplicationStatus,
-  getActivityRecords,
-  recordActivity,
-  uploadActivityProof,
-  getVolunteerStats,
-  getCertificates,
-  applyCertificate
+  getSchoolList,
+  getSchoolDetail,
+  getCities,
+  getDistricts,
+  getVolunteerApplications,
+  getVolunteerApplicationDetail,
+  createVolunteerApplication,
+  submitVolunteerApplication,
+  deleteVolunteerApplication,
+  addVolunteerItem,
+  removeVolunteerItem,
+  reorderVolunteerItems,
+  getSimulations,
+  createSimulation,
+  getApplicationHistory,
+  calculateAdmissionProbability,
+  generateSmartRecommendation,
+  getRecommendationPreferences,
+  saveRecommendationPreferences,
+  getAnnouncements,
+  getHelpDocuments
 }

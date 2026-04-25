@@ -130,7 +130,7 @@ page {
 
 .select-value {
   font-size: 28rpx;
-  color: {{form.gender || form.birthday ? '#333' : '#ccc'}};
+  color: #333;
 }
 
 .select-arrow {

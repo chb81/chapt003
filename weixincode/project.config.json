@@ -45,7 +45,7 @@
   },
   "appid": "wxc82ce01ef7c7f4f5",
   "projectname": "volunteer-system-miniprogram",
-  "libVersion": "2.25.4",
+  "libVersion": "3.15.2",
   "compileType": "miniprogram",
   "condition": {
     "search": {
@@ -67,36 +67,36 @@
   "packOptions": {
     "ignore": [
       {
-        "type": "folder",
-        "value": "miniprogram"
+        "value": "miniprogram",
+        "type": "folder"
       },
       {
-        "type": "folder",
-        "value": "cloudfunctions"
+        "value": "cloudfunctions",
+        "type": "folder"
       },
       {
-        "type": "folder",
-        "value": "rules"
+        "value": "rules",
+        "type": "folder"
       },
       {
-        "type": "folder",
-        "value": ".codebuddy"
+        "value": ".codebuddy",
+        "type": "folder"
       },
       {
-        "type": "folder",
-        "value": "codebuddy-plugin"
+        "value": "codebuddy-plugin",
+        "type": "folder"
       },
       {
-        "type": "folder",
-        "value": ".rules"
+        "value": ".rules",
+        "type": "folder"
       },
       {
-        "type": "file",
-        "value": "cloudbaserc.json"
+        "value": "cloudbaserc.json",
+        "type": "file"
       },
       {
-        "type": "file",
-        "value": "uploadCloudFunction.sh"
+        "value": "uploadCloudFunction.sh",
+        "type": "file"
       }
     ],
     "include": []

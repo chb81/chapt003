@@ -1,4 +1,3 @@
-// pages/applications/applications.js
 const app = getApp()
 const volunteer = require('../../api/volunteer')
 const auth = require('../../api/auth')
@@ -10,19 +9,15 @@ Page({
     refreshing: false,
     activeTab: 'all',
     tabs: [
-      { key: 'all', label: '全部' },
-      { key: 'pending', label: '待审核' },
-      { key: 'approved', label: '已通过' },
-      { key: 'rejected', label: '已拒绝' },
-      { key: 'completed', label: '已完成' }
-    ],
-    showDetailModal: false,
-    currentApplication: null,
-    cancelling: false
+      { value: 'all', label: '全部' },
+      { value: 'DRAFT', label: '草稿' },
+      { value: 'SUBMITTED', label: '已提交' },
+      { value: 'SIMULATION', label: '模拟方案' }
+    ]
   },
 
   onLoad() {
-    this.checkLoginStatus()
+    this.checkLoginAndLoad()
   },
 
   onShow() {
@@ -33,17 +28,14 @@ Page({
     this.refreshApplications()
   },
 
-  checkLoginStatus() {
-    const isLoggedIn = auth.checkLoginStatus()
-    if (!isLoggedIn) {
+  checkLoginAndLoad() {
+    if (!auth.checkLoginStatus()) {
       wx.showModal({
         title: '提示',
-        content: '请先登录后再查看申请记录',
+        content: '请先登录后再查看志愿填报',
         success: (res) => {
           if (res.confirm) {
-            wx.navigateTo({
-              url: '/pages/login/login'
-            })
+            wx.navigateTo({ url: '/pages/login/login' })
           } else {
             wx.navigateBack()
           }
@@ -54,175 +46,141 @@ Page({
 
   async loadApplications() {
     if (this.data.loading) return
-    
+
     this.setData({ loading: true })
-    wx.showLoading({ title: '加载中...' })
-    
+
     try {
-      const response = await volunteer.getUserApplications()
-      let applications = response.data || []
-      
-      // 根据当前tab过滤
-      if (this.data.activeTab !== 'all') {
-        applications = applications.filter(app => app.status === this.data.activeTab)
-      }
-      
+      const response = await volunteer.getVolunteerApplications({ page: 0, size: 50 })
+      const data = response.data || response || {}
+      const content = data.content || []
+
       this.setData({
-        applications: applications,
+        applications: content,
         loading: false
       })
-      
     } catch (error) {
-      console.error('加载申请记录失败:', error)
-      wx.showToast({
-        title: '加载失败',
-        icon: 'error'
-      })
+      console.error('加载志愿列表失败:', error)
+      wx.showToast({ title: '加载失败', icon: 'error' })
       this.setData({ loading: false })
-    } finally {
-      wx.hideLoading()
     }
   },
 
   async refreshApplications() {
-    if (this.data.refreshing) return
-    
     this.setData({ refreshing: true })
-    
+
     try {
-      const response = await volunteer.getUserApplications()
-      let applications = response.data || []
-      
-      if (this.data.activeTab !== 'all') {
-        applications = applications.filter(app => app.status === this.data.activeTab)
-      }
-      
+      const response = await volunteer.getVolunteerApplications({ page: 0, size: 50 })
+      const data = response.data || response || {}
+      const content = data.content || []
+
       this.setData({
-        applications: applications,
+        applications: content,
         refreshing: false
       })
-      
       wx.stopPullDownRefresh()
-      
     } catch (error) {
-      console.error('刷新申请记录失败:', error)
-      wx.showToast({
-        title: '刷新失败',
-        icon: 'error'
-      })
+      console.error('刷新志愿列表失败:', error)
       this.setData({ refreshing: false })
     }
   },
 
   onTabChange(e) {
-    const { key } = e.currentTarget.dataset
-    this.setData({ activeTab: key })
-    this.loadApplications()
+    const tab = e.currentTarget.dataset.tab
+    this.setData({ activeTab: tab })
   },
 
-  showApplicationDetail(e) {
+  getFilteredApplications() {
+    const { applications, activeTab } = this.data
+    if (activeTab === 'all') return applications
+    return applications.filter(app => app.status === activeTab)
+  },
+
+  async onViewDetail(e) {
     const { id } = e.currentTarget.dataset
-    const application = this.data.applications.find(app => app.id === id)
-    if (application) {
-      this.setData({
-        currentApplication: application,
-        showDetailModal: true
+    try {
+      const response = await volunteer.getVolunteerApplicationDetail(id)
+      const data = response.data || response
+
+      wx.showModal({
+        title: data.name || '志愿方案详情',
+        content: `状态: ${this.getStatusLabel(data.status)}\n学校数量: ${(data.items || []).length}\n创建时间: ${this.formatDate(data.createdAt)}`,
+        showCancel: false
       })
+    } catch (error) {
+      console.error('获取志愿详情失败:', error)
+      wx.showToast({ title: '获取详情失败', icon: 'error' })
     }
   },
 
-  hideDetailModal() {
-    this.setData({
-      showDetailModal: false,
-      currentApplication: null
-    })
-  },
-
-  async cancelApplication(e) {
+  async onSubmitApplication(e) {
     const { id } = e.currentTarget.dataset
-    
+
     wx.showModal({
-      title: '确认取消',
-      content: '确定要取消这个申请吗？',
+      title: '确认提交',
+      content: '提交后不可修改，确定提交吗？',
       success: async (res) => {
         if (res.confirm) {
-          await this.doCancelApplication(id)
+          try {
+            await volunteer.submitVolunteerApplication(id)
+            wx.showToast({ title: '提交成功', icon: 'success' })
+            this.loadApplications()
+          } catch (error) {
+            console.error('提交志愿失败:', error)
+            wx.showToast({ title: '提交失败', icon: 'error' })
+          }
         }
       }
     })
   },
 
-  async doCancelApplication(applicationId) {
-    if (this.data.cancelling) return
-    
-    this.setData({ cancelling: true })
-    wx.showLoading({ title: '取消中...' })
-    
-    try {
-      await volunteer.cancelApplication(applicationId)
-      
-      wx.showToast({
-        title: '已取消申请',
-        icon: 'success'
-      })
-      
-      setTimeout(() => {
-        this.loadApplications()
-      }, 1500)
-      
-    } catch (error) {
-      console.error('取消申请失败:', error)
-      wx.showToast({
-        title: '取消失败，请重试',
-        icon: 'error'
-      })
-    } finally {
-      this.setData({ cancelling: false })
-      wx.hideLoading()
+  async onDeleteApplication(e) {
+    const { id } = e.currentTarget.dataset
+
+    wx.showModal({
+      title: '确认删除',
+      content: '确定删除该志愿方案吗？',
+      success: async (res) => {
+        if (res.confirm) {
+          try {
+            await volunteer.deleteVolunteerApplication(id)
+            wx.showToast({ title: '删除成功', icon: 'success' })
+            this.loadApplications()
+          } catch (error) {
+            console.error('删除志愿失败:', error)
+            wx.showToast({ title: '删除失败', icon: 'error' })
+          }
+        }
+      }
+    })
+  },
+
+  onCreateNew() {
+    wx.switchTab({
+      url: '/pages/projects/projects'
+    })
+  },
+
+  getStatusLabel(status) {
+    const labels = {
+      DRAFT: '草稿',
+      SUBMITTED: '已提交',
+      SIMULATION: '模拟方案'
     }
+    return labels[status] || status || ''
+  },
+
+  getStatusColor(status) {
+    const colors = {
+      DRAFT: '#909399',
+      SUBMITTED: '#67c23a',
+      SIMULATION: '#e6a23c'
+    }
+    return colors[status] || '#909399'
   },
 
   formatDate(dateString) {
     if (!dateString) return ''
     const date = new Date(dateString)
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const hour = String(date.getHours()).padStart(2, '0')
-    const minute = String(date.getMinutes()).padStart(2, '0')
-    return `${year}-${month}-${day} ${hour}:${minute}`
-  },
-
-  getStatusLabel(status) {
-    const labels = {
-      pending: '待审核',
-      approved: '已通过',
-      rejected: '已拒绝',
-      completed: '已完成',
-      cancelled: '已取消'
-    }
-    return labels[status] || status
-  },
-
-  getStatusColor(status) {
-    const colors = {
-      pending: '#ff976a',
-      approved: '#07c160',
-      rejected: '#ee0a24',
-      completed: '#1989fa',
-      cancelled: '#969799'
-    }
-    return colors[status] || '#969799'
-  },
-
-  getStatusBgColor(status) {
-    const bgColors = {
-      pending: '#fff7e6',
-      approved: '#f0f9ff',
-      rejected: '#fef0f0',
-      completed: '#f0f9ff',
-      cancelled: '#f5f5f5'
-    }
-    return bgColors[status] || '#f5f5f5'
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
   }
 })

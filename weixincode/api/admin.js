@@ -8,128 +8,174 @@ function getUsers(params) {
   })
 }
 
-function getUserDetail(id) {
+function getUserDetail(userId) {
   return request({
-    url: '/admin/users/' + id,
+    url: '/admin/users/' + userId,
     method: 'GET'
   })
 }
 
-function updateUser(id, data) {
+function updateUserRole(userId, role) {
   return request({
-    url: '/admin/users/' + id,
+    url: '/admin/users/' + userId + '/role',
     method: 'PUT',
-    data: data
+    data: { role: role }
   })
 }
 
-function deleteUser(id) {
+function updateUserStatus(userId, status) {
   return request({
-    url: '/admin/users/' + id,
-    method: 'DELETE'
-  })
-}
-
-function toggleUserStatus(id, status) {
-  return request({
-    url: '/admin/users/' + id + '/status',
+    url: '/admin/users/' + userId + '/status',
     method: 'PUT',
     data: { status: status }
   })
 }
 
-function getProjects(params) {
+function deleteUser(userId) {
   return request({
-    url: '/admin/projects',
-    method: 'GET',
-    data: params || {}
-  })
-}
-
-function createProject(data) {
-  return request({
-    url: '/admin/projects',
-    method: 'POST',
-    data: data
-  })
-}
-
-function updateProject(id, data) {
-  return request({
-    url: '/admin/projects/' + id,
-    method: 'PUT',
-    data: data
-  })
-}
-
-function deleteProject(id) {
-  return request({
-    url: '/admin/projects/' + id,
+    url: '/admin/users/' + userId,
     method: 'DELETE'
   })
 }
 
-function toggleProjectStatus(id, status) {
+function getAuditLogs(params) {
   return request({
-    url: '/admin/projects/' + id + '/status',
-    method: 'PUT',
-    data: { status: status }
-  })
-}
-
-function getApplications(params) {
-  return request({
-    url: '/admin/applications',
+    url: '/admin/audit-logs',
     method: 'GET',
     data: params || {}
   })
 }
 
-function processApplication(id, data) {
+function getHistoricalAdmissionData(params) {
   return request({
-    url: '/admin/applications/' + id + '/process',
+    url: '/admin/historical-admission-data',
+    method: 'GET',
+    data: params || {}
+  })
+}
+
+function createHistoricalAdmissionData(data) {
+  return request({
+    url: '/admin/historical-admission-data',
+    method: 'POST',
+    data: data
+  })
+}
+
+function updateHistoricalAdmissionData(id, data) {
+  return request({
+    url: '/admin/historical-admission-data/' + id,
     method: 'PUT',
     data: data
   })
 }
 
-function getStats() {
+function deleteHistoricalAdmissionData(id) {
   return request({
-    url: '/admin/stats',
+    url: '/admin/historical-admission-data/' + id,
+    method: 'DELETE'
+  })
+}
+
+function importHistoricalAdmissionData(data) {
+  return request({
+    url: '/admin/historical-admission-data/import',
+    method: 'POST',
+    data: data
+  })
+}
+
+function getSystemConfigs() {
+  return request({
+    url: '/admin/system-config',
     method: 'GET'
   })
 }
 
-function exportData(params) {
+function saveSystemConfig(data) {
   return request({
-    url: '/admin/export',
-    method: 'GET',
-    data: params || {}
+    url: '/admin/system-config',
+    method: 'POST',
+    data: data
   })
 }
 
-function submitFeedback(data) {
+function deleteSystemConfig(id) {
   return request({
-    url: '/feedback',
-    method: 'POST',
-    data: data
+    url: '/admin/system-config/' + id,
+    method: 'DELETE'
+  })
+}
+
+function getSystemPerformance() {
+  return request({
+    url: '/admin/system-monitor/performance',
+    method: 'GET'
+  })
+}
+
+function getBusinessMetrics() {
+  return request({
+    url: '/admin/metrics/business',
+    method: 'GET'
+  })
+}
+
+function exportSystemData(dataType) {
+  return request({
+    url: '/admin/system-data/export/' + dataType,
+    method: 'GET'
+  })
+}
+
+function createSystemBackup() {
+  return request({
+    url: '/admin/system-data/backup',
+    method: 'POST'
+  })
+}
+
+function getSystemBackups() {
+  return request({
+    url: '/admin/system-data/backups',
+    method: 'GET'
+  })
+}
+
+function deleteSystemBackup(filename) {
+  return request({
+    url: '/admin/system-data/backups/' + encodeURIComponent(filename),
+    method: 'DELETE'
+  })
+}
+
+function restoreSystemBackup(filename, dryRun) {
+  return request({
+    url: '/admin/system-data/restore/' + encodeURIComponent(filename) + '?dryRun=' + (dryRun || false),
+    method: 'POST'
   })
 }
 
 module.exports = {
   getUsers,
   getUserDetail,
-  updateUser,
+  updateUserRole,
+  updateUserStatus,
   deleteUser,
-  toggleUserStatus,
-  getProjects,
-  createProject,
-  updateProject,
-  deleteProject,
-  toggleProjectStatus,
-  getApplications,
-  processApplication,
-  getStats,
-  exportData,
-  submitFeedback
+  getAuditLogs,
+  getHistoricalAdmissionData,
+  createHistoricalAdmissionData,
+  updateHistoricalAdmissionData,
+  deleteHistoricalAdmissionData,
+  importHistoricalAdmissionData,
+  getSystemConfigs,
+  saveSystemConfig,
+  deleteSystemConfig,
+  getSystemPerformance,
+  getBusinessMetrics,
+  exportSystemData,
+  createSystemBackup,
+  getSystemBackups,
+  deleteSystemBackup,
+  restoreSystemBackup
 }

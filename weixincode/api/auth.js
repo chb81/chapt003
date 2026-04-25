@@ -1,4 +1,3 @@
-const app = getApp()
 const { request } = require('../utils/request')
 
 function login(data) {
@@ -17,68 +16,7 @@ function register(data) {
   })
 }
 
-function logout() {
-  return request({
-    url: '/auth/logout',
-    method: 'POST'
-  })
-}
-
-function getCurrentUser() {
-  return request({
-    url: '/users/current',
-    method: 'GET'
-  })
-}
-
-function updateUser(data) {
-  return request({
-    url: '/users/current',
-    method: 'PUT',
-    data
-  })
-}
-
-function updateProfile(data) {
-  return request({
-    url: '/user/profile',
-    method: 'PUT',
-    data
-  })
-}
-
-function getUserInfo() {
-  return request({
-    url: '/users/current',
-    method: 'GET'
-  })
-}
-
-function changePassword(data) {
-  return request({
-    url: '/auth/change-password',
-    method: 'POST',
-    data
-  })
-}
-
-function sendVerificationCode(data) {
-  return request({
-    url: '/auth/send-verification-code',
-    method: 'POST',
-    data
-  })
-}
-
-function resetPassword(data) {
-  return request({
-    url: '/auth/password-reset/verify',
-    method: 'POST',
-    data
-  })
-}
-
-function verifyEmail(data) {
+function verify(data) {
   return request({
     url: '/auth/verify',
     method: 'POST',
@@ -86,10 +24,70 @@ function verifyEmail(data) {
   })
 }
 
-function verifyMobile(data) {
+function resendVerification(email) {
   return request({
-    url: '/auth/verify-mobile',
+    url: '/auth/resend-verification?email=' + encodeURIComponent(email),
+    method: 'POST'
+  })
+}
+
+function resetPasswordSendCode(data) {
+  return request({
+    url: '/auth/password-reset/send-code',
     method: 'POST',
+    data
+  })
+}
+
+function resetPasswordVerify(data) {
+  return request({
+    url: '/auth/password-reset/verify',
+    method: 'POST',
+    data
+  })
+}
+
+function getUserProfile() {
+  return request({
+    url: '/user/profile',
+    method: 'GET'
+  })
+}
+
+function updateUserProfile(data) {
+  return request({
+    url: '/user/profile',
+    method: 'PUT',
+    data
+  })
+}
+
+function getStudentProfile() {
+  return request({
+    url: '/student/profile',
+    method: 'GET'
+  })
+}
+
+function createOrUpdateStudentProfile(data) {
+  return request({
+    url: '/student/profile',
+    method: 'PUT',
+    data
+  })
+}
+
+function getStudentScore() {
+  return request({
+    url: '/student/score',
+    method: 'GET'
+  })
+}
+
+function createOrUpdateStudentScore(data) {
+  return request({
+    url: '/student/score',
+    method: 'PUT',
     data
   })
 }
@@ -100,6 +98,7 @@ function checkLoginStatus() {
     return false
   }
 
+  const app = getApp()
   const loginTime = wx.getStorageSync('loginTime')
   const currentTime = new Date().getTime()
   const tokenExpireTime = app.globalData.tokenExpireTime
@@ -117,15 +116,15 @@ function checkLoginStatus() {
 module.exports = {
   login,
   register,
-  logout,
-  getCurrentUser,
-  updateUser,
-  updateProfile,
-  getUserInfo,
-  changePassword,
-  sendVerificationCode,
-  resetPassword,
-  verifyEmail,
-  verifyMobile,
+  verify,
+  resendVerification,
+  resetPasswordSendCode,
+  resetPasswordVerify,
+  getUserProfile,
+  updateUserProfile,
+  getStudentProfile,
+  createOrUpdateStudentProfile,
+  getStudentScore,
+  createOrUpdateStudentScore,
   checkLoginStatus
 }

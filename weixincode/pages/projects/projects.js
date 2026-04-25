@@ -1,185 +1,192 @@
-// pages/projects/projects.js
 const app = getApp()
 const volunteer = require('../../api/volunteer')
 const auth = require('../../api/auth')
 
 Page({
   data: {
-    projects: [],
+    schools: [],
     loading: false,
     refreshing: false,
     hasMore: true,
-    page: 1,
+    page: 0,
     pageSize: 10,
     filters: {
-      category: '',
-      status: '',
-      location: ''
+      city: '',
+      district: '',
+      schoolType: ''
     },
     searchKeyword: '',
     activeTab: 'all',
-    categories: [
-      { value: 'education', label: '教育支持' },
-      { value: 'environment', label: '环境保护' },
-      { value: 'elderly', label: '敬老服务' },
-      { value: 'medical', label: '医疗健康' },
-      { value: 'poverty', label: '扶贫助困' },
-      { value: 'community', label: '社区服务' },
-      { value: 'other', label: '其他' }
+    schoolTypes: [
+      { value: 'KEY_HIGH_SCHOOL', label: '重点高中' },
+      { value: 'REGULAR_HIGH_SCHOOL', label: '普通高中' },
+      { value: 'VOCATIONAL_HIGH_SCHOOL', label: '职业高中' }
     ],
-    statusOptions: [
-      { value: 'recruiting', label: '招募中' },
-      { value: 'ongoing', label: '进行中' },
-      { value: 'completed', label: '已结束' },
-      { value: 'paused', label: '暂停中' }
-    ],
-    currentProject: null,
-    showApplyModal: false,
-    applyForm: {
-      project_id: '',
-      motivation: '',
-      experience: '',
-      availability: ''
-    },
-    submitting: false
+    cities: [],
+    districts: [],
+    currentSchool: null,
+    showDetailModal: false,
+    admissionProbability: null
   },
 
   onLoad() {
-    this.checkLoginStatus()
+    this.loadCities()
+    this.loadSchools()
   },
 
   onShow() {
-    this.loadProjects()
+    if (this.data.schools.length === 0) {
+      this.loadSchools()
+    }
   },
 
   onPullDownRefresh() {
-    this.refreshProjects()
+    this.refreshSchools()
   },
 
   onReachBottom() {
     if (this.data.hasMore && !this.data.loading) {
-      this.loadMoreProjects()
+      this.loadMoreSchools()
     }
   },
 
-  checkLoginStatus() {
-    const isLoggedIn = auth.checkLoginStatus()
-    if (!isLoggedIn) {
-      wx.showModal({
-        title: '提示',
-        content: '请先登录后再查看志愿项目',
-        success: (res) => {
-          if (res.confirm) {
-            wx.navigateTo({
-              url: '/pages/login/login'
-            })
-          } else {
-            wx.navigateBack()
-          }
-        }
+  async loadCities() {
+    try {
+      const response = await volunteer.getCities()
+      const data = response.data || response || []
+      this.setData({
+        cities: Array.isArray(data) ? data : []
       })
+    } catch (error) {
+      console.error('加载城市列表失败:', error)
     }
   },
 
-  async loadProjects() {
+  async loadDistricts(city) {
+    if (!city) {
+      this.setData({ districts: [] })
+      return
+    }
+    try {
+      const response = await volunteer.getDistricts(city)
+      const data = response.data || response || []
+      this.setData({
+        districts: Array.isArray(data) ? data : []
+      })
+    } catch (error) {
+      console.error('加载区县列表失败:', error)
+    }
+  },
+
+  async loadSchools() {
     if (this.data.loading) return
-    
+
     this.setData({ loading: true })
     wx.showLoading({ title: '加载中...' })
-    
+
     try {
       const params = {
-        page: 1,
-        pageSize: this.data.pageSize,
-        ...this.data.filters,
-        keyword: this.data.searchKeyword
+        page: 0,
+        size: this.data.pageSize,
+        keyword: this.data.searchKeyword || undefined,
+        city: this.data.filters.city || undefined,
+        district: this.data.filters.district || undefined,
+        schoolType: this.data.filters.schoolType || undefined
       }
-      
-      const response = await volunteer.getVolunteerProjects(params)
-      const projects = response.data || []
-      
+
+      Object.keys(params).forEach(key => {
+        if (params[key] === undefined || params[key] === '') delete params[key]
+      })
+
+      const response = await volunteer.getSchoolList(params)
+      const data = response.data || response || {}
+      const content = data.content || []
+
       this.setData({
-        projects: projects,
-        hasMore: projects.length >= this.data.pageSize,
-        page: 2,
+        schools: content,
+        hasMore: content.length >= this.data.pageSize,
+        page: 1,
         loading: false
       })
-      
+
     } catch (error) {
-      console.error('加载项目列表失败:', error)
-      wx.showToast({
-        title: '加载失败',
-        icon: 'error'
-      })
+      console.error('加载学校列表失败:', error)
+      wx.showToast({ title: '加载失败', icon: 'error' })
     } finally {
       wx.hideLoading()
     }
   },
 
-  async refreshProjects() {
+  async refreshSchools() {
     if (this.data.refreshing) return
-    
+
     this.setData({ refreshing: true })
-    
+
     try {
       const params = {
-        page: 1,
-        pageSize: this.data.pageSize,
-        ...this.data.filters,
-        keyword: this.data.searchKeyword
+        page: 0,
+        size: this.data.pageSize,
+        keyword: this.data.searchKeyword || undefined,
+        city: this.data.filters.city || undefined,
+        district: this.data.filters.district || undefined,
+        schoolType: this.data.filters.schoolType || undefined
       }
-      
-      const response = await volunteer.getVolunteerProjects(params)
-      const projects = response.data || []
-      
+
+      Object.keys(params).forEach(key => {
+        if (params[key] === undefined || params[key] === '') delete params[key]
+      })
+
+      const response = await volunteer.getSchoolList(params)
+      const data = response.data || response || {}
+      const content = data.content || []
+
       this.setData({
-        projects: projects,
-        hasMore: projects.length >= this.data.pageSize,
-        page: 2,
+        schools: content,
+        hasMore: content.length >= this.data.pageSize,
+        page: 1,
         refreshing: false
       })
-      
+
       wx.stopPullDownRefresh()
-      
+
     } catch (error) {
-      console.error('刷新项目列表失败:', error)
-      wx.showToast({
-        title: '刷新失败',
-        icon: 'error'
-      })
+      console.error('刷新学校列表失败:', error)
       this.setData({ refreshing: false })
     }
   },
 
-  async loadMoreProjects() {
+  async loadMoreSchools() {
     if (!this.data.hasMore || this.data.loading) return
-    
+
     this.setData({ loading: true })
-    
+
     try {
       const params = {
         page: this.data.page,
-        pageSize: this.data.pageSize,
-        ...this.data.filters,
-        keyword: this.data.searchKeyword
+        size: this.data.pageSize,
+        keyword: this.data.searchKeyword || undefined,
+        city: this.data.filters.city || undefined,
+        district: this.data.filters.district || undefined,
+        schoolType: this.data.filters.schoolType || undefined
       }
-      
-      const response = await volunteer.getVolunteerProjects(params)
-      const newProjects = response.data || []
-      
+
+      Object.keys(params).forEach(key => {
+        if (params[key] === undefined || params[key] === '') delete params[key]
+      })
+
+      const response = await volunteer.getSchoolList(params)
+      const data = response.data || response || {}
+      const content = data.content || []
+
       this.setData({
-        projects: [...this.data.projects, ...newProjects],
-        hasMore: newProjects.length >= this.data.pageSize,
+        schools: [...this.data.schools, ...content],
+        hasMore: content.length >= this.data.pageSize,
         page: this.data.page + 1,
         loading: false
       })
-      
+
     } catch (error) {
-      console.error('加载更多项目失败:', error)
-      wx.showToast({
-        title: '加载失败',
-        icon: 'error'
-      })
+      console.error('加载更多学校失败:', error)
       this.setData({ loading: false })
     }
   },
@@ -189,214 +196,87 @@ Page({
   },
 
   onSearchConfirm() {
-    this.loadProjects()
+    this.loadSchools()
   },
 
-  onCategoryChange(e) {
-    const { category } = e.detail.value
-    this.setData({
-      'filters.category': category,
-      activeTab: category || 'all'
-    })
-    this.loadProjects()
+  onCityChange(e) {
+    const city = e.detail.value
+    this.setData({ 'filters.city': city, 'filters.district': '' })
+    this.loadDistricts(city)
+    this.loadSchools()
   },
 
-  onStatusChange(e) {
-    const { status } = e.detail.value
-    this.setData({
-      'filters.status': status
-    })
-    this.loadProjects()
+  onDistrictChange(e) {
+    this.setData({ 'filters.district': e.detail.value })
+    this.loadSchools()
   },
 
-  onLocationChange(e) {
+  onTypeChange(e) {
+    const type = e.detail.value
     this.setData({
-      'filters.location': e.detail.value
+      'filters.schoolType': type,
+      activeTab: type || 'all'
     })
-    this.loadProjects()
-  },
-
-  onLocationInput(e) {
-    this.setData({
-      'filters.location': e.detail.value
-    })
+    this.loadSchools()
   },
 
   clearFilters() {
     this.setData({
-      filters: {
-        category: '',
-        status: '',
-        location: ''
-      },
-      activeTab: 'all'
+      filters: { city: '', district: '', schoolType: '' },
+      activeTab: 'all',
+      searchKeyword: '',
+      districts: []
     })
-    this.loadProjects()
+    this.loadSchools()
   },
 
-  async showProjectDetail(e) {
+  async showSchoolDetail(e) {
     const { id } = e.currentTarget.dataset
     try {
-      const response = await volunteer.getProjectDetail(id)
-      const project = response.data
-      
-      this.setData({ currentProject: project })
-      this.showProjectModal()
-    } catch (error) {
-      console.error('获取项目详情失败:', error)
-      wx.showToast({
-        title: '获取详情失败',
-        icon: 'error'
+      const response = await volunteer.getSchoolDetail(id)
+      const data = response.data || response
+      this.setData({
+        currentSchool: data,
+        showDetailModal: true
       })
-    }
-  },
 
-  showProjectModal() {
-    this.setData({
-      showProjectModal: true
-    })
-  },
-
-  hideProjectModal() {
-    this.setData({
-      showProjectModal: false,
-      currentProject: null
-    })
-  },
-
-  async applyForProject(e) {
-    const { id } = e.currentTarget.dataset
-    
-    // 检查是否已申请过
-    const hasApplied = await this.checkApplicationStatus(id)
-    if (hasApplied) {
-      wx.showToast({
-        title: '您已申请过该项目',
-        icon: 'none'
-      })
-      return
-    }
-    
-    this.setData({
-      showApplyModal: true,
-      'applyForm.project_id': id
-    })
-  },
-
-  async checkApplicationStatus(projectId) {
-    try {
-      const response = await volunteer.getUserApplications()
-      const applications = response.data || []
-      return applications.some(app => app.project_id === projectId)
-    } catch (error) {
-      console.error('检查申请状态失败:', error)
-      return false
-    }
-  },
-
-  onApplyInputChange(e) {
-    const { field } = e.currentTarget.dataset
-    this.setData({
-      [`applyForm.${field}`]: e.detail.value
-    })
-  },
-
-  async submitApplication() {
-    if (this.data.submitting) return
-    
-    const { applyForm } = this.data
-    
-    // 表单验证
-    if (!applyForm.motivation || applyForm.motivation.trim().length < 10) {
-      wx.showToast({
-        title: '请填写申请动机（至少10个字符）',
-        icon: 'none'
-      })
-      return
-    }
-    
-    if (!applyForm.experience || applyForm.experience.trim().length < 5) {
-      wx.showToast({
-        title: '请填写相关经验',
-        icon: 'none'
-      })
-      return
-    }
-    
-    this.setData({ submitting: true })
-    wx.showLoading({ title: '提交中...' })
-    
-    try {
-      const response = await volunteer.applyForProject(applyForm)
-      
-      wx.showToast({
-        title: '申请成功',
-        icon: 'success'
-      })
-      
-      setTimeout(() => {
-        this.setData({
-          showApplyModal: false,
-          submitting: false,
-          applyForm: {
-            project_id: '',
-            motivation: '',
-            experience: '',
-            availability: ''
-          }
-        })
-        this.hideProjectModal()
-        wx.navigateBack()
-      }, 1500)
-      
-    } catch (error) {
-      console.error('提交申请失败:', error)
-      wx.showToast({
-        title: '申请失败，请重试',
-        icon: 'error'
-      })
-      this.setData({ submitting: false })
-    } finally {
-      wx.hideLoading()
-    }
-  },
-
-  cancelApplication() {
-    this.setData({
-      showApplyModal: false,
-      submitting: false,
-      applyForm: {
-        project_id: '',
-        motivation: '',
-        experience: '',
-        availability: ''
+      const isLoggedIn = auth.checkLoginStatus()
+      if (isLoggedIn) {
+        this.calculateProbability(id)
       }
+    } catch (error) {
+      console.error('获取学校详情失败:', error)
+      wx.showToast({ title: '获取详情失败', icon: 'error' })
+    }
+  },
+
+  async calculateProbability(schoolId) {
+    try {
+      const response = await volunteer.calculateAdmissionProbability(schoolId)
+      const data = response.data || response
+      this.setData({ admissionProbability: data })
+    } catch (error) {
+      console.error('计算录取概率失败:', error)
+      this.setData({ admissionProbability: null })
+    }
+  },
+
+  hideDetailModal() {
+    this.setData({
+      showDetailModal: false,
+      currentSchool: null,
+      admissionProbability: null
     })
+  },
+
+  getSchoolTypeLabel(value) {
+    const type = this.data.schoolTypes.find(t => t.value === value)
+    return type ? type.label : value || ''
   },
 
   formatDate(dateString) {
     if (!dateString) return ''
     const date = new Date(dateString)
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-  },
-
-  getCategoryLabel(value) {
-    const category = this.data.categories.find(c => c.value === value)
-    return category ? category.label : value
-  },
-
-  getStatusLabel(value) {
-    const status = this.data.statusOptions.find(s => s.value === value)
-    return status ? status.label : value
-  },
-
-  getStatusColor(value) {
-    const colors = {
-      recruiting: '#07c160',
-      ongoing: '#1989fa',
-      completed: '#8c8c8c',
-      paused: '#ff976a'
-    }
-    return colors[value] || '#8c8c8c'
   }
 })
