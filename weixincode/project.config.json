@@ -1,8 +1,7 @@
 {
-  "miniprogramRoot": "pages/applications/applications.js",
-  "cloudfunctionRoot": "cloudfunctions/",
+  "miniprogramRoot": "./",
   "setting": {
-    "urlCheck": true,
+    "urlCheck": false,
     "es6": true,
     "enhance": true,
     "postcss": true,
@@ -45,9 +44,9 @@
     "disableSWC": true
   },
   "appid": "wxc82ce01ef7c7f4f5",
-  "projectname": "quickstart-wx-cloud",
-  "libVersion": "2.20.1",
-  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
+  "projectname": "volunteer-system-miniprogram",
+  "libVersion": "2.25.4",
+  "compileType": "miniprogram",
   "condition": {
     "search": {
       "list": []
@@ -62,19 +61,44 @@
       "list": []
     },
     "miniprogram": {
-      "list": [
-        {
-          "id": -1,
-          "name": "db guide",
-          "pathName": "pages/databaseGuide/databaseGuide"
-        }
-      ]
+      "list": []
     }
   },
-  "compileType": "miniprogram",
-  "srcMiniprogramRoot": "miniprogram/",
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "miniprogram"
+      },
+      {
+        "type": "folder",
+        "value": "cloudfunctions"
+      },
+      {
+        "type": "folder",
+        "value": "rules"
+      },
+      {
+        "type": "folder",
+        "value": ".codebuddy"
+      },
+      {
+        "type": "folder",
+        "value": "codebuddy-plugin"
+      },
+      {
+        "type": "folder",
+        "value": ".rules"
+      },
+      {
+        "type": "file",
+        "value": "cloudbaserc.json"
+      },
+      {
+        "type": "file",
+        "value": "uploadCloudFunction.sh"
+      }
+    ],
     "include": []
   },
   "editorSetting": {

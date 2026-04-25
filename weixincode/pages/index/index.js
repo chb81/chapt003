@@ -1,7 +1,7 @@
 // pages/index/index.js
 const app = getApp()
-const { volunteer } = require('../../api/volunteer')
-const { auth } = require('../../api/auth')
+const volunteer = require('../../api/volunteer')
+const auth = require('../../api/auth')
 
 Page({
   data: {

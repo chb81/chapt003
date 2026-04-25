@@ -1,5 +1,5 @@
 const app = getApp()
-const { auth } = require('../../api/auth')
+const auth = require('../../api/auth')
 const { showError, showLoading, hideLoading } = require('../../utils/request')
 
 Page({
