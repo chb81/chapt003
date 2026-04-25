@@ -50,6 +50,21 @@ Page({
         userInfo: userInfo
       })
       this.loadUserData()
+    } else {
+      // 尝试微信静默登录
+      const app = getApp()
+      app.autoWechatLogin().then(result => {
+        if (result.success) {
+          const newUserInfo = wx.getStorageSync('userInfo')
+          this.setData({
+            isLoggedIn: true,
+            userInfo: newUserInfo
+          })
+          this.loadUserData()
+        }
+      }).catch(error => {
+        console.warn('微信自动登录失败:', error)
+      })
     }
   },
 
@@ -74,8 +89,21 @@ Page({
   },
 
   handleLogin() {
-    wx.navigateTo({
-      url: '/pages/login/login'
+    // 微信登录
+    const app = getApp()
+    app.autoWechatLogin().then(result => {
+      if (result.success) {
+        const userInfo = wx.getStorageSync('userInfo')
+        this.setData({
+          isLoggedIn: true,
+          userInfo: userInfo
+        })
+        this.loadUserData()
+      } else {
+        wx.navigateTo({ url: '/pages/login/login' })
+      }
+    }).catch(() => {
+      wx.navigateTo({ url: '/pages/login/login' })
     })
   },
 

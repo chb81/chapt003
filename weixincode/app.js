@@ -1,6 +1,7 @@
 const { performanceMonitor } = require('./utils/performance')
 const { getCacheInfo, clearExpiredCache } = require('./utils/cache')
 const { getImageCacheStats } = require('./utils/image')
+const auth = require('./api/auth')
 
 App({
   globalData: {
@@ -10,14 +11,16 @@ App({
     userInfo: null,
     token: null,
     isConnected: true,
-    networkType: 'wifi'
+    networkType: 'wifi',
+    wechatLoginPromise: null  // 防止重复登录
   },
 
   onLaunch() {
     console.log('App Launch')
     performanceMonitor.startMeasure('appLaunch')
     
-    this.checkTokenExpiration()
+    // 优先检查已有登录态，若无效则尝试静默微信登录
+    this.autoWechatLogin()
     this.initPerformanceMonitor()
     this.initCacheManager()
     this.initNetworkListener()
@@ -41,6 +44,57 @@ App({
     this.reportError(error)
   },
 
+  /**
+   * 自动微信登录
+   * 1. 若已有有效 token，直接返回
+   * 2. 若 token 过期或不存在，调用微信静默登录
+   */
+  autoWechatLogin() {
+    // 防止重复调用
+    if (this.globalData.wechatLoginPromise) {
+      return this.globalData.wechatLoginPromise
+    }
+
+    // 检查已有登录态
+    const existingToken = wx.getStorageSync('token')
+    const existingLoginTime = wx.getStorageSync('loginTime')
+    if (existingToken && existingLoginTime) {
+      const elapsed = new Date().getTime() - existingLoginTime
+      if (elapsed < this.globalData.tokenExpireTime) {
+        // Token 仍有效，恢复全局状态
+        this.globalData.token = existingToken
+        this.globalData.userInfo = wx.getStorageSync('userInfo')
+        this.globalData.loginTime = existingLoginTime
+        console.log('已有有效登录态，无需重新登录')
+        return Promise.resolve({ success: true, restored: true })
+      }
+    }
+
+    // Token 无效或不存在，执行静默微信登录
+    console.log('开始微信静默登录...')
+    this.globalData.wechatLoginPromise = auth.silentWechatLogin()
+      .then(response => {
+        const loginResult = response.data || response
+        if (loginResult && loginResult.token) {
+          auth.saveWechatLoginResult(loginResult)
+          console.log('微信静默登录成功, isNewUser:', loginResult.isNewUser)
+          return { success: true, isNewUser: loginResult.isNewUser }
+        } else {
+          console.warn('微信静默登录返回数据异常')
+          return { success: false, message: '返回数据异常' }
+        }
+      })
+      .catch(error => {
+        console.warn('微信静默登录失败，用户可能需要手动登录:', error.message)
+        return { success: false, message: error.message }
+      })
+      .finally(() => {
+        this.globalData.wechatLoginPromise = null
+      })
+
+    return this.globalData.wechatLoginPromise
+  },
+
   checkTokenExpiration() {
     const loginTime = wx.getStorageSync('loginTime')
     const currentTime = new Date().getTime()
@@ -51,6 +105,8 @@ App({
         wx.removeStorageSync('token')
         wx.removeStorageSync('userInfo')
         wx.removeStorageSync('loginTime')
+        // Token 过期后尝试静默重新登录
+        this.autoWechatLogin()
       }
     }
   },

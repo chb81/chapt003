@@ -10,10 +10,19 @@
     "pages/login/login",
     "pages/register/register",
     "pages/verify/verify",
-    "pages/password-reset-request/password-reset-request",
-    "pages/password-reset-verify/password-reset-verify",
     "pages/verify-mobile/verify-mobile",
-    "pages/verify-email/verify-email"
+    "pages/verify-email/verify-email",
+    "pages/privacy/privacy",
+    "pages/terms/terms"
+  ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序位置接口的效果展示"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
   ],
   "tabBar": {
     "color": "#999999",

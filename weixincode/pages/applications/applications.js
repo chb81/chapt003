@@ -30,58 +30,79 @@ Page({
 
   checkLoginAndLoad() {
     if (!auth.checkLoginStatus()) {
-      wx.showModal({
-        title: '提示',
-        content: '请先登录后再查看志愿填报',
-        success: (res) => {
-          if (res.confirm) {
-            wx.navigateTo({ url: '/pages/login/login' })
-          } else {
-            wx.navigateBack()
-          }
+      // 尝试微信静默登录
+      const app = getApp()
+      app.autoWechatLogin().then(result => {
+        if (result.success) {
+          this.loadApplications()
+        } else {
+          wx.showModal({
+            title: '提示',
+            content: '请先登录后再查看志愿填报',
+            success: (res) => {
+              if (res.confirm) {
+                wx.navigateTo({ url: '/pages/login/login' })
+              } else {
+                wx.navigateBack()
+              }
+            }
+          })
         }
+      }).catch(() => {
+        wx.showModal({
+          title: '提示',
+          content: '请先登录后再查看志愿填报',
+          success: (res) => {
+            if (res.confirm) {
+              wx.navigateTo({ url: '/pages/login/login' })
+            } else {
+              wx.navigateBack()
+            }
+          }
+        })
       })
     }
   },
 
-  async loadApplications() {
+  loadApplications() {
     if (this.data.loading) return
-
+    const self = this
     this.setData({ loading: true })
 
-    try {
-      const response = await volunteer.getVolunteerApplications({ page: 0, size: 50 })
-      const data = response.data || response || {}
-      const content = data.content || []
-
-      this.setData({
-        applications: content,
-        loading: false
+    volunteer.getVolunteerApplications({ page: 0, size: 50 })
+      .then(function(response) {
+        const data = response.data || response || {}
+        const content = data.content || []
+        self.setData({
+          applications: content,
+          loading: false
+        })
       })
-    } catch (error) {
-      console.error('加载志愿列表失败:', error)
-      wx.showToast({ title: '加载失败', icon: 'error' })
-      this.setData({ loading: false })
-    }
+      .catch(function(error) {
+        console.error('加载志愿列表失败:', error)
+        wx.showToast({ title: '加载失败', icon: 'error' })
+        self.setData({ loading: false })
+      })
   },
 
-  async refreshApplications() {
+  refreshApplications() {
+    const self = this
     this.setData({ refreshing: true })
 
-    try {
-      const response = await volunteer.getVolunteerApplications({ page: 0, size: 50 })
-      const data = response.data || response || {}
-      const content = data.content || []
-
-      this.setData({
-        applications: content,
-        refreshing: false
+    volunteer.getVolunteerApplications({ page: 0, size: 50 })
+      .then(function(response) {
+        const data = response.data || response || {}
+        const content = data.content || []
+        self.setData({
+          applications: content,
+          refreshing: false
+        })
+        wx.stopPullDownRefresh()
       })
-      wx.stopPullDownRefresh()
-    } catch (error) {
-      console.error('刷新志愿列表失败:', error)
-      this.setData({ refreshing: false })
-    }
+      .catch(function(error) {
+        console.error('刷新志愿列表失败:', error)
+        self.setData({ refreshing: false })
+      })
   },
 
   onTabChange(e) {
@@ -95,60 +116,65 @@ Page({
     return applications.filter(app => app.status === activeTab)
   },
 
-  async onViewDetail(e) {
+  onViewDetail(e) {
     const { id } = e.currentTarget.dataset
-    try {
-      const response = await volunteer.getVolunteerApplicationDetail(id)
-      const data = response.data || response
-
-      wx.showModal({
-        title: data.name || '志愿方案详情',
-        content: `状态: ${this.getStatusLabel(data.status)}\n学校数量: ${(data.items || []).length}\n创建时间: ${this.formatDate(data.createdAt)}`,
-        showCancel: false
+    const self = this
+    volunteer.getVolunteerApplicationDetail(id)
+      .then(function(response) {
+        const data = response.data || response
+        wx.showModal({
+          title: data.name || '志愿方案详情',
+          content: '状态: ' + self.getStatusLabel(data.status) + '\n学校数量: ' + (data.items || []).length + '\n创建时间: ' + self.formatDate(data.createdAt),
+          showCancel: false
+        })
       })
-    } catch (error) {
-      console.error('获取志愿详情失败:', error)
-      wx.showToast({ title: '获取详情失败', icon: 'error' })
-    }
+      .catch(function(error) {
+        console.error('获取志愿详情失败:', error)
+        wx.showToast({ title: '获取详情失败', icon: 'error' })
+      })
   },
 
-  async onSubmitApplication(e) {
+  onSubmitApplication(e) {
     const { id } = e.currentTarget.dataset
+    const self = this
 
     wx.showModal({
       title: '确认提交',
       content: '提交后不可修改，确定提交吗？',
-      success: async (res) => {
+      success: function(res) {
         if (res.confirm) {
-          try {
-            await volunteer.submitVolunteerApplication(id)
-            wx.showToast({ title: '提交成功', icon: 'success' })
-            this.loadApplications()
-          } catch (error) {
-            console.error('提交志愿失败:', error)
-            wx.showToast({ title: '提交失败', icon: 'error' })
-          }
+          volunteer.submitVolunteerApplication(id)
+            .then(function() {
+              wx.showToast({ title: '提交成功', icon: 'success' })
+              self.loadApplications()
+            })
+            .catch(function(error) {
+              console.error('提交志愿失败:', error)
+              wx.showToast({ title: '提交失败', icon: 'error' })
+            })
         }
       }
     })
   },
 
-  async onDeleteApplication(e) {
+  onDeleteApplication(e) {
     const { id } = e.currentTarget.dataset
+    const self = this
 
     wx.showModal({
       title: '确认删除',
       content: '确定删除该志愿方案吗？',
-      success: async (res) => {
+      success: function(res) {
         if (res.confirm) {
-          try {
-            await volunteer.deleteVolunteerApplication(id)
-            wx.showToast({ title: '删除成功', icon: 'success' })
-            this.loadApplications()
-          } catch (error) {
-            console.error('删除志愿失败:', error)
-            wx.showToast({ title: '删除失败', icon: 'error' })
-          }
+          volunteer.deleteVolunteerApplication(id)
+            .then(function() {
+              wx.showToast({ title: '删除成功', icon: 'success' })
+              self.loadApplications()
+            })
+            .catch(function(error) {
+              console.error('删除志愿失败:', error)
+              wx.showToast({ title: '删除失败', icon: 'error' })
+            })
         }
       }
     })

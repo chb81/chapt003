@@ -4,24 +4,86 @@ const { showError, showLoading, hideLoading } = require('../../utils/request')
 
 Page({
   data: {
-    email: '',
+    phone: '',
     code: '',
-    loading: false
+    loading: false,
+    countdown: 0
   },
 
   onLoad(options) {
-    if (options.email) {
-      this.setData({ email: options.email })
+    // 微信登录后可能需要绑定手机号
+    const userInfo = wx.getStorageSync('userInfo')
+    if (userInfo && userInfo.phone) {
+      // 已有手机号，无需验证
+      wx.navigateBack()
     }
+  },
+
+  onPhoneInput(e) {
+    this.setData({ phone: e.detail.value })
   },
 
   onCodeInput(e) {
     this.setData({ code: e.detail.value })
   },
 
-  async handleVerify() {
-    const { email, code } = this.data
+  /**
+   * 微信获取手机号（推荐方式）
+   */
+  getPhoneNumber(e) {
+    if (e.detail.errMsg !== 'getPhoneNumber:ok') {
+      console.warn('用户拒绝授权手机号')
+      return
+    }
 
+    // 将微信返回的加密数据发送到后端解密
+    this.setData({ loading: true })
+    showLoading('绑定中...')
+
+    auth.updateUserProfile({
+      encryptedData: e.detail.encryptedData,
+      iv: e.detail.iv
+    }).then(() => {
+      hideLoading()
+      wx.showToast({ title: '绑定成功', icon: 'success' })
+      setTimeout(() => wx.navigateBack(), 1000)
+    }).catch(error => {
+      hideLoading()
+      showError(error.message || '绑定失败')
+    }).finally(() => {
+      this.setData({ loading: false })
+    })
+  },
+
+  /**
+   * 手动输入手机号验证（降级方案）
+   */
+  async sendVerifyCode() {
+    const { phone } = this.data
+    if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+      showError('请输入正确的手机号')
+      return
+    }
+
+    try {
+      showLoading('发送中...')
+      await auth.resetPasswordSendCode({ phone })
+      hideLoading()
+      wx.showToast({ title: '验证码已发送', icon: 'success' })
+      this.startCountdown()
+    } catch (error) {
+      hideLoading()
+      showError(error.message || '发送失败')
+    }
+  },
+
+  async handleVerify() {
+    const { phone, code } = this.data
+
+    if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+      showError('请输入正确的手机号')
+      return
+    }
     if (!code || code.trim().length === 0) {
       showError('请输入验证码')
       return
@@ -31,16 +93,10 @@ Page({
     showLoading('验证中...')
 
     try {
-      await auth.verify({ email, code })
+      await auth.updateUserProfile({ phone, verificationCode: code })
       hideLoading()
-
-      wx.showToast({ title: '验证成功', icon: 'success' })
-
-      setTimeout(() => {
-        wx.redirectTo({
-          url: '/pages/login/login'
-        })
-      }, 1500)
+      wx.showToast({ title: '绑定成功', icon: 'success' })
+      setTimeout(() => wx.navigateBack(), 1000)
     } catch (error) {
       hideLoading()
       showError(error.message || '验证失败')
@@ -49,18 +105,19 @@ Page({
     }
   },
 
-  async resendCode() {
-    const { email } = this.data
-    if (!email) {
-      showError('邮箱地址缺失')
-      return
-    }
+  startCountdown() {
+    this.setData({ countdown: 60 })
+    this._timer = setInterval(() => {
+      if (this.data.countdown <= 1) {
+        clearInterval(this._timer)
+        this.setData({ countdown: 0 })
+      } else {
+        this.setData({ countdown: this.data.countdown - 1 })
+      }
+    }, 1000)
+  },
 
-    try {
-      await auth.resendVerification(email)
-      wx.showToast({ title: '验证码已重新发送', icon: 'success' })
-    } catch (error) {
-      showError(error.message || '发送失败')
-    }
+  onUnload() {
+    if (this._timer) clearInterval(this._timer)
   }
 })

@@ -1,8 +1,18 @@
-const app = getApp()
+// 延迟获取 baseURL，避免模块加载时 App 未初始化
+function getBaseURL() {
+  try {
+    var app = getApp()
+    if (app && app.globalData && app.globalData.apiBaseUrl) {
+      return app.globalData.apiBaseUrl
+    }
+  } catch (e) {
+    // App 未初始化
+  }
+  return 'http://localhost:8080/api/v1'
+}
 
 // 请求配置
 const requestConfig = {
-  baseURL: app.globalData.apiBaseUrl,
   timeout: 30000,
   header: {
     'Content-Type': 'application/json',
@@ -114,7 +124,7 @@ function request(options = {}) {
       
       // 构建请求配置
       const requestOptions = {
-        url: `${requestConfig.baseURL}${url}`,
+        url: getBaseURL() + url,
         method: method.toUpperCase(),
         data: data,
         header: finalHeader,
@@ -133,21 +143,21 @@ function request(options = {}) {
                 // 成功响应
                 resolve(responseData)
               } else if (statusCode === 401) {
-                // 未授权，跳转到登录页
+                // 未授权，直接跳转登录页
+                // 注意：不在 401 回调中发起重新登录请求，避免死循环
+                // （autoWechatLogin → silentWechatLogin → request → 如果也401 → 再次autoWechatLogin → 死循环）
                 wx.removeStorageSync('token')
                 wx.removeStorageSync('userInfo')
                 wx.removeStorageSync('loginTime')
-                
+
                 if (!noToast) {
                   showError('登录已过期，请重新登录')
                 }
-                
-                setTimeout(() => {
-                  wx.reLaunch({
-                    url: '/pages/login/login'
-                  })
+
+                setTimeout(function() {
+                  wx.reLaunch({ url: '/pages/login/login' })
                 }, 1500)
-                
+
                 reject(new Error('未授权'))
               } else if (statusCode >= 400 && statusCode < 500) {
                 // 客户端错误
@@ -238,7 +248,7 @@ const http = {
   upload: (url, filePath, formData, options = {}) => {
     return new Promise((resolve, reject) => {
       wx.uploadFile({
-        url: `${requestConfig.baseURL}${url}`,
+        url: getBaseURL() + url,
         filePath: filePath,
         name: 'file',
         formData: formData,

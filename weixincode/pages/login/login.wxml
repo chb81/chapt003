@@ -2,31 +2,56 @@
   <!-- 顶部Logo区域 -->
   <view class="logo-section">
     <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
-    <text class="app-name">志愿者管理系统</text>
-    <text class="app-slogan">汇聚爱心，传递温暖</text>
+    <text class="app-name">中考志愿填报</text>
+    <text class="app-slogan">智能填报，科学择校</text>
   </view>
 
-  <!-- 登录表单 -->
-  <view class="form-section">
+  <!-- 微信一键登录（主按钮） -->
+  <view class="wechat-login-section">
+    <button 
+      class="wechat-login-btn {{loading ? 'loading' : ''}}" 
+      open-type="getUserInfo"
+      bindgetuserinfo="handleWechatLogin"
+      disabled="{{loading}}"
+    >
+      <image class="wechat-icon" src="/images/wechat-icon.png" mode="aspectFit"></image>
+      <text wx:if="{{!loading}}">微信一键登录</text>
+      <text wx:else>登录中...</text>
+    </button>
+
+    <view class="login-tip">
+      <text>登录即代表同意</text>
+      <text class="link" bindtap="goToTerms">《用户协议》</text>
+      <text>和</text>
+      <text class="link" bindtap="goToPrivacy">《隐私政策》</text>
+    </view>
+  </view>
+
+  <!-- 分割线 -->
+  <view class="divider">
+    <view class="divider-line"></view>
+    <text class="divider-text">其他登录方式</text>
+    <view class="divider-line"></view>
+  </view>
+
+  <!-- 传统账号密码登录（降级方案，默认隐藏） -->
+  <view class="traditional-login-section" wx:if="{{showTraditionalLogin}}">
     <view class="form-group">
-      <view class="input-wrapper {{loginForm.usernameFocus ? 'focused' : ''}}">
+      <view class="input-wrapper">
         <icon class="input-icon" type="person" size="16"></icon>
         <input 
           class="input-field" 
           type="text" 
-          placeholder="请输入用户名/手机号/邮箱" 
+          placeholder="请输入用户名/邮箱" 
           value="{{loginForm.username}}"
           data-field="username"
           bindinput="onInputChange"
-          bindfocus="onFocus"
-          bindblur="onBlur"
-          bindconfirm="onKeyPress"
         />
       </view>
     </view>
 
     <view class="form-group">
-      <view class="input-wrapper {{loginForm.passwordFocus ? 'focused' : ''}}">
+      <view class="input-wrapper">
         <icon class="input-icon" type="locked" size="16"></icon>
         <input 
           class="input-field" 
@@ -35,60 +60,24 @@
           value="{{loginForm.password}}"
           data-field="password"
           bindinput="onInputChange"
-          bindfocus="onFocus"
-          bindblur="onBlur"
-          bindconfirm="onKeyPress"
         />
       </view>
     </view>
 
-    <!-- 验证码（可选） -->
-    <view class="form-group" wx:if="{{showCaptcha}}">
-      <view class="input-wrapper">
-        <input 
-          class="input-field captcha-input" 
-          type="text" 
-          placeholder="请输入验证码" 
-          value="{{loginForm.captcha}}"
-          data-field="captcha"
-          bindinput="onInputChange"
-        />
-        <image class="captcha-image" src="{{captchaUrl}}" bindtap="refreshCaptcha"></image>
-      </view>
-    </view>
-
-    <!-- 记住密码和忘记密码 -->
-    <view class="form-options">
-      <view class="remember-password" bindtap="toggleRememberMe">
-        <icon class="checkbox {{rememberMe ? 'checked' : ''}}" type="success" size="16"></icon>
-        <text>记住密码</text>
-      </view>
-      <view class="forgot-password" bindtap="handleForgotPassword">
-        <text>忘记密码？</text>
-      </view>
-    </view>
-
-    <!-- 登录按钮 -->
     <button 
-      class="login-btn {{loading ? 'loading' : ''}}" 
-      bindtap="handleLogin"
+      class="traditional-login-btn {{loading ? 'loading' : ''}}" 
+      bindtap="handleTraditionalLogin"
       disabled="{{loading}}"
     >
-      {{loading ? '登录中...' : '登录'}}
+      {{loading ? '登录中...' : '账号登录'}}
     </button>
-
-    <!-- 微信登录按钮 -->
-    <view class="wechat-login">
-      <button class="wechat-btn" bindtap="handleWechatLogin">
-        <icon class="wechat-icon" type="success" size="16"></icon>
-        微信一键登录
-      </button>
-    </view>
   </view>
 
-  <!-- 底部注册链接 -->
-  <view class="bottom-section">
-    <text>还没有账号？</text>
-    <text class="register-link" bindtap="handleRegister">立即注册</text>
+  <!-- 切换传统登录 -->
+  <view class="switch-login" wx:if="{{!showTraditionalLogin}}" bindtap="toggleTraditionalLogin">
+    <text>使用账号密码登录</text>
+  </view>
+  <view class="switch-login" wx:else bindtap="toggleTraditionalLogin">
+    <text>使用微信登录</text>
   </view>
 </view>

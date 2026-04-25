@@ -52,6 +52,7 @@ Page({
   },
 
   async checkLoginStatus() {
+    // 优先检查本地 token
     const isLoggedIn = auth.checkLoginStatus()
     if (isLoggedIn) {
       const userInfo = wx.getStorageSync('userInfo')
@@ -59,6 +60,22 @@ Page({
         isLoggedIn: true,
         userInfo: userInfo
       })
+      return
+    }
+
+    // token 无效，尝试微信静默登录
+    try {
+      const app = getApp()
+      const result = await app.autoWechatLogin()
+      if (result.success) {
+        const userInfo = wx.getStorageSync('userInfo')
+        this.setData({
+          isLoggedIn: true,
+          userInfo: userInfo
+        })
+      }
+    } catch (error) {
+      console.warn('微信自动登录失败:', error)
     }
   },
 
@@ -114,11 +131,23 @@ Page({
       wx.showModal({
         title: '提示',
         content: '请先登录后再使用此功能',
-        success: (res) => {
+        success: function(res) {
           if (res.confirm) {
-            wx.navigateTo({
-              url: '/pages/login/login'
-            })
+            // 尝试微信静默登录
+            var app = getApp()
+            app.autoWechatLogin()
+              .then(function(loginResult) {
+                if (loginResult.success) {
+                  var userInfo = wx.getStorageSync('userInfo')
+                  self.setData({ isLoggedIn: true, userInfo: userInfo })
+                  wx.switchTab({ url: url })
+                } else {
+                  wx.navigateTo({ url: '/pages/login/login' })
+                }
+              })
+              .catch(function(error) {
+                wx.navigateTo({ url: '/pages/login/login' })
+              })
           }
         }
       })
@@ -142,12 +171,14 @@ Page({
   },
 
   onLogin() {
+    // 微信登录
     wx.navigateTo({
       url: '/pages/login/login'
     })
   },
 
   onRegister() {
+    // 微信授权完善资料
     wx.navigateTo({
       url: '/pages/register/register'
     })

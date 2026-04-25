@@ -5,20 +5,64 @@ const { showError, showLoading, hideLoading } = require('../../utils/request')
 Page({
   data: {
     form: {
+      nickname: '',
       phone: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      verificationCode: ''
+      gender: '',
+      birthday: ''
     },
-    countdown: 0,
+    wechatUserInfo: null,
     loading: false,
-    agreeTerms: false
+    step: 'authorize' // authorize -> profile
   },
 
-  onLoad(options) {
-    if (options.email) {
-      this.setData({ 'form.email': options.email })
+  onLoad() {
+    // 检查是否已登录（微信自动创建账号）
+    if (!auth.checkLoginStatus()) {
+      // 未登录，先引导微信登录
+      this.handleWechatLogin()
+    } else {
+      this.setData({ step: 'profile' })
+    }
+  },
+
+  /**
+   * 微信登录授权
+   */
+  async handleWechatLogin() {
+    this.setData({ loading: true })
+    showLoading('微信授权中...')
+
+    try {
+      const result = await auth.performWechatLogin()
+      hideLoading()
+
+      if (result.success) {
+        this.setData({ step: 'profile' })
+        wx.showToast({ title: '授权成功', icon: 'success' })
+      } else {
+        showError(result.message || '微信授权失败')
+      }
+    } catch (error) {
+      hideLoading()
+      showError('微信授权失败，请重试')
+    } finally {
+      this.setData({ loading: false })
+    }
+  },
+
+  /**
+   * 获取微信用户资料
+   */
+  async handleGetUserProfile() {
+    try {
+      const wechatInfo = await auth.getWechatUserProfile()
+      this.setData({
+        wechatUserInfo: wechatInfo,
+        'form.nickname': wechatInfo.nickName || '',
+        'form.gender': wechatInfo.gender === 1 ? '男' : (wechatInfo.gender === 2 ? '女' : '')
+      })
+    } catch (error) {
+      console.warn('获取微信用户资料失败:', error)
     }
   },
 
@@ -27,91 +71,34 @@ Page({
     this.setData({ [`form.${field}`]: e.detail.value })
   },
 
-  toggleAgreeTerms() {
-    this.setData({ agreeTerms: !this.data.agreeTerms })
-  },
+  async handleSubmitProfile() {
+    const { nickname, phone } = this.data.form
 
-  async sendVerificationCode() {
-    const { email } = this.data.form
-    if (!email || !email.includes('@')) {
-      showError('请输入正确的邮箱地址')
-      return
-    }
-
-    try {
-      showLoading('发送中...')
-      await auth.resendVerification(email)
-      hideLoading()
-
-      wx.showToast({ title: '验证码已发送', icon: 'success' })
-      this.startCountdown()
-    } catch (error) {
-      hideLoading()
-      showError(error.message || '发送失败')
-    }
-  },
-
-  startCountdown() {
-    this.setData({ countdown: 60 })
-    this._timer = setInterval(() => {
-      if (this.data.countdown <= 1) {
-        clearInterval(this._timer)
-        this.setData({ countdown: 0 })
-      } else {
-        this.setData({ countdown: this.data.countdown - 1 })
-      }
-    }, 1000)
-  },
-
-  async handleRegister() {
-    const { email, password, confirmPassword, verificationCode } = this.data.form
-
-    if (!email || !email.includes('@')) {
-      showError('请输入正确的邮箱地址')
-      return
-    }
-    if (!password || password.length < 6) {
-      showError('密码长度不能少于6位')
-      return
-    }
-    if (password !== confirmPassword) {
-      showError('两次密码不一致')
-      return
-    }
-    if (!this.data.agreeTerms) {
-      showError('请先同意用户协议')
+    if (!nickname || !nickname.trim()) {
+      showError('请输入昵称')
       return
     }
 
     this.setData({ loading: true })
-    showLoading('注册中...')
+    showLoading('保存中...')
 
     try {
-      await auth.register({ email, password, verificationCode })
+      await auth.updateUserProfile(this.data.form)
       hideLoading()
-
-      wx.showToast({ title: '注册成功', icon: 'success' })
+      wx.showToast({ title: '保存成功', icon: 'success' })
 
       setTimeout(() => {
-        wx.redirectTo({
-          url: '/pages/login/login'
-        })
-      }, 1500)
+        wx.switchTab({ url: '/pages/index/index' })
+      }, 1000)
     } catch (error) {
       hideLoading()
-      showError(error.message || '注册失败')
+      showError(error.message || '保存失败')
     } finally {
       this.setData({ loading: false })
     }
   },
 
-  goToLogin() {
-    wx.navigateBack()
-  },
-
-  onUnload() {
-    if (this._timer) {
-      clearInterval(this._timer)
-    }
+  skipProfile() {
+    wx.switchTab({ url: '/pages/index/index' })
   }
 })
