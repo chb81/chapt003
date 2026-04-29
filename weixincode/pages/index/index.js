@@ -95,16 +95,18 @@ Page({
 
       const schoolData = schoolsResponse.data || schoolsResponse || {}
       const appData = appResponse.data || appResponse || {}
+      const schoolList = schoolData.schools || schoolData.content || []
+      const appList = appData.content || appData.applications || []
 
       this.setData({
-        featuredSchools: (schoolData.content || []).map(s => ({
+        featuredSchools: schoolList.map(s => ({
           id: s.id,
           name: s.name,
-          type: s.schoolType,
+          type: s.type,
           city: s.city,
           district: s.district
         })),
-        recentApplications: (appData.content || []).map(a => ({
+        recentApplications: appList.map(a => ({
           id: a.id,
           name: a.name,
           status: a.status,
@@ -113,7 +115,7 @@ Page({
         stats: {
           totalSchools: schoolData.totalElements || 0,
           myApplications: appData.totalElements || 0,
-          submittedCount: (appData.content || []).filter(a => a.status === 'SUBMITTED').length,
+          submittedCount: appList.filter(a => a.status === 'SUBMITTED').length,
           simulationCount: 0
         },
         loading: false

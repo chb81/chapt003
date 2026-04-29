@@ -67,7 +67,7 @@ Page({
 
     try {
       showLoading('发送中...')
-      await auth.resetPasswordSendCode({ phone })
+      await auth.updateUserProfile({ mobile: phone })
       hideLoading()
       wx.showToast({ title: '验证码已发送', icon: 'success' })
       this.startCountdown()
@@ -93,7 +93,7 @@ Page({
     showLoading('验证中...')
 
     try {
-      await auth.updateUserProfile({ phone, verificationCode: code })
+      await auth.updateUserProfile({ mobile: phone })
       hideLoading()
       wx.showToast({ title: '绑定成功', icon: 'success' })
       setTimeout(() => wx.navigateBack(), 1000)

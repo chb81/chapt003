@@ -1,14 +1,13 @@
 <view class="index-container">
-  <!-- 用户信息头部 -->
   <view class="user-header">
     <view class="user-info">
-      <image class="avatar" src="{{userInfo.avatar || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+      <view class="avatar-wrap">
+        <view class="avatar-text">{{isLoggedIn ? (userInfo.nickname || userInfo.email || '用户')[0] : '?'}}</view>
+      </view>
       <view class="user-details">
-        <view class="username">{{userInfo.username || '未登录'}}</view>
-        <view wx:if="{{userInfo}}" class="user-meta">
-          <text class="meta-item">{{userInfo.phone || ''}}</text>
-          <text class="meta-item">|</text>
-          <text class="meta-item">志愿时长: {{userInfo.volunteer_hours || 0}}小时</text>
+        <view class="username">{{isLoggedIn ? (userInfo.nickname || userInfo.email || '用户') : '未登录'}}</view>
+        <view wx:if="{{isLoggedIn}}" class="user-meta">
+          <text class="meta-item">{{userInfo.email || ''}}</text>
         </view>
         <view wx:else class="auth-buttons">
           <view class="auth-btn" bindtap="onLogin">登录</view>
@@ -18,29 +17,27 @@
     </view>
   </view>
 
-  <!-- 统计数据 -->
   <view class="stats-section">
     <view class="stats-grid">
       <view class="stat-item">
-        <view class="stat-value">{{stats.totalProjects}}</view>
-        <view class="stat-label">全部项目</view>
-      </view>
-      <view class="stat-item">
-        <view class="stat-value">{{stats.recruitingProjects}}</view>
-        <view class="stat-label">招募中</view>
+        <view class="stat-value">{{stats.totalSchools}}</view>
+        <view class="stat-label">学校总数</view>
       </view>
       <view class="stat-item">
         <view class="stat-value">{{stats.myApplications}}</view>
-        <view class="stat-label">我的申请</view>
+        <view class="stat-label">我的志愿</view>
       </view>
       <view class="stat-item">
-        <view class="stat-value">{{stats.completedHours}}</view>
-        <view class="stat-label">志愿时长</view>
+        <view class="stat-value">{{stats.submittedCount}}</view>
+        <view class="stat-label">已提交</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{stats.simulationCount}}</view>
+        <view class="stat-label">模拟方案</view>
       </view>
     </view>
   </view>
 
-  <!-- 快捷操作 -->
   <view class="quick-actions-section">
     <view class="section-title">快捷功能</view>
     <view class="actions-grid">
@@ -59,80 +56,57 @@
     </view>
   </view>
 
-  <!-- 轮播图 -->
-  <view class="banner-section">
-    <swiper class="banner-swiper" indicator-dots autoplay interval="3000" circular>
-      <swiper-item wx:for="{{banners}}" wx:key="image">
-        <view class="banner-item">
-          <image class="banner-image" src="{{item.image}}" mode="aspectFill"></image>
-          <view class="banner-content">
-            <view class="banner-title">{{item.title}}</view>
-            <view class="banner-description">{{item.description}}</view>
-          </view>
-        </view>
-      </swiper-item>
-    </swiper>
-  </view>
-
-  <!-- 精选项目 -->
-  <view class="projects-section">
+  <view class="schools-section">
     <view class="section-header">
-      <view class="section-title">精选项目</view>
-      <view class="more-btn" bindtap="onAllProjects">查看全部 ></view>
+      <view class="section-title">热门学校</view>
+      <view class="more-btn" bindtap="onAllSchools">查看全部 ></view>
     </view>
     
-    <view class="projects-grid">
+    <view class="schools-grid">
       <view 
-        wx:for="{{featuredProjects}}" 
+        wx:for="{{featuredSchools}}" 
         wx:key="id"
-        class="project-card"
-        bindtap="onProjectDetail"
+        class="school-card"
+        bindtap="onSchoolDetail"
         data-id="{{item.id}}"
       >
-        <view class="project-image">
-          <image src="{{item.cover_image || '/images/project-default.png'}}" mode="aspectFill"></image>
-        </view>
-        <view class="project-info">
-          <view class="project-title">{{item.title}}</view>
-          <view class="project-meta">
-            <text class="meta-text">{{item.required_volunteers}}人</text>
-            <text class="meta-text">{{item.location}}</text>
+        <view class="school-info">
+          <view class="school-name">{{item.name}}</view>
+          <view class="school-meta">
+            <text class="meta-text">{{item.city || ''}}</text>
+            <text wx:if="{{item.district}}" class="meta-text">{{item.district}}</text>
           </view>
+          <view class="school-type-tag">{{item.type === 'KEY_HIGH_SCHOOL' ? '重点高中' : (item.type === 'REGULAR_HIGH_SCHOOL' ? '普通高中' : '职业高中')}}</view>
         </view>
       </view>
     </view>
 
-    <!-- 空状态 -->
-    <view wx:if="{{featuredProjects.length === 0 && !loading}}" class="empty-state">
-      <image class="empty-image" src="/images/empty.png" mode="aspectFit"></image>
-      <view class="empty-text">暂无项目</view>
+    <view wx:if="{{featuredSchools.length === 0 && !loading}}" class="empty-state">
+      <view class="empty-text">暂无学校数据</view>
     </view>
   </view>
 
-  <!-- 最近活动 -->
-  <view wx:if="{{isLoggedIn && recentActivities.length > 0}}" class="activities-section">
-    <view class="section-title">最近活动</view>
-    <view class="activities-list">
+  <view wx:if="{{isLoggedIn && recentApplications.length > 0}}" class="applications-section">
+    <view class="section-title">最近志愿</view>
+    <view class="applications-list">
       <view 
-        wx:for="{{recentActivities}}" 
+        wx:for="{{recentApplications}}" 
         wx:key="id"
-        class="activity-item"
+        class="application-item"
       >
-        <view class="activity-content">
-          <view class="activity-title">{{item.title}}</view>
-          <view class="activity-status">{{getStatusLabel(item.status)}}</view>
+        <view class="application-content">
+          <view class="application-name">{{item.name || '志愿方案'}}</view>
+          <view class="application-status">{{item.status === 'DRAFT' ? '草稿' : (item.status === 'SUBMITTED' ? '已提交' : '模拟')}}</view>
         </view>
-        <view class="activity-time">{{formatDate(item.time)}}</view>
+        <view class="application-time">{{formatDate(item.createdAt)}}</view>
       </view>
     </view>
   </view>
 
-  <!-- 加载状态 -->
   <view wx:if="{{loading}}" class="loading-state">
     <view class="loading-spinner"></view>
     <view class="loading-text">加载中...</view>
   </view>
 
-  <!-- 底部空白 -->
   <view class="bottom-space"></view>
 </view>

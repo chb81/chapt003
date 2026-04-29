@@ -106,16 +106,23 @@ Page({
     this.setData({ loading: true })
     showLoading('登录中...')
 
-    auth.login(loginForm)
+    auth.login({ email: loginForm.username, password: loginForm.password })
       .then(response => {
         hideLoading()
-        if (response.token) {
-          wx.setStorageSync('token', response.token)
-          wx.setStorageSync('userInfo', response.userInfo || {})
+        const data = response.data || response
+        if (data.token) {
+          wx.setStorageSync('token', data.token)
+          wx.setStorageSync('userInfo', {
+            id: data.userId,
+            userId: data.userId,
+            email: data.email,
+            mobile: data.mobile,
+            role: data.role
+          })
           wx.setStorageSync('loginTime', new Date().getTime())
 
-          app.globalData.token = response.token
-          app.globalData.userInfo = response.userInfo
+          app.globalData.token = data.token
+          app.globalData.userInfo = wx.getStorageSync('userInfo')
 
           wx.showToast({ title: '登录成功', icon: 'success' })
           setTimeout(() => {

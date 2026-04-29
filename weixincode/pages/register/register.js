@@ -83,7 +83,10 @@ Page({
     showLoading('保存中...')
 
     try {
-      await auth.updateUserProfile(this.data.form)
+      await auth.updateUserProfile({
+        username: this.data.form.nickname,
+        mobile: this.data.form.phone
+      })
       hideLoading()
       wx.showToast({ title: '保存成功', icon: 'success' })
 

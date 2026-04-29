@@ -2,13 +2,13 @@
   <view class="header-section">
     <view class="user-info-card" wx:if="{{isLoggedIn}}">
       <view class="user-avatar" bindtap="handleEditProfile">
-        <image src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+        <view class="avatar-text">{{(userInfo.nickname || userInfo.username || userInfo.email || '用户')[0]}}</view>
         <view class="edit-icon">✏️</view>
       </view>
       <view class="user-details">
-        <view class="user-name">{{userInfo.nickname || '志愿者'}}</view>
-        <view class="user-phone" wx:if="{{userInfo.phone}}">{{userInfo.phone}}</view>
-        <view class="user-id">ID: {{userInfo.id || ''}}</view>
+        <view class="user-name">{{userInfo.nickname || userInfo.username || '用户'}}</view>
+        <view class="user-phone" wx:if="{{userInfo.phone || userInfo.mobile}}">{{userInfo.phone || userInfo.mobile}}</view>
+        <view class="user-email" wx:if="{{userInfo.email}}">{{userInfo.email}}</view>
       </view>
       <view class="logout-btn" bindtap="handleLogout">退出</view>
     </view>
@@ -17,23 +17,6 @@
       <view class="login-icon">👤</view>
       <view class="login-text">点击登录</view>
       <view class="login-tip">登录后享受更多服务</view>
-    </view>
-  </view>
-
-  <view class="stats-card" wx:if="{{isLoggedIn}}">
-    <view class="stat-item">
-      <view class="stat-value">{{stats.totalHours}}</view>
-      <view class="stat-label">志愿时长</view>
-    </view>
-    <view class="stat-divider"></view>
-    <view class="stat-item">
-      <view class="stat-value">{{stats.projectCount}}</view>
-      <view class="stat-label">参与项目</view>
-    </view>
-    <view class="stat-divider"></view>
-    <view class="stat-item">
-      <view class="stat-value">{{stats.creditScore}}</view>
-      <view class="stat-label">信用积分</view>
     </view>
   </view>
 
@@ -51,7 +34,7 @@
   <view class="guest-section" wx:else>
     <view class="guest-tip">
       <view class="tip-icon">💡</view>
-      <view class="tip-text">登录后可以申请志愿服务、查看志愿证书、记录志愿时长</view>
+      <view class="tip-text">登录后可以查看学校信息、填报志愿、获取智能推荐</view>
     </view>
   </view>
 

@@ -61,7 +61,7 @@ Page({
     showLoading('验证中...')
 
     try {
-      await auth.updateUserProfile({ email, verificationCode: code })
+      await auth.verify({ email, code })
       hideLoading()
       wx.showToast({ title: '绑定成功', icon: 'success' })
       setTimeout(() => wx.navigateBack(), 1000)

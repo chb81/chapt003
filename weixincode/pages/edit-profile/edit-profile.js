@@ -198,7 +198,13 @@ Page({
     wx.showLoading({ title: '保存中...' })
     
     try {
-      const response = await auth.updateUserProfile(this.data.form)
+      const form = this.data.form
+      const updateData = {
+        username: form.nickname,
+        email: form.email,
+        mobile: form.phone
+      }
+      const response = await auth.updateUserProfile(updateData)
       
       if (response.code === 200) {
         const updatedUserInfo = response.data
@@ -208,15 +214,15 @@ Page({
         this.setData({
           userInfo: updatedUserInfo,
           form: {
-            nickname: updatedUserInfo.nickname || '',
-            phone: updatedUserInfo.phone || '',
+            nickname: updatedUserInfo.username || updatedUserInfo.nickname || '',
+            phone: updatedUserInfo.mobile || updatedUserInfo.phone || '',
             email: updatedUserInfo.email || '',
-            realName: updatedUserInfo.realName || '',
-            idCard: updatedUserInfo.idCard || '',
-            gender: updatedUserInfo.gender || '',
-            birthday: updatedUserInfo.birthday || '',
-            address: updatedUserInfo.address || '',
-            avatarUrl: updatedUserInfo.avatarUrl || ''
+            realName: form.realName || '',
+            idCard: form.idCard || '',
+            gender: form.gender || '',
+            birthday: form.birthday || '',
+            address: form.address || '',
+            avatarUrl: form.avatarUrl || ''
           }
         })
         

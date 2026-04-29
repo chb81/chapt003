@@ -163,8 +163,8 @@ Page({
 
   handleAbout() {
     wx.showModal({
-      title: '关于志愿汇',
-      content: `志愿汇小程序\n版本: ${this.data.version}\n\n让爱心传递，让世界更美好`,
+      title: '关于中考志愿填报',
+      content: `中考志愿填报小程序\n版本: ${this.data.version}\n\n让志愿填报更科学、更轻松`,
       showCancel: false
     })
   },
@@ -181,7 +181,7 @@ Page({
   handleTerms() {
     wx.showModal({
       title: '用户协议',
-      content: '欢迎使用志愿汇小程序。使用本应用即表示您同意我们的用户协议和隐私政策。请仔细阅读相关条款。',
+      content: '欢迎使用中考志愿填报小程序。使用本应用即表示您同意我们的用户协议和隐私政策。请仔细阅读相关条款。',
       confirmText: '知道了',
       showCancel: false
     })
@@ -195,7 +195,7 @@ Page({
 
   handleShare() {
     return {
-      title: '志愿汇 - 让爱心传递',
+      title: '中考志愿填报',
       path: '/pages/index/index'
     }
   },

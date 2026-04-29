@@ -5,6 +5,7 @@ const auth = require('../../api/auth')
 Page({
   data: {
     applications: [],
+    filteredApplications: [],
     loading: false,
     refreshing: false,
     activeTab: 'all',
@@ -72,9 +73,10 @@ Page({
     volunteer.getVolunteerApplications({ page: 0, size: 50 })
       .then(function(response) {
         const data = response.data || response || {}
-        const content = data.content || []
+        const content = data.applications || data.content || []
         self.setData({
           applications: content,
+          filteredApplications: self.filterByTab(content, self.data.activeTab),
           loading: false
         })
       })
@@ -92,9 +94,10 @@ Page({
     volunteer.getVolunteerApplications({ page: 0, size: 50 })
       .then(function(response) {
         const data = response.data || response || {}
-        const content = data.content || []
+        const content = data.applications || data.content || []
         self.setData({
           applications: content,
+          filteredApplications: self.filterByTab(content, self.data.activeTab),
           refreshing: false
         })
         wx.stopPullDownRefresh()
@@ -107,13 +110,15 @@ Page({
 
   onTabChange(e) {
     const tab = e.currentTarget.dataset.tab
-    this.setData({ activeTab: tab })
+    this.setData({ 
+      activeTab: tab,
+      filteredApplications: this.filterByTab(this.data.applications, tab)
+    })
   },
 
-  getFilteredApplications() {
-    const { applications, activeTab } = this.data
-    if (activeTab === 'all') return applications
-    return applications.filter(app => app.status === activeTab)
+  filterByTab(applications, tab) {
+    if (tab === 'all') return applications
+    return applications.filter(app => app.status === tab)
   },
 
   onViewDetail(e) {

@@ -1,7 +1,10 @@
 Page({
-  data: {},
-  
   onLoad: function() {
-    console.log('个人资料编辑页面加载');
+    wx.redirectTo({
+      url: '/pages/edit-profile/edit-profile',
+      fail: function() {
+        wx.navigateBack()
+      }
+    })
   }
-});
+})

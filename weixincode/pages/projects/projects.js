@@ -91,7 +91,7 @@ Page({
         keyword: this.data.searchKeyword || undefined,
         city: this.data.filters.city || undefined,
         district: this.data.filters.district || undefined,
-        schoolType: this.data.filters.schoolType || undefined
+        type: this.data.filters.schoolType || undefined
       }
 
       Object.keys(params).forEach(key => {
@@ -100,11 +100,11 @@ Page({
 
       const response = await volunteer.getSchoolList(params)
       const data = response.data || response || {}
-      const content = data.content || []
+      const schoolList = data.schools || data.content || []
 
       this.setData({
-        schools: content,
-        hasMore: content.length >= this.data.pageSize,
+        schools: schoolList,
+        hasMore: schoolList.length >= this.data.pageSize,
         page: 1,
         loading: false
       })
@@ -129,7 +129,7 @@ Page({
         keyword: this.data.searchKeyword || undefined,
         city: this.data.filters.city || undefined,
         district: this.data.filters.district || undefined,
-        schoolType: this.data.filters.schoolType || undefined
+        type: this.data.filters.schoolType || undefined
       }
 
       Object.keys(params).forEach(key => {
@@ -138,11 +138,11 @@ Page({
 
       const response = await volunteer.getSchoolList(params)
       const data = response.data || response || {}
-      const content = data.content || []
+      const schoolList = data.schools || data.content || []
 
       this.setData({
-        schools: content,
-        hasMore: content.length >= this.data.pageSize,
+        schools: schoolList,
+        hasMore: schoolList.length >= this.data.pageSize,
         page: 1,
         refreshing: false
       })
@@ -167,7 +167,7 @@ Page({
         keyword: this.data.searchKeyword || undefined,
         city: this.data.filters.city || undefined,
         district: this.data.filters.district || undefined,
-        schoolType: this.data.filters.schoolType || undefined
+        type: this.data.filters.schoolType || undefined
       }
 
       Object.keys(params).forEach(key => {
@@ -176,11 +176,11 @@ Page({
 
       const response = await volunteer.getSchoolList(params)
       const data = response.data || response || {}
-      const content = data.content || []
+      const schoolList = data.schools || data.content || []
 
       this.setData({
-        schools: [...this.data.schools, ...content],
-        hasMore: content.length >= this.data.pageSize,
+        schools: [...this.data.schools, ...schoolList],
+        hasMore: schoolList.length >= this.data.pageSize,
         page: this.data.page + 1,
         loading: false
       })
@@ -200,19 +200,22 @@ Page({
   },
 
   onCityChange(e) {
-    const city = e.detail.value
+    const index = e.detail.value
+    const city = this.data.cities[index] || ''
     this.setData({ 'filters.city': city, 'filters.district': '' })
     this.loadDistricts(city)
     this.loadSchools()
   },
 
   onDistrictChange(e) {
-    this.setData({ 'filters.district': e.detail.value })
+    const index = e.detail.value
+    const district = this.data.districts[index] || ''
+    this.setData({ 'filters.district': district })
     this.loadSchools()
   },
 
   onTypeChange(e) {
-    const type = e.detail.value
+    const type = e.currentTarget.dataset.value
     this.setData({
       'filters.schoolType': type,
       activeTab: type || 'all'

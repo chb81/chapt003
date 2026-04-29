@@ -1,12 +1,11 @@
 <view class="projects-container">
-  <!-- 搜索栏 -->
   <view class="search-section">
     <view class="search-bar">
       <icon class="search-icon" type="search" size="16"></icon>
       <input 
         class="search-input" 
         type="text" 
-        placeholder="搜索志愿项目" 
+        placeholder="搜索学校名称" 
         value="{{searchKeyword}}"
         bindinput="onSearchInput"
         bindconfirm="onSearchConfirm"
@@ -15,7 +14,6 @@
     </view>
   </view>
 
-  <!-- 筛选栏 -->
   <view class="filter-section">
     <scroll-view class="filter-scroll" scroll-x enable-flex>
       <view 
@@ -25,244 +23,146 @@
         全部
       </view>
       <view 
-        wx:for="{{categories}}" 
+        wx:for="{{schoolTypes}}" 
         wx:key="value"
         class="filter-item {{activeTab === item.value ? 'active' : ''}}" 
-        bindtap="onCategoryChange"
-        data-category="{{item.value}}"
+        bindtap="onTypeChange"
+        data-value="{{item.value}}"
       >
         {{item.label}}
       </view>
     </scroll-view>
   </view>
 
-  <!-- 高级筛选 -->
   <view class="advanced-filter">
     <view class="filter-row">
-      <view class="filter-label">状态</view>
+      <view class="filter-label">城市</view>
       <picker 
         class="filter-picker"
-        range="{{statusOptions}}" 
-        range-key="label" 
-        bindchange="onStatusChange"
-        value="{{filters.status}}"
+        range="{{cities}}" 
+        bindchange="onCityChange"
       >
         <view class="picker-value">
-          {{filters.status ? getStatusLabel(filters.status) : '请选择状态'}}
+          {{filters.city || '请选择城市'}}
         </view>
       </picker>
     </view>
     
-    <view class="filter-row">
-      <view class="filter-label">地区</view>
-      <input 
-        class="filter-input" 
-        type="text" 
-        placeholder="输入地区" 
-        value="{{filters.location}}"
-        bindinput="onLocationInput"
-      />
+    <view wx:if="{{districts.length > 0}}" class="filter-row">
+      <view class="filter-label">区县</view>
+      <picker 
+        class="filter-picker"
+        range="{{districts}}" 
+        bindchange="onDistrictChange"
+      >
+        <view class="picker-value">
+          {{filters.district || '请选择区县'}}
+        </view>
+      </picker>
     </view>
   </view>
 
-  <!-- 项目列表 -->
-  <view class="projects-list">
+  <view class="schools-list">
     <view 
-      wx:for="{{projects}}" 
+      wx:for="{{schools}}" 
       wx:key="id" 
-      class="project-card"
-      bindtap="showProjectDetail"
+      class="school-card"
+      bindtap="showSchoolDetail"
       data-id="{{item.id}}"
     >
-      <view class="project-image">
-        <image src="{{item.cover_image || '/images/project-default.png'}}" mode="aspectFill"></image>
-        <view class="project-status" style="background: {{getStatusColor(item.status)}}">
-          {{getStatusLabel(item.status)}}
+      <view class="school-content">
+        <view class="school-header">
+          <view class="school-name">{{item.name}}</view>
+          <view class="school-type-badge">{{getSchoolTypeLabel(item.type)}}</view>
         </view>
-      </view>
-      
-      <view class="project-content">
-        <view class="project-title">{{item.title}}</view>
-        <view class="project-category">{{getCategoryLabel(item.category)}}</view>
-        <view class="project-info">
-          <text class="info-item">
-            <icon type="waiting" size="12"></icon>
-            {{item.required_volunteers}}人
-          </text>
-          <text class="info-item">
-            <icon type="time" size="12"></icon>
-            {{formatDate(item.start_date)}}
-          </text>
+        <view class="school-info">
+          <text class="info-item">{{item.city || ''}}</text>
+          <text wx:if="{{item.district}}" class="info-item">{{item.district}}</text>
         </view>
-        <view class="project-location">
-          <icon type="waiting" size="12"></icon>
-          {{item.location}}
+        <view wx:if="{{item.admissionScoreYear1}}" class="school-scores">
+          <text class="score-item">近年分数线: {{item.admissionScoreYear1}}</text>
         </view>
-        
-        <view class="project-actions">
-          <view 
-            wx:if="{{item.status === 'recruiting'}}"
-            class="apply-btn" 
-            catchtap="applyForProject"
-            data-id="{{item.id}}"
-          >
-            申请参加
-          </view>
-          <view wx:else class="view-btn">查看详情</view>
+        <view wx:if="{{item.enrollmentQuota}}" class="school-quota">
+          <text class="quota-text">招生计划: {{item.enrollmentQuota}}人</text>
         </view>
       </view>
     </view>
 
-    <!-- 空状态 -->
-    <view wx:if="{{projects.length === 0 && !loading}}" class="empty-state">
-      <image class="empty-image" src="/images/empty.png" mode="aspectFit"></image>
-      <view class="empty-text">暂无志愿项目</view>
+    <view wx:if="{{schools.length === 0 && !loading}}" class="empty-state">
+      <view class="empty-text">暂无学校数据</view>
     </view>
 
-    <!-- 加载状态 -->
     <view wx:if="{{loading}}" class="loading-state">
       <view class="loading-spinner"></view>
       <view class="loading-text">加载中...</view>
     </view>
 
-    <!-- 没有更多 -->
-    <view wx:if="{{!hasMore && projects.length > 0}}" class="no-more">
-      没有更多了
+    <view wx:if="{{hasMore && !loading}}" class="load-more" bindtap="loadMoreSchools">
+      <text>加载更多</text>
+    </view>
+    <view wx:if="{{!hasMore && schools.length > 0}}" class="no-more">
+      <text>没有更多了</text>
     </view>
   </view>
 </view>
 
-<!-- 项目详情模态框 -->
-<view wx:if="{{showProjectModal}}" class="modal-mask" bindtap="hideProjectModal">
-  <view class="project-modal" catchtap="stopPropagation">
+<view wx:if="{{showDetailModal}}" class="modal-mask" bindtap="hideDetailModal">
+  <view class="detail-modal" catchtap="">
     <view class="modal-header">
-      <view class="modal-title">{{currentProject.title}}</view>
-      <icon class="close-icon" type="clear" size="20" bindtap="hideProjectModal"></icon>
+      <view class="modal-title">{{currentSchool.name || '学校详情'}}</view>
+      <icon class="close-icon" type="clear" size="20" bindtap="hideDetailModal"></icon>
     </view>
     
     <scroll-view class="modal-body" scroll-y>
       <view class="detail-section">
-        <view class="detail-label">项目简介</view>
-        <view class="detail-content">{{currentProject.description}}</view>
+        <view class="detail-label">学校类型</view>
+        <view class="detail-content">{{getSchoolTypeLabel(currentSchool.type)}}</view>
       </view>
       
       <view class="detail-section">
-        <view class="detail-label">项目详情</view>
-        <view class="detail-grid">
-          <view class="detail-item">
-            <text class="item-label">招募人数</text>
-            <text class="item-value">{{currentProject.required_volunteers}}人</text>
-          </view>
-          <view class="detail-item">
-            <text class="item-label">开始时间</text>
-            <text class="item-value">{{formatDate(currentProject.start_date)}}</text>
-          </view>
-          <view class="detail-item">
-            <text class="item-label">结束时间</text>
-            <text class="item-value">{{formatDate(currentProject.end_date)}}</text>
-          </view>
-          <view class="detail-item">
-            <text class="item-label">项目地点</text>
-            <text class="item-value">{{currentProject.location}}</text>
-          </view>
+        <view class="detail-label">所在地区</view>
+        <view class="detail-content">{{currentSchool.city}} {{currentSchool.district}}</view>
+      </view>
+      
+      <view wx:if="{{currentSchool.address}}" class="detail-section">
+        <view class="detail-label">地址</view>
+        <view class="detail-content">{{currentSchool.address}}</view>
+      </view>
+      
+      <view wx:if="{{currentSchool.phone}}" class="detail-section">
+        <view class="detail-label">联系电话</view>
+        <view class="detail-content">{{currentSchool.phone}}</view>
+      </view>
+
+      <view wx:if="{{currentSchool.admissionScoreYear1}}" class="detail-section">
+        <view class="detail-label">历年分数线</view>
+        <view class="detail-content">
+          <text>前年: {{currentSchool.admissionScoreYear3 || '-'}}</text>
+          <text>去年: {{currentSchool.admissionScoreYear2 || '-'}}</text>
+          <text>今年: {{currentSchool.admissionScoreYear1 || '-'}}</text>
         </view>
       </view>
-      
-      <view class="detail-section">
-        <view class="detail-label">活动时间</view>
-        <view class="detail-content">{{currentProject.activity_time}}</view>
+
+      <view wx:if="{{currentSchool.enrollmentQuota}}" class="detail-section">
+        <view class="detail-label">招生计划</view>
+        <view class="detail-content">{{currentSchool.enrollmentQuota}}人</view>
       </view>
-      
-      <view class="detail-section">
-        <view class="detail-label">服务对象</view>
-        <view class="detail-content">{{currentProject.service_target}}</view>
+
+      <view wx:if="{{currentSchool.features}}" class="detail-section">
+        <view class="detail-label">学校特色</view>
+        <view class="detail-content">{{currentSchool.features}}</view>
       </view>
-      
-      <view wx:if="{{currentProject.requirements}}" class="detail-section">
-        <view class="detail-label">志愿者要求</view>
-        <view class="detail-content">{{currentProject.requirements}}</view>
+
+      <view wx:if="{{currentSchool.description}}" class="detail-section">
+        <view class="detail-label">学校简介</view>
+        <view class="detail-content">{{currentSchool.description}}</view>
       </view>
-      
-      <view wx:if="{{currentProject.benefits}}" class="detail-section">
-        <view class="detail-label">项目福利</view>
-        <view class="detail-content">{{currentProject.benefits}}</view>
+
+      <view wx:if="{{admissionProbability}}" class="detail-section">
+        <view class="detail-label">录取概率</view>
+        <view class="detail-content probability">{{admissionProbability.probabilityPercent || '--'}}%</view>
+        <view wx:if="{{admissionProbability.suggestion}}" class="detail-sub">{{admissionProbability.suggestion}}</view>
       </view>
     </scroll-view>
-    
-    <view class="modal-footer">
-      <view 
-        wx:if="{{currentProject.status === 'recruiting'}}"
-        class="modal-btn primary" 
-        bindtap="applyForProject"
-        data-id="{{currentProject.id}}"
-      >
-        申请参加
-      </view>
-      <view class="modal-btn" bindtap="hideProjectModal">关闭</view>
-    </view>
-  </view>
-</view>
-
-<!-- 申请模态框 -->
-<view wx:if="{{showApplyModal}}" class="modal-mask" bindtap="cancelApplication">
-  <view class="apply-modal" catchtap="stopPropagation">
-    <view class="modal-header">
-      <view class="modal-title">申请参加</view>
-      <icon class="close-icon" type="clear" size="20" bindtap="cancelApplication"></icon>
-    </view>
-    
-    <view class="modal-body">
-      <view class="form-group">
-        <view class="form-label">申请动机 <text class="required">*</text></view>
-        <textarea 
-          class="form-textarea" 
-          placeholder="请说明您为什么想参加这个志愿项目（至少10个字符）"
-          value="{{applyForm.motivation}}"
-          data-field="motivation"
-          bindinput="onApplyInputChange"
-          maxlength="500"
-          show-confirm-bar="{{false}}"
-        ></textarea>
-        <view class="form-counter">{{applyForm.motivation.length}}/500</view>
-      </view>
-      
-      <view class="form-group">
-        <view class="form-label">相关经验 <text class="required">*</text></view>
-        <textarea 
-          class="form-textarea" 
-          placeholder="请简述您的相关经验（至少5个字符）"
-          value="{{applyForm.experience}}"
-          data-field="experience"
-          bindinput="onApplyInputChange"
-          maxlength="300"
-          show-confirm-bar="{{false}}"
-        ></textarea>
-        <view class="form-counter">{{applyForm.experience.length}}/300</view>
-      </view>
-      
-      <view class="form-group">
-        <view class="form-label">可用时间</view>
-        <textarea 
-          class="form-textarea" 
-          placeholder="请说明您的可用时间安排"
-          value="{{applyForm.availability}}"
-          data-field="availability"
-          bindinput="onApplyInputChange"
-          maxlength="200"
-          show-confirm-bar="{{false}}"
-        ></textarea>
-        <view class="form-counter">{{applyForm.availability.length}}/200</view>
-      </view>
-    </view>
-    
-    <view class="modal-footer">
-      <view 
-        class="modal-btn primary {{submitting ? 'disabled' : ''}}" 
-        bindtap="submitApplication"
-      >
-        {{submitting ? '提交中...' : '提交申请'}}
-      </view>
-      <view class="modal-btn" bindtap="cancelApplication">取消</view>
-    </view>
   </view>
 </view>

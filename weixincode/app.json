@@ -38,13 +38,13 @@
       },
       {
         "pagePath": "pages/projects/projects",
-        "text": "项目",
+        "text": "学校",
         "iconPath": "images/project.png",
         "selectedIconPath": "images/project-active.png"
       },
       {
         "pagePath": "pages/applications/applications",
-        "text": "申请",
+        "text": "志愿",
         "iconPath": "images/application.png",
         "selectedIconPath": "images/application-active.png"
       },
