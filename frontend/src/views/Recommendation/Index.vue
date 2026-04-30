@@ -62,10 +62,19 @@
                 <el-tag size="small">{{ row.school_type === 'KEY' ? '重点' : row.school_type === 'REGULAR' ? '普通' : '职高' }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="录取概率" width="120">
-              <template #default="{ row }">{{ row.probability }}%</template>
+            <el-table-column label="录取概率" width="160">
+              <template #default="{ row }">
+                {{ row.probability }}%
+                <span v-if="row.confidence_interval" style="color:#909399;font-size:12px"> ±{{ row.confidence_interval }}%</span>
+              </template>
             </el-table-column>
-            <el-table-column prop="reason" label="推荐理由" min-width="200" />
+            <el-table-column label="分配生" width="100">
+              <template #default="{ row }">
+                <el-tag v-if="row.allocation_advantage" type="success" size="small">分配生优势</el-tag>
+                <el-tag v-else-if="row.allocation_tag" type="info" size="small">{{ row.allocation_tag }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="reason" label="推荐理由" min-width="180" />
           </el-table>
           <el-empty v-if="!loading && recommendations.length === 0" description="点击获取推荐按钮生成推荐" />
         </el-card>

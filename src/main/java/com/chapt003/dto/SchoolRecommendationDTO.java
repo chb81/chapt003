@@ -37,4 +37,13 @@ public class SchoolRecommendationDTO {
 
     @JsonProperty("position")
     private Integer position;
+
+    @JsonProperty("allocation_advantage")
+    private Boolean allocationAdvantage;
+
+    @JsonProperty("allocation_tag")
+    private String allocationTag;
+
+    @JsonProperty("confidence_interval")
+    private BigDecimal confidenceInterval;
 }

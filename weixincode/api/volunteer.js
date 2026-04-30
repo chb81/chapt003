@@ -228,5 +228,26 @@ module.exports = {
   convertScoreToRank,
   getMyRank,
   getAllocationQuotas,
-  getMyAllocationOptions
+  getMyAllocationOptions,
+  getOnboardingStatus: function() {
+    return request({ url: '/user-experience/onboarding/status', method: 'GET' })
+  },
+  completeOnboardingStep: function(step) {
+    return request({ url: '/user-experience/onboarding/complete-step', method: 'POST', data: { step: step } })
+  },
+  getUnreadNotifications: function() {
+    return request({ url: '/user-experience/notifications/unread', method: 'GET' })
+  },
+  getUnreadCount: function() {
+    return request({ url: '/user-experience/notifications/unread-count', method: 'GET' })
+  },
+  markNotificationRead: function(id) {
+    return request({ url: '/user-experience/notifications/' + id + '/read', method: 'POST' })
+  },
+  createShare: function(data) {
+    return request({ url: '/user-experience/share', method: 'POST', data: data })
+  },
+  getShare: function(shareCode) {
+    return request({ url: '/user-experience/share/' + shareCode, method: 'GET' })
+  }
 }

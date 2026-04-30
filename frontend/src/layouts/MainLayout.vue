@@ -34,6 +34,14 @@
           <el-icon><MagicStick /></el-icon>
           <template #title>智能推荐</template>
         </el-menu-item>
+        <el-sub-menu index="/plan-tools">
+          <template #title>
+            <el-icon><DataAnalysis /></el-icon>
+            <span>方案工具</span>
+          </template>
+          <el-menu-item index="/risk-assessment">风险评估</el-menu-item>
+          <el-menu-item index="/plan-comparison">方案对比</el-menu-item>
+        </el-sub-menu>
         <el-sub-menu index="/help-center">
           <template #title>
             <el-icon><QuestionFilled /></el-icon>
@@ -109,6 +117,7 @@
         <router-view />
       </el-main>
     </el-container>
+    <OnboardingGuide />
   </el-container>
 </template>
 
@@ -116,6 +125,7 @@
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import OnboardingGuide from '@/components/Common/OnboardingGuide.vue'
 import {
   School, DataAnalysis, OfficeBuilding, User, Edit,
   MagicStick, QuestionFilled, Setting, Fold, Expand, ArrowDown,

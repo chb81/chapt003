@@ -57,6 +57,12 @@ const router = createRouter({
           meta: { title: '方案对比分析' }
         },
         {
+          path: 'risk-assessment',
+          name: 'RiskAssessment',
+          component: () => import('@/views/Volunteer/RiskAssessment.vue'),
+          meta: { title: '风险评估' }
+        },
+        {
           path: 'recommendation',
           name: 'Recommendation',
           component: () => import('@/views/Recommendation/Index.vue'),

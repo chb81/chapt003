@@ -15,9 +15,10 @@ import java.util.Optional;
 @Service
 public class AdmissionProbabilityService {
 
-    private static final BigDecimal WEIGHT_SCORE = new BigDecimal("0.5");
-    private static final BigDecimal WEIGHT_ADMISSION_RATE = new BigDecimal("0.3");
-    private static final BigDecimal WEIGHT_TREND = new BigDecimal("0.2");
+    private static final BigDecimal WEIGHT_SCORE = new BigDecimal("0.45");
+    private static final BigDecimal WEIGHT_ADMISSION_RATE = new BigDecimal("0.25");
+    private static final BigDecimal WEIGHT_TREND = new BigDecimal("0.15");
+    private static final BigDecimal WEIGHT_VOLATILITY = new BigDecimal("0.15");
     private static final BigDecimal HIGH_PROBABILITY = new BigDecimal("80.00");
     private static final BigDecimal MEDIUM_PROBABILITY = new BigDecimal("50.00");
 
@@ -97,10 +98,12 @@ public class AdmissionProbabilityService {
         BigDecimal scoreMatch = calculateScoreMatch(studentScore, school);
         BigDecimal admissionRate = calculateAdmissionRate(school);
         BigDecimal trend = calculateTrend(school);
+        BigDecimal volatility = calculateVolatilityFactor(school);
 
         BigDecimal probability = WEIGHT_SCORE.multiply(scoreMatch)
                 .add(WEIGHT_ADMISSION_RATE.multiply(admissionRate))
-                .add(WEIGHT_TREND.multiply(trend));
+                .add(WEIGHT_TREND.multiply(trend))
+                .add(WEIGHT_VOLATILITY.multiply(volatility));
 
         probability = probability.multiply(new BigDecimal("100"));
         probability = probability.setScale(2, RoundingMode.HALF_UP);
@@ -261,5 +264,34 @@ public class AdmissionProbabilityService {
         BigDecimal stdDev = new BigDecimal(Math.sqrt(variance.doubleValue()));
 
         return stdDev.multiply(new BigDecimal("2")).min(new BigDecimal("15")).max(new BigDecimal("5"));
+    }
+
+    private BigDecimal calculateVolatilityFactor(School school) {
+        BigDecimal y1 = school.getAdmissionScoreYear1();
+        BigDecimal y2 = school.getAdmissionScoreYear2();
+        BigDecimal y3 = school.getAdmissionScoreYear3();
+
+        if (y1 == null || y2 == null || y3 == null) {
+            return new BigDecimal("0.5");
+        }
+
+        BigDecimal avg = y1.add(y2).add(y3).divide(new BigDecimal("3"), 2, RoundingMode.HALF_UP);
+        BigDecimal variance = y1.subtract(avg).pow(2)
+                .add(y2.subtract(avg).pow(2))
+                .add(y3.subtract(avg).pow(2))
+                .divide(new BigDecimal("3"), 4, RoundingMode.HALF_UP);
+
+        BigDecimal stdDev = new BigDecimal(Math.sqrt(variance.doubleValue()));
+
+        if (stdDev.compareTo(new BigDecimal("5")) <= 0) {
+            return new BigDecimal("0.9");
+        } else if (stdDev.compareTo(new BigDecimal("15")) <= 0) {
+            BigDecimal range = new BigDecimal("15").subtract(new BigDecimal("5"));
+            BigDecimal position = stdDev.subtract(new BigDecimal("5"));
+            return BigDecimal.ONE.subtract(position.divide(range, 4, RoundingMode.HALF_UP)
+                    .multiply(new BigDecimal("0.5")));
+        } else {
+            return new BigDecimal("0.3");
+        }
     }
 }

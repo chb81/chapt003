@@ -37,6 +37,8 @@ public interface VolunteerApplicationRepository extends JpaRepository<VolunteerA
 
     boolean existsByUserIdAndYearAndStatus(Long userId, Integer year, VolunteerApplicationStatus status);
 
+    long countByUserId(Long userId);
+
     @Query("SELECT va FROM VolunteerApplication va LEFT JOIN FETCH va.items WHERE va.id = :id")
     Optional<VolunteerApplication> findByIdWithItems(@Param("id") Long id);
 }

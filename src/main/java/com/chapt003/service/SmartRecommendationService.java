@@ -126,6 +126,8 @@ public class SmartRecommendationService {
                     .probability(null)
                     .recommendationScore(BigDecimal.ZERO)
                     .reason("数据不足")
+                    .allocationAdvantage(false)
+                    .allocationTag(null)
                     .build();
         }
 
@@ -151,6 +153,9 @@ public class SmartRecommendationService {
                 .reason(reason)
                 .isAdded(false)
                 .position(null)
+                .allocationAdvantage(false)
+                .allocationTag("统招竞争")
+                .confidenceInterval(new BigDecimal("8"))
                 .build();
     }
 
