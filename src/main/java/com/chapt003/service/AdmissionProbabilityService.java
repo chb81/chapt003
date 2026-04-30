@@ -66,6 +66,17 @@ public class AdmissionProbabilityService {
         String message = getProbabilityMessage(probabilityDecimal);
         Integer probability = probabilityDecimal != null ? probabilityDecimal.intValue() : null;
 
+        BigDecimal confidence = calculateConfidenceInterval(school);
+        BigDecimal lowerBound = probabilityDecimal != null
+                ? probabilityDecimal.subtract(confidence).max(BigDecimal.ZERO).setScale(2, RoundingMode.HALF_UP)
+                : null;
+        BigDecimal upperBound = probabilityDecimal != null
+                ? probabilityDecimal.add(confidence).min(new BigDecimal("100")).setScale(2, RoundingMode.HALF_UP)
+                : null;
+
+        Boolean allocationAdvantage = false;
+        Integer allocationAdjustedProbability = null;
+
         return AdmissionProbabilityDetailResponse.builder()
                 .studentTotalScore(studentTotalScore)
                 .schoolAdmissionScoreYear1(school.getAdmissionScoreYear1())
@@ -73,6 +84,11 @@ public class AdmissionProbabilityService {
                 .schoolAdmissionScoreYear3(school.getAdmissionScoreYear3())
                 .admissionRate(calculateAdmissionRate(school))
                 .probability(probability)
+                .confidenceInterval(confidence)
+                .lowerBound(lowerBound)
+                .upperBound(upperBound)
+                .allocationAdvantage(allocationAdvantage)
+                .allocationAdjustedProbability(allocationAdjustedProbability)
                 .message(message)
                 .build();
     }
@@ -223,5 +239,27 @@ public class AdmissionProbabilityService {
         } else {
             return "录取概率较低";
         }
+    }
+
+    private BigDecimal calculateConfidenceInterval(School school) {
+        int dataPoints = 0;
+        if (school.getAdmissionScoreYear1() != null) dataPoints++;
+        if (school.getAdmissionScoreYear2() != null) dataPoints++;
+        if (school.getAdmissionScoreYear3() != null) dataPoints++;
+
+        if (dataPoints < 2) return new BigDecimal("15");
+        if (dataPoints == 2) return new BigDecimal("10");
+
+        BigDecimal y1 = school.getAdmissionScoreYear1();
+        BigDecimal y2 = school.getAdmissionScoreYear2();
+        BigDecimal y3 = school.getAdmissionScoreYear3();
+        BigDecimal avg = y1.add(y2).add(y3).divide(new BigDecimal("3"), 2, RoundingMode.HALF_UP);
+        BigDecimal variance = y1.subtract(avg).pow(2)
+                .add(y2.subtract(avg).pow(2))
+                .add(y3.subtract(avg).pow(2))
+                .divide(new BigDecimal("3"), 4, RoundingMode.HALF_UP);
+        BigDecimal stdDev = new BigDecimal(Math.sqrt(variance.doubleValue()));
+
+        return stdDev.multiply(new BigDecimal("2")).min(new BigDecimal("15")).max(new BigDecimal("5"));
     }
 }

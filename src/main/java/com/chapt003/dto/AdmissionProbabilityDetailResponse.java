@@ -32,6 +32,21 @@ public class AdmissionProbabilityDetailResponse {
     @JsonProperty("probability")
     private Integer probability;
 
+    @JsonProperty("confidence_interval")
+    private BigDecimal confidenceInterval;
+
+    @JsonProperty("lower_bound")
+    private BigDecimal lowerBound;
+
+    @JsonProperty("upper_bound")
+    private BigDecimal upperBound;
+
+    @JsonProperty("allocation_advantage")
+    private Boolean allocationAdvantage;
+
+    @JsonProperty("allocation_adjusted_probability")
+    private Integer allocationAdjustedProbability;
+
     @JsonProperty("message")
     private String message;
 }

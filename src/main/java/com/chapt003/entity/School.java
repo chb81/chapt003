@@ -64,6 +64,30 @@ public class School {
     @Column(length = 200)
     private String address;
 
+    @Column(name = "school_level", length = 30)
+    private String schoolLevel;
+
+    @Column(name = "college_admission_rate", precision = 5, scale = 2)
+    private BigDecimal collegeAdmissionRate;
+
+    @Column(name = "first_tier_rate", precision = 5, scale = 2)
+    private BigDecimal firstTierRate;
+
+    @Column(name = "boarding_type", length = 20)
+    private String boardingType;
+
+    @Column(name = "tuition_range", length = 100)
+    private String tuitionRange;
+
+    @Column(name = "special_classes", columnDefinition = "TEXT")
+    private String specialClasses;
+
+    @Column(name = "facilities_score", precision = 3, scale = 1)
+    private BigDecimal facilitiesScore;
+
+    @Column(length = 200)
+    private String transportation;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -220,4 +244,21 @@ public class School {
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
     }
+
+    public String getSchoolLevel() { return schoolLevel; }
+    public void setSchoolLevel(String schoolLevel) { this.schoolLevel = schoolLevel; }
+    public BigDecimal getCollegeAdmissionRate() { return collegeAdmissionRate; }
+    public void setCollegeAdmissionRate(BigDecimal collegeAdmissionRate) { this.collegeAdmissionRate = collegeAdmissionRate; }
+    public BigDecimal getFirstTierRate() { return firstTierRate; }
+    public void setFirstTierRate(BigDecimal firstTierRate) { this.firstTierRate = firstTierRate; }
+    public String getBoardingType() { return boardingType; }
+    public void setBoardingType(String boardingType) { this.boardingType = boardingType; }
+    public String getTuitionRange() { return tuitionRange; }
+    public void setTuitionRange(String tuitionRange) { this.tuitionRange = tuitionRange; }
+    public String getSpecialClasses() { return specialClasses; }
+    public void setSpecialClasses(String specialClasses) { this.specialClasses = specialClasses; }
+    public BigDecimal getFacilitiesScore() { return facilitiesScore; }
+    public void setFacilitiesScore(BigDecimal facilitiesScore) { this.facilitiesScore = facilitiesScore; }
+    public String getTransportation() { return transportation; }
+    public void setTransportation(String transportation) { this.transportation = transportation; }
 }

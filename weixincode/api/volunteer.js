@@ -156,6 +156,51 @@ function getHelpDocuments(category) {
   })
 }
 
+function getRiskAssessment(planId) {
+  return request({
+    url: '/plan-analysis/' + planId + '/risk',
+    method: 'GET'
+  })
+}
+
+function comparePlans(planIds) {
+  return request({
+    url: '/plan-analysis/compare',
+    method: 'POST',
+    data: planIds
+  })
+}
+
+function convertScoreToRank(totalScore, city, year) {
+  return request({
+    url: '/plan-analysis/score-rank',
+    method: 'GET',
+    data: { totalScore: totalScore, city: city, year: year }
+  })
+}
+
+function getMyRank() {
+  return request({
+    url: '/plan-analysis/my-rank',
+    method: 'GET'
+  })
+}
+
+function getAllocationQuotas(schoolId, year) {
+  return request({
+    url: '/allocation/schools/' + schoolId + '/quotas',
+    method: 'GET',
+    data: { year: year }
+  })
+}
+
+function getMyAllocationOptions() {
+  return request({
+    url: '/allocation/my-options',
+    method: 'GET'
+  })
+}
+
 module.exports = {
   getSchoolList,
   getSchoolDetail,
@@ -177,5 +222,11 @@ module.exports = {
   getRecommendationPreferences,
   saveRecommendationPreferences,
   getAnnouncements,
-  getHelpDocuments
+  getHelpDocuments,
+  getRiskAssessment,
+  comparePlans,
+  convertScoreToRank,
+  getMyRank,
+  getAllocationQuotas,
+  getMyAllocationOptions
 }

@@ -51,6 +51,12 @@ const router = createRouter({
           meta: { title: '志愿填报' }
         },
         {
+          path: 'plan-comparison',
+          name: 'PlanComparison',
+          component: () => import('@/views/Volunteer/PlanComparison.vue'),
+          meta: { title: '方案对比分析' }
+        },
+        {
           path: 'recommendation',
           name: 'Recommendation',
           component: () => import('@/views/Recommendation/Index.vue'),
