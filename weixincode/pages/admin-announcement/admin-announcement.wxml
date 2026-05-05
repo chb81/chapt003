@@ -1,0 +1,53 @@
+<view class="container">
+  <view class="header"><text class="title">公告管理</text></view>
+  <view class="action-bar">
+    <view class="action-btn primary" bindtap="onAdd"><text>+ 新增公告</text></view>
+  </view>
+  <view class="list" wx:if="{{items.length > 0}}">
+    <view class="card" wx:for="{{items}}" wx:key="id">
+      <view class="card-header">
+        <text class="card-title">{{item.title}}</text>
+        <text class="type-tag {{item.type === 'IMPORTANT' ? 'important' : ''}}">{{item.type === 'IMPORTANT' ? '重要' : '普通'}}</text>
+      </view>
+      <view class="card-body">
+        <view class="info-row"><text class="label">发布者：</text><text class="value">{{item.publisher || '-'}}</text></view>
+        <view class="info-row"><text class="label">优先级：</text><text class="value">{{item.priority}}</text></view>
+        <view class="info-row"><text class="label">已读人数：</text><text class="value highlight">{{item.readCount || 0}}</text></view>
+        <view class="info-row"><text class="label">发布时间：</text><text class="value">{{item.publishedAtStr || '-'}}</text></view>
+      </view>
+      <view class="card-actions">
+        <view class="btn-edit" bindtap="onEdit" data-item="{{item}}">编辑</view>
+        <view class="btn-delete" bindtap="onDelete" data-id="{{item.id}}">删除</view>
+      </view>
+    </view>
+  </view>
+  <view class="empty" wx:if="{{!loading && items.length === 0}}"><text>暂无公告</text></view>
+  <view class="loading" wx:if="{{loading}}"><text>加载中...</text></view>
+  <view class="pagination" wx:if="{{totalPages > 1}}">
+    <view class="page-btn" bindtap="onPrevPage" style="opacity: {{currentPage > 0 ? 1 : 0.5}}"><text>上一页</text></view>
+    <text class="page-info">{{currentPage + 1}} / {{totalPages}}</text>
+    <view class="page-btn" bindtap="onNextPage" style="opacity: {{currentPage < totalPages - 1 ? 1 : 0.5}}"><text>下一页</text></view>
+  </view>
+  <view class="modal-mask" wx:if="{{showForm}}" bindtap="onCancelForm"></view>
+  <view class="modal" wx:if="{{showForm}}">
+    <view class="modal-header">
+      <text class="modal-title">{{editingId ? '编辑公告' : '新增公告'}}</text>
+      <text class="modal-close" bindtap="onCancelForm">✕</text>
+    </view>
+    <scroll-view scroll-y class="modal-body">
+      <view class="form-group"><text class="form-label">标题 *</text><input class="form-input" placeholder="输入标题" value="{{formData.title}}" bindinput="onFormInput" data-field="title" /></view>
+      <view class="form-group"><text class="form-label">类型 *</text>
+        <picker range="{{types}}" value="{{typeIndex}}" bindchange="onTypeChange">
+          <view class="form-input picker-value"><text>{{formData.type || '选择类型'}}</text><text class="arrow">▼</text></view>
+        </picker>
+      </view>
+      <view class="form-group"><text class="form-label">发布者</text><input class="form-input" placeholder="发布者名称" value="{{formData.publisher}}" bindinput="onFormInput" data-field="publisher" /></view>
+      <view class="form-group"><text class="form-label">优先级</text><input class="form-input" type="number" placeholder="0-10" value="{{formData.priority}}" bindinput="onFormInput" data-field="priority" /></view>
+      <view class="form-group"><text class="form-label">内容 *</text><textarea class="form-textarea" placeholder="公告内容" value="{{formData.content}}" bindinput="onFormInput" data-field="content" auto-height maxlength="-1" /></view>
+    </scroll-view>
+    <view class="modal-footer">
+      <view class="modal-btn cancel" bindtap="onCancelForm">取消</view>
+      <view class="modal-btn confirm" bindtap="onSaveForm">保存</view>
+    </view>
+  </view>
+</view>

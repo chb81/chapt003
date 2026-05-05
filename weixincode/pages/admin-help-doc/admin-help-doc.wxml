@@ -1,0 +1,57 @@
+<view class="container">
+  <view class="header"><text class="title">帮助文档管理</text></view>
+  <view class="action-bar">
+    <view class="action-btn primary" bindtap="onAdd"><text>+ 新增文档</text></view>
+  </view>
+  <view class="list" wx:if="{{items.length > 0}}">
+    <view class="card" wx:for="{{items}}" wx:key="id">
+      <view class="card-header">
+        <text class="card-title">{{item.title}}</text>
+        <text class="status-tag {{item.published ? 'published' : 'unpublished'}}">{{item.published ? '已发布' : '草稿'}}</text>
+      </view>
+      <view class="card-body">
+        <view class="info-row"><text class="label">分类：</text><text class="value">{{item.category}}</text></view>
+        <view class="info-row"><text class="label">浏览量：</text><text class="value">{{item.viewCount || 0}}</text></view>
+        <view class="info-row"><text class="label">有用：</text><text class="value highlight">{{item.helpfulCount || 0}}</text></view>
+        <view class="info-row"><text class="label">无用：</text><text class="value">{{item.notHelpfulCount || 0}}</text></view>
+      </view>
+      <view class="card-actions">
+        <view class="btn-edit" bindtap="onEdit" data-item="{{item}}">编辑</view>
+        <view class="btn-toggle" bindtap="onTogglePublish" data-item="{{item}}">{{item.published ? '下架' : '发布'}}</view>
+        <view class="btn-delete" bindtap="onDelete" data-id="{{item.id}}">删除</view>
+      </view>
+    </view>
+  </view>
+  <view class="empty" wx:if="{{!loading && items.length === 0}}"><text>暂无帮助文档</text></view>
+  <view class="loading" wx:if="{{loading}}"><text>加载中...</text></view>
+  <view class="pagination" wx:if="{{totalPages > 1}}">
+    <view class="page-btn" bindtap="onPrevPage" style="opacity: {{currentPage > 0 ? 1 : 0.5}}"><text>上一页</text></view>
+    <text class="page-info">{{currentPage + 1}} / {{totalPages}}</text>
+    <view class="page-btn" bindtap="onNextPage" style="opacity: {{currentPage < totalPages - 1 ? 1 : 0.5}}"><text>下一页</text></view>
+  </view>
+  <view class="modal-mask" wx:if="{{showForm}}" bindtap="onCancelForm"></view>
+  <view class="modal" wx:if="{{showForm}}">
+    <view class="modal-header">
+      <text class="modal-title">{{editingId ? '编辑文档' : '新增文档'}}</text>
+      <text class="modal-close" bindtap="onCancelForm">✕</text>
+    </view>
+    <scroll-view scroll-y class="modal-body">
+      <view class="form-group"><text class="form-label">标题 *</text><input class="form-input" placeholder="输入标题" value="{{formData.title}}" bindinput="onFormInput" data-field="title" /></view>
+      <view class="form-group"><text class="form-label">分类 *</text>
+        <picker range="{{categories}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
+          <view class="form-input picker-val"><text>{{formData.category || '选择分类'}}</text><text class="arrow">▼</text></view>
+        </picker>
+      </view>
+      <view class="form-group"><text class="form-label">描述</text><input class="form-input" placeholder="简短描述" value="{{formData.description}}" bindinput="onFormInput" data-field="description" /></view>
+      <view class="form-group"><text class="form-label">预计阅读(分钟)</text><input class="form-input" type="number" placeholder="如5" value="{{formData.readingTime}}" bindinput="onFormInput" data-field="readingTime" /></view>
+      <view class="form-group"><text class="form-label">内容 *</text><textarea class="form-textarea" placeholder="文档内容" value="{{formData.content}}" bindinput="onFormInput" data-field="content" auto-height maxlength="-1" /></view>
+      <view class="form-group" wx:if="{{!editingId}}">
+        <view class="form-switch-row"><text class="form-label">立即发布</text><switch checked="{{formData.published}}" bindchange="onPublishChange" color="#1890ff" /></view>
+      </view>
+    </scroll-view>
+    <view class="modal-footer">
+      <view class="modal-btn cancel" bindtap="onCancelForm">取消</view>
+      <view class="modal-btn confirm" bindtap="onSaveForm">保存</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,133 @@
+<view class="container">
+  <view class="header">
+    <text class="title">分配生政策管理</text>
+  </view>
+
+  <view class="filter-bar">
+    <picker mode="number" range="{{yearRange}}" value="{{yearIndex}}" bindchange="onYearChange">
+      <view class="filter-item">
+        <text>{{filterYear ? filterYear + '年' : '年度'}}</text>
+        <text class="arrow">▼</text>
+      </view>
+    </picker>
+    <input class="filter-input" placeholder="城市" value="{{filterCity}}" bindinput="onCityInput" />
+    <input class="filter-input" placeholder="区县" value="{{filterDistrict}}" bindinput="onDistrictInput" />
+    <view class="filter-btn" bindtap="onSearch">
+      <text>搜索</text>
+    </view>
+  </view>
+
+  <view class="action-bar">
+    <view class="action-btn primary" bindtap="onAdd">
+      <text>+ 新增政策</text>
+    </view>
+  </view>
+
+  <view class="list" wx:if="{{policies.length > 0}}">
+    <view class="card" wx:for="{{policies}}" wx:key="id">
+      <view class="card-header">
+        <text class="policy-name">{{item.policyName}}</text>
+        <text class="type-tag">{{item.policyType}}</text>
+      </view>
+      <view class="card-body">
+        <view class="info-row">
+          <text class="label">地区：</text>
+          <text class="value">{{item.city}} {{item.district}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">年度：</text>
+          <text class="value">{{item.year}}年</text>
+        </view>
+        <view class="info-row">
+          <text class="label">分配比例：</text>
+          <text class="value highlight">{{item.totalQuotaPercentage ? item.totalQuotaPercentage + '%' : '-'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">最低分差：</text>
+          <text class="value">{{item.minScoreGap ? item.minScoreGap + '分' : '-'}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.description}}">
+          <text class="label">说明：</text>
+          <text class="value desc">{{item.description}}</text>
+        </view>
+      </view>
+      <view class="card-actions">
+        <view class="btn-edit" bindtap="onEdit" data-item="{{item}}">编辑</view>
+        <view class="btn-delete" bindtap="onDelete" data-id="{{item.id}}" data-name="{{item.policyName}}">删除</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && policies.length === 0}}">
+    <text>暂无分配生政策数据</text>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="pagination" wx:if="{{totalPages > 1}}">
+    <view class="page-btn" bindtap="onPrevPage" style="opacity: {{currentPage > 0 ? 1 : 0.5}}">
+      <text>上一页</text>
+    </view>
+    <text class="page-info">{{currentPage + 1}} / {{totalPages}}</text>
+    <view class="page-btn" bindtap="onNextPage" style="opacity: {{currentPage < totalPages - 1 ? 1 : 0.5}}">
+      <text>下一页</text>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showForm}}" bindtap="onCancelForm"></view>
+  <view class="modal" wx:if="{{showForm}}">
+    <view class="modal-header">
+      <text class="modal-title">{{editingId ? '编辑政策' : '新增政策'}}</text>
+      <text class="modal-close" bindtap="onCancelForm">✕</text>
+    </view>
+    <scroll-view scroll-y class="modal-body">
+      <view class="form-group">
+        <text class="form-label">城市 *</text>
+        <input class="form-input" placeholder="如：武汉" value="{{formData.city}}" bindinput="onFormInput" data-field="city" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">区县 *</text>
+        <input class="form-input" placeholder="如：武昌区" value="{{formData.district}}" bindinput="onFormInput" data-field="district" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">年度 *</text>
+        <input class="form-input" type="number" placeholder="如2025" value="{{formData.year}}" bindinput="onFormInput" data-field="year" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">政策名称 *</text>
+        <input class="form-input" placeholder="如：武昌区分配生政策" value="{{formData.policyName}}" bindinput="onFormInput" data-field="policyName" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">政策类型 *</text>
+        <picker range="{{policyTypes}}" value="{{policyTypeIndex}}" bindchange="onPolicyTypeChange">
+          <view class="form-input picker-value">
+            <text>{{formData.policyType || '选择类型'}}</text>
+            <text class="arrow">▼</text>
+          </view>
+        </picker>
+      </view>
+      <view class="form-group">
+        <text class="form-label">分配比例(%)</text>
+        <input class="form-input" type="digit" placeholder="如50" value="{{formData.totalQuotaPercentage}}" bindinput="onFormInput" data-field="totalQuotaPercentage" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">最低分数差</text>
+        <input class="form-input" type="digit" placeholder="分配生线最多低于统招线多少分" value="{{formData.minScoreGap}}" bindinput="onFormInput" data-field="minScoreGap" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">资格条件(JSON)</text>
+        <textarea class="form-textarea" placeholder="输入资格条件JSON" value="{{formData.eligibleConditions}}" bindinput="onFormInput" data-field="eligibleConditions" auto-height maxlength="-1" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">政策说明</text>
+        <textarea class="form-textarea" placeholder="输入政策详细说明" value="{{formData.description}}" bindinput="onFormInput" data-field="description" auto-height maxlength="-1" />
+      </view>
+    </scroll-view>
+    <view class="modal-footer">
+      <view class="modal-btn cancel" bindtap="onCancelForm">取消</view>
+      <view class="modal-btn confirm" bindtap="onSaveForm">保存</view>
+    </view>
+  </view>
+</view>

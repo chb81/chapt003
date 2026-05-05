@@ -1,6 +1,8 @@
 package com.chapt003.repository;
 
 import com.chapt003.entity.CustomerServiceSession;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -59,4 +61,6 @@ public interface CustomerServiceSessionRepository extends JpaRepository<Customer
      * 统计活跃会话数量
      */
     long countBySessionStatus(String status);
+
+    Page<CustomerServiceSession> findBySessionStatusOrderByStartTimeDesc(String status, Pageable pageable);
 }

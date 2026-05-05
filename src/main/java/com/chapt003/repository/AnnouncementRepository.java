@@ -2,6 +2,8 @@ package com.chapt003.repository;
 
 import com.chapt003.entity.Announcement;
 import com.chapt003.entity.enums.AnnouncementType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +25,6 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, Long
 
     @Query("SELECT a FROM Announcement a WHERE a.publishedAt <= :now AND a.deleted = false AND a.type = :type ORDER BY a.publishedAt DESC")
     List<Announcement> findByTypeAndActive(@Param("type") AnnouncementType type, @Param("now") LocalDateTime now);
+
+    Page<Announcement> findByTypeOrderByCreatedAtDesc(AnnouncementType type, Pageable pageable);
 }

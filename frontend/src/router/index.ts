@@ -127,6 +127,48 @@ const router = createRouter({
           name: 'SystemData',
           component: () => import('@/views/Admin/SystemData.vue'),
           meta: { title: '数据管理', requiresAdmin: true }
+        },
+        {
+          path: 'admin/allocation-quotas',
+          name: 'AllocationQuota',
+          component: () => import('@/views/Admin/AllocationQuota.vue'),
+          meta: { title: '分配生名额管理', requiresAdmin: true }
+        },
+        {
+          path: 'admin/allocation-policies',
+          name: 'AllocationPolicy',
+          component: () => import('@/views/Admin/AllocationPolicy.vue'),
+          meta: { title: '分配生政策管理', requiresAdmin: true }
+        },
+        {
+          path: 'admin/score-ranks',
+          name: 'ScoreRankData',
+          component: () => import('@/views/Admin/ScoreRankData.vue'),
+          meta: { title: '分数位次管理', requiresAdmin: true }
+        },
+        {
+          path: 'admin/announcements',
+          name: 'AnnouncementAdmin',
+          component: () => import('@/views/Admin/AnnouncementAdmin.vue'),
+          meta: { title: '公告管理', requiresAdmin: true }
+        },
+        {
+          path: 'admin/help-documents',
+          name: 'HelpDocumentAdmin',
+          component: () => import('@/views/Admin/HelpDocumentAdmin.vue'),
+          meta: { title: '帮助文档管理', requiresAdmin: true }
+        },
+        {
+          path: 'admin/customer-service',
+          name: 'CustomerServiceAdmin',
+          component: () => import('@/views/Admin/CustomerServiceAdmin.vue'),
+          meta: { title: '客服管理', requiresAdmin: true }
+        },
+        {
+          path: 'admin/notifications',
+          name: 'NotificationAdmin',
+          component: () => import('@/views/Admin/NotificationAdmin.vue'),
+          meta: { title: '通知管理', requiresAdmin: true }
         }
       ]
     },

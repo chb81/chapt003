@@ -156,6 +156,259 @@ function restoreSystemBackup(filename, dryRun) {
   })
 }
 
+function getAllocationQuotas(params) {
+  return request({
+    url: '/admin/allocation/quotas',
+    method: 'GET',
+    data: params || {}
+  })
+}
+
+function createAllocationQuota(data) {
+  return request({
+    url: '/admin/allocation/quotas',
+    method: 'POST',
+    data: data
+  })
+}
+
+function updateAllocationQuota(id, data) {
+  return request({
+    url: '/admin/allocation/quotas/' + id,
+    method: 'PUT',
+    data: data
+  })
+}
+
+function deleteAllocationQuota(id) {
+  return request({
+    url: '/admin/allocation/quotas/' + id,
+    method: 'DELETE'
+  })
+}
+
+function importAllocationQuotas(data) {
+  return request({
+    url: '/admin/allocation/quotas/import',
+    method: 'POST',
+    data: data
+  })
+}
+
+function getAllocationPolicies(params) {
+  return request({
+    url: '/admin/allocation/policies',
+    method: 'GET',
+    data: params || {}
+  })
+}
+
+function createAllocationPolicy(data) {
+  return request({
+    url: '/admin/allocation/policies',
+    method: 'POST',
+    data: data
+  })
+}
+
+function updateAllocationPolicy(id, data) {
+  return request({
+    url: '/admin/allocation/policies/' + id,
+    method: 'PUT',
+    data: data
+  })
+}
+
+function deleteAllocationPolicy(id) {
+  return request({
+    url: '/admin/allocation/policies/' + id,
+    method: 'DELETE'
+  })
+}
+
+function getScoreRanks(params) {
+  return request({
+    url: '/admin/allocation/score-ranks',
+    method: 'GET',
+    data: params || {}
+  })
+}
+
+function createScoreRank(data) {
+  return request({
+    url: '/admin/allocation/score-ranks',
+    method: 'POST',
+    data: data
+  })
+}
+
+function updateScoreRank(id, data) {
+  return request({
+    url: '/admin/allocation/score-ranks/' + id,
+    method: 'PUT',
+    data: data
+  })
+}
+
+function deleteScoreRank(id) {
+  return request({
+    url: '/admin/allocation/score-ranks/' + id,
+    method: 'DELETE'
+  })
+}
+
+function importScoreRanks(data) {
+  return request({
+    url: '/admin/allocation/score-ranks/import',
+    method: 'POST',
+    data: data
+  })
+}
+
+function getAnnouncements(params) {
+  return request({
+    url: '/admin/announcements',
+    method: 'GET',
+    data: params || {}
+  })
+}
+
+function createAnnouncement(data) {
+  return request({
+    url: '/admin/announcements',
+    method: 'POST',
+    data: data
+  })
+}
+
+function updateAnnouncement(id, data) {
+  return request({
+    url: '/admin/announcements/' + id,
+    method: 'PUT',
+    data: data
+  })
+}
+
+function deleteAnnouncement(id) {
+  return request({
+    url: '/admin/announcements/' + id,
+    method: 'DELETE'
+  })
+}
+
+function getAnnouncementStats(id) {
+  return request({
+    url: '/admin/announcements/' + id + '/stats',
+    method: 'GET'
+  })
+}
+
+function getHelpDocuments(params) {
+  return request({
+    url: '/admin/help-documents',
+    method: 'GET',
+    data: params || {}
+  })
+}
+
+function createHelpDocument(data) {
+  return request({
+    url: '/admin/help-documents',
+    method: 'POST',
+    data: data
+  })
+}
+
+function updateHelpDocument(id, data) {
+  return request({
+    url: '/admin/help-documents/' + id,
+    method: 'PUT',
+    data: data
+  })
+}
+
+function toggleHelpDocumentPublish(id, published) {
+  return request({
+    url: '/admin/help-documents/' + id + '/publish?published=' + published,
+    method: 'PUT'
+  })
+}
+
+function deleteHelpDocument(id) {
+  return request({
+    url: '/admin/help-documents/' + id,
+    method: 'DELETE'
+  })
+}
+
+function getCustomerServiceSessions(params) {
+  return request({
+    url: '/admin/customer-service/sessions',
+    method: 'GET',
+    data: params || {}
+  })
+}
+
+function getCustomerServiceSessionDetail(sessionId) {
+  return request({
+    url: '/admin/customer-service/sessions/' + sessionId,
+    method: 'GET'
+  })
+}
+
+function replyCustomerServiceMessage(sessionId, adminId, content) {
+  return request({
+    url: '/admin/customer-service/sessions/' + sessionId + '/reply?adminId=' + adminId,
+    method: 'POST',
+    data: content
+  })
+}
+
+function closeCustomerServiceSession(sessionId, resolutionNote) {
+  return request({
+    url: '/admin/customer-service/sessions/' + sessionId + '/close' + (resolutionNote ? '?resolutionNote=' + encodeURIComponent(resolutionNote) : ''),
+    method: 'PUT'
+  })
+}
+
+function assignCustomerServiceAgent(sessionId, agentId) {
+  return request({
+    url: '/admin/customer-service/sessions/' + sessionId + '/assign?agentId=' + agentId,
+    method: 'PUT'
+  })
+}
+
+function getCustomerServiceStats() {
+  return request({
+    url: '/admin/customer-service/stats',
+    method: 'GET'
+  })
+}
+
+function getNotifications(params) {
+  return request({
+    url: '/admin/notifications',
+    method: 'GET',
+    data: params || {}
+  })
+}
+
+function sendNotification(data) {
+  return request({
+    url: '/admin/notifications/send',
+    method: 'POST',
+    data: data
+  })
+}
+
+function sendNotificationToAll(data) {
+  return request({
+    url: '/admin/notifications/send-all',
+    method: 'POST',
+    data: data
+  })
+}
+
 module.exports = {
   getUsers,
   getUserDetail,
@@ -177,5 +430,38 @@ module.exports = {
   createSystemBackup,
   getSystemBackups,
   deleteSystemBackup,
-  restoreSystemBackup
+  restoreSystemBackup,
+  getAllocationQuotas,
+  createAllocationQuota,
+  updateAllocationQuota,
+  deleteAllocationQuota,
+  importAllocationQuotas,
+  getAllocationPolicies,
+  createAllocationPolicy,
+  updateAllocationPolicy,
+  deleteAllocationPolicy,
+  getScoreRanks,
+  createScoreRank,
+  updateScoreRank,
+  deleteScoreRank,
+  importScoreRanks,
+  getAnnouncements,
+  createAnnouncement,
+  updateAnnouncement,
+  deleteAnnouncement,
+  getAnnouncementStats,
+  getHelpDocuments,
+  createHelpDocument,
+  updateHelpDocument,
+  toggleHelpDocumentPublish,
+  deleteHelpDocument,
+  getCustomerServiceSessions,
+  getCustomerServiceSessionDetail,
+  replyCustomerServiceMessage,
+  closeCustomerServiceSession,
+  assignCustomerServiceAgent,
+  getCustomerServiceStats,
+  getNotifications,
+  sendNotification,
+  sendNotificationToAll
 }

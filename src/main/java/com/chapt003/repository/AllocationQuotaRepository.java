@@ -1,6 +1,8 @@
 package com.chapt003.repository;
 
 import com.chapt003.entity.AllocationQuota;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,4 +29,10 @@ public interface AllocationQuotaRepository extends JpaRepository<AllocationQuota
 
     @Query("SELECT SUM(aq.quotaCount) FROM AllocationQuota aq WHERE aq.schoolId = :schoolId AND aq.year = :year")
     Integer getTotalQuotaBySchoolAndYear(@Param("schoolId") Long schoolId, @Param("year") Integer year);
+
+    Page<AllocationQuota> findBySchoolIdAndYear(Long schoolId, Integer year, Pageable pageable);
+
+    Page<AllocationQuota> findByYear(Integer year, Pageable pageable);
+
+    Page<AllocationQuota> findBySourceSchoolNameContaining(String sourceSchoolName, Pageable pageable);
 }

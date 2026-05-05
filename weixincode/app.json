@@ -19,7 +19,15 @@
     "pages/score-rank/score-rank",
     "pages/password-reset-request/password-reset-request",
     "pages/password-reset-verify/password-reset-verify",
-    "pages/profile-edit/profile-edit"
+    "pages/profile-edit/profile-edit",
+    "pages/admin-allocation-quota/admin-allocation-quota",
+    "pages/admin-allocation-policy/admin-allocation-policy",
+    "pages/admin-score-rank/admin-score-rank",
+    "pages/admin-announcement/admin-announcement",
+    "pages/admin-help-doc/admin-help-doc",
+    "pages/admin-customer-service/admin-customer-service",
+    "pages/admin-cs-detail/admin-cs-detail",
+    "pages/admin-notification/admin-notification"
   ],
   "permission": {
     "scope.userLocation": {

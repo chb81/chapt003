@@ -1,6 +1,8 @@
 package com.chapt003.repository;
 
 import com.chapt003.entity.ScoreRankMapping;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,4 +27,10 @@ public interface ScoreRankMappingRepository extends JpaRepository<ScoreRankMappi
 
     @Query("SELECT DISTINCT srm.year FROM ScoreRankMapping srm WHERE srm.city = :city ORDER BY srm.year DESC")
     List<Integer> findAvailableYears(@Param("city") String city);
+
+    Page<ScoreRankMapping> findByCityAndYear(String city, Integer year, Pageable pageable);
+
+    Page<ScoreRankMapping> findByYear(Integer year, Pageable pageable);
+
+    Page<ScoreRankMapping> findByCity(String city, Pageable pageable);
 }

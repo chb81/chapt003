@@ -1,0 +1,20 @@
+<view class="container">
+  <view class="session-info">
+    <view class="info-row"><text class="label">用户：</text><text class="value">{{session.username || '-'}}</text></view>
+    <view class="info-row"><text class="label">状态：</text><text class="value">{{session.status}}</text></view>
+    <view class="info-row"><text class="label">分类：</text><text class="value">{{session.category || '-'}}</text></view>
+  </view>
+  <view class="messages">
+    <view class="msg {{item.messageType === 'AGENT_MESSAGE' ? 'agent' : 'user'}}" wx:for="{{messages}}" wx:key="id">
+      <view class="msg-header"><text class="msg-sender">{{item.senderName || (item.messageType === 'AGENT_MESSAGE' ? '客服' : '用户')}}</text><text class="msg-time">{{item.messageTimeStr}}</text></view>
+      <view class="msg-content"><text>{{item.content}}</text></view>
+    </view>
+  </view>
+  <view class="input-bar" wx:if="{{session.status === 'ACTIVE'}}">
+    <input class="msg-input" placeholder="输入回复内容" value="{{replyContent}}" bindinput="onReplyInput" bindconfirm="onSendReply" />
+    <view class="send-btn" bindtap="onSendReply"><text>发送</text></view>
+  </view>
+  <view class="action-bar-bottom" wx:if="{{session.status === 'ACTIVE'}}">
+    <view class="close-btn" bindtap="onCloseSession"><text>关闭会话</text></view>
+  </view>
+</view>

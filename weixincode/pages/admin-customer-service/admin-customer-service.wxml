@@ -1,0 +1,35 @@
+<view class="container">
+  <view class="header"><text class="title">客服会话管理</text></view>
+  <view class="stats-bar">
+    <view class="stat-item"><text class="stat-num">{{stats.activeCount || 0}}</text><text class="stat-label">进行中</text></view>
+    <view class="stat-item"><text class="stat-num">{{stats.closedCount || 0}}</text><text class="stat-label">已关闭</text></view>
+    <view class="stat-item"><text class="stat-num">{{stats.resolvedCount || 0}}</text><text class="stat-label">已解决</text></view>
+  </view>
+  <view class="filter-bar">
+    <picker range="{{statusOptions}}" value="{{statusIndex}}" bindchange="onStatusChange">
+      <view class="filter-item"><text>{{filterStatus || '全部状态'}}</text><text class="arrow">▼</text></view>
+    </picker>
+    <view class="filter-btn" bindtap="onSearch"><text>筛选</text></view>
+  </view>
+  <view class="list" wx:if="{{items.length > 0}}">
+    <view class="card" wx:for="{{items}}" wx:key="id" bindtap="onViewSession" data-id="{{item.id}}">
+      <view class="card-header">
+        <text class="card-title">{{item.username || '用户'}}</text>
+        <text class="status-dot {{item.status === 'ACTIVE' ? 'active' : (item.status === 'RESOLVED' ? 'resolved' : 'closed')}}"></text>
+      </view>
+      <view class="card-body">
+        <view class="info-row"><text class="label">状态：</text><text class="value">{{item.status}}</text></view>
+        <view class="info-row"><text class="label">分类：</text><text class="value">{{item.category || '-'}}</text></view>
+        <view class="info-row"><text class="label">优先级：</text><text class="value">{{item.priority || '-'}}</text></view>
+        <view class="info-row"><text class="label">开始时间：</text><text class="value">{{item.startTimeStr}}</text></view>
+      </view>
+    </view>
+  </view>
+  <view class="empty" wx:if="{{!loading && items.length === 0}}"><text>暂无客服会话</text></view>
+  <view class="loading" wx:if="{{loading}}"><text>加载中...</text></view>
+  <view class="pagination" wx:if="{{totalPages > 1}}">
+    <view class="page-btn" bindtap="onPrevPage" style="opacity: {{currentPage > 0 ? 1 : 0.5}}"><text>上一页</text></view>
+    <text class="page-info">{{currentPage + 1}} / {{totalPages}}</text>
+    <view class="page-btn" bindtap="onNextPage" style="opacity: {{currentPage < totalPages - 1 ? 1 : 0.5}}"><text>下一页</text></view>
+  </view>
+</view>

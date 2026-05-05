@@ -2,6 +2,8 @@ package com.chapt003.repository;
 
 import com.chapt003.entity.HelpDocument;
 import com.chapt003.entity.enums.HelpDocumentCategory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,4 +29,10 @@ public interface HelpDocumentRepository extends JpaRepository<HelpDocument, Long
                                                   @Param("keyword") String keyword);
 
     List<HelpDocument> findByPublishedAndDeletedFalseOrderByCreatedAtDesc(Boolean published);
+
+    Page<HelpDocument> findByPublishedAndDeletedFalseOrderByCreatedAtDesc(Boolean published, Pageable pageable);
+
+    Page<HelpDocument> findByCategoryAndPublishedAndDeletedFalseOrderByCreatedAtDesc(HelpDocumentCategory category, Boolean published, Pageable pageable);
+
+    Page<HelpDocument> findByDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 }

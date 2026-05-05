@@ -23,4 +23,6 @@ public interface UserAnnouncementReadRepository extends JpaRepository<UserAnnoun
 
     @Query("SELECT COUNT(r) > 0 FROM Announcement a LEFT JOIN UserAnnouncementRead r ON r.announcement = a WHERE a.id = :announcementId AND r.user.id = :userId")
     boolean hasUserReadAnnouncement(@Param("userId") Long userId, @Param("announcementId") Long announcementId);
+
+    long countByAnnouncementId(Long announcementId);
 }

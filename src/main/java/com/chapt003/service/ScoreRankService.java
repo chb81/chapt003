@@ -1,12 +1,17 @@
 package com.chapt003.service;
 
+import com.chapt003.dto.ScoreRankMappingRequest;
+import com.chapt003.dto.ScoreRankMappingResponse;
 import com.chapt003.dto.ScoreRankResponse;
 import com.chapt003.entity.ScoreRankMapping;
 import com.chapt003.repository.ScoreRankMappingRepository;
 import com.chapt003.repository.StudentProfileRepository;
 import com.chapt003.repository.StudentScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -99,6 +104,93 @@ public class ScoreRankService {
                 .percentile(percentile)
                 .year(mapping.getYear())
                 .city(mapping.getCity())
+                .build();
+    }
+
+    public Page<ScoreRankMappingResponse> getScoreRankList(String city, Integer year, Pageable pageable) {
+        Page<ScoreRankMapping> page;
+        if (city != null && year != null) {
+            page = scoreRankMappingRepository.findByCityAndYear(city, year, pageable);
+        } else if (year != null) {
+            page = scoreRankMappingRepository.findByYear(year, pageable);
+        } else if (city != null) {
+            page = scoreRankMappingRepository.findByCity(city, pageable);
+        } else {
+            page = scoreRankMappingRepository.findAll(pageable);
+        }
+        return page.map(this::convertToResponse);
+    }
+
+    @Transactional
+    public ScoreRankMappingResponse createScoreRankMapping(ScoreRankMappingRequest request) {
+        ScoreRankMapping mapping = ScoreRankMapping.builder()
+                .city(request.getCity())
+                .year(request.getYear())
+                .totalScore(request.getTotalScore())
+                .cityRank(request.getCityRank())
+                .district(request.getDistrict())
+                .districtRank(request.getDistrictRank())
+                .studentCount(request.getStudentCount())
+                .cumulativeCount(request.getCumulativeCount())
+                .build();
+        mapping = scoreRankMappingRepository.save(mapping);
+        return convertToResponse(mapping);
+    }
+
+    @Transactional
+    public ScoreRankMappingResponse updateScoreRankMapping(Long id, ScoreRankMappingRequest request) {
+        ScoreRankMapping mapping = scoreRankMappingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("分数位次数据不存在: " + id));
+        mapping.setCity(request.getCity());
+        mapping.setYear(request.getYear());
+        mapping.setTotalScore(request.getTotalScore());
+        mapping.setCityRank(request.getCityRank());
+        mapping.setDistrict(request.getDistrict());
+        mapping.setDistrictRank(request.getDistrictRank());
+        mapping.setStudentCount(request.getStudentCount());
+        mapping.setCumulativeCount(request.getCumulativeCount());
+        mapping = scoreRankMappingRepository.save(mapping);
+        return convertToResponse(mapping);
+    }
+
+    @Transactional
+    public void deleteScoreRankMapping(Long id) {
+        ScoreRankMapping mapping = scoreRankMappingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("分数位次数据不存在: " + id));
+        scoreRankMappingRepository.delete(mapping);
+    }
+
+    @Transactional
+    public int batchImportScoreRankMappings(List<ScoreRankMappingRequest> requests) {
+        int count = 0;
+        for (ScoreRankMappingRequest req : requests) {
+            ScoreRankMapping mapping = ScoreRankMapping.builder()
+                    .city(req.getCity())
+                    .year(req.getYear())
+                    .totalScore(req.getTotalScore())
+                    .cityRank(req.getCityRank())
+                    .district(req.getDistrict())
+                    .districtRank(req.getDistrictRank())
+                    .studentCount(req.getStudentCount())
+                    .cumulativeCount(req.getCumulativeCount())
+                    .build();
+            scoreRankMappingRepository.save(mapping);
+            count++;
+        }
+        return count;
+    }
+
+    private ScoreRankMappingResponse convertToResponse(ScoreRankMapping m) {
+        return ScoreRankMappingResponse.builder()
+                .id(m.getId())
+                .city(m.getCity())
+                .year(m.getYear())
+                .totalScore(m.getTotalScore())
+                .cityRank(m.getCityRank())
+                .district(m.getDistrict())
+                .districtRank(m.getDistrictRank())
+                .studentCount(m.getStudentCount())
+                .cumulativeCount(m.getCumulativeCount())
                 .build();
     }
 }

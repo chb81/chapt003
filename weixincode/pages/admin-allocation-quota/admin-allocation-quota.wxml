@@ -1,0 +1,131 @@
+<view class="container">
+  <view class="header">
+    <text class="title">分配生名额管理</text>
+  </view>
+
+  <view class="filter-bar">
+    <picker mode="number" range="{{yearRange}}" value="{{yearIndex}}" bindchange="onYearChange">
+      <view class="filter-item">
+        <text>{{filterYear ? filterYear + '年' : '选择年度'}}</text>
+        <text class="arrow">▼</text>
+      </view>
+    </picker>
+    <input class="filter-input" placeholder="生源初中名称" value="{{filterSourceSchool}}" bindinput="onSourceSchoolInput" bindconfirm="onSearch" />
+    <view class="filter-btn" bindtap="onSearch">
+      <text>搜索</text>
+    </view>
+  </view>
+
+  <view class="action-bar">
+    <view class="action-btn primary" bindtap="onAdd">
+      <text>+ 新增名额</text>
+    </view>
+  </view>
+
+  <view class="list" wx:if="{{quotas.length > 0}}">
+    <view class="card" wx:for="{{quotas}}" wx:key="id">
+      <view class="card-header">
+        <text class="school-name">{{item.schoolName || '未知学校'}}</text>
+        <text class="year-tag">{{item.year}}年</text>
+      </view>
+      <view class="card-body">
+        <view class="info-row">
+          <text class="label">生源初中：</text>
+          <text class="value">{{item.sourceSchoolName}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">分配名额：</text>
+          <text class="value highlight">{{item.quotaCount}}人</text>
+        </view>
+        <view class="info-row">
+          <text class="label">分配生线：</text>
+          <text class="value">{{item.admissionScore || '-'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">统招线：</text>
+          <text class="value">{{item.unifiedScore || '-'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">分差：</text>
+          <text class="value {{item.scoreDifference > 0 ? 'green' : ''}}">{{item.scoreDifference ? item.scoreDifference + '分' : '-'}}</text>
+        </view>
+      </view>
+      <view class="card-actions">
+        <view class="btn-edit" bindtap="onEdit" data-item="{{item}}">编辑</view>
+        <view class="btn-delete" bindtap="onDelete" data-id="{{item.id}}" data-name="{{item.sourceSchoolName}}">删除</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty" wx:if="{{!loading && quotas.length === 0}}">
+    <text>暂无分配生名额数据</text>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="pagination" wx:if="{{totalPages > 1}}">
+    <view class="page-btn" bindtap="onPrevPage" style="opacity: {{currentPage > 0 ? 1 : 0.5}}">
+      <text>上一页</text>
+    </view>
+    <text class="page-info">{{currentPage + 1}} / {{totalPages}}</text>
+    <view class="page-btn" bindtap="onNextPage" style="opacity: {{currentPage < totalPages - 1 ? 1 : 0.5}}">
+      <text>下一页</text>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showForm}}" bindtap="onCancelForm"></view>
+  <view class="modal" wx:if="{{showForm}}">
+    <view class="modal-header">
+      <text class="modal-title">{{editingId ? '编辑名额' : '新增名额'}}</text>
+      <text class="modal-close" bindtap="onCancelForm">✕</text>
+    </view>
+    <scroll-view scroll-y class="modal-body">
+      <view class="form-group">
+        <text class="form-label">目标高中ID *</text>
+        <input class="form-input" type="number" placeholder="输入学校ID" value="{{formData.schoolId}}" bindinput="onFormInput" data-field="schoolId" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">生源初中名称 *</text>
+        <input class="form-input" placeholder="输入初中名称" value="{{formData.sourceSchoolName}}" bindinput="onFormInput" data-field="sourceSchoolName" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">初中所在城市</text>
+        <input class="form-input" placeholder="输入城市" value="{{formData.sourceSchoolCity}}" bindinput="onFormInput" data-field="sourceSchoolCity" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">初中所在区县</text>
+        <input class="form-input" placeholder="输入区县" value="{{formData.sourceSchoolDistrict}}" bindinput="onFormInput" data-field="sourceSchoolDistrict" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">年度 *</text>
+        <input class="form-input" type="number" placeholder="如2025" value="{{formData.year}}" bindinput="onFormInput" data-field="year" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">分配名额数</text>
+        <input class="form-input" type="number" placeholder="输入名额数" value="{{formData.quotaCount}}" bindinput="onFormInput" data-field="quotaCount" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">分配生录取分数线</text>
+        <input class="form-input" type="digit" placeholder="输入分数线" value="{{formData.admissionScore}}" bindinput="onFormInput" data-field="admissionScore" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">统招录取分数线</text>
+        <input class="form-input" type="digit" placeholder="输入统招线" value="{{formData.unifiedScore}}" bindinput="onFormInput" data-field="unifiedScore" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">分数差值</text>
+        <input class="form-input" type="digit" placeholder="自动计算或手动输入" value="{{formData.scoreDifference}}" bindinput="onFormInput" data-field="scoreDifference" />
+      </view>
+      <view class="form-group">
+        <text class="form-label">适用政策规则</text>
+        <input class="form-input" placeholder="输入政策规则" value="{{formData.policyRule}}" bindinput="onFormInput" data-field="policyRule" />
+      </view>
+    </scroll-view>
+    <view class="modal-footer">
+      <view class="modal-btn cancel" bindtap="onCancelForm">取消</view>
+      <view class="modal-btn confirm" bindtap="onSaveForm">保存</view>
+    </view>
+  </view>
+</view>

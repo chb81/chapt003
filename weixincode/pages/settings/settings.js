@@ -1,6 +1,7 @@
 Page({
   data: {
     userInfo: null,
+    isAdmin: false,
     settings: {
       notificationEnabled: true,
       messageEnabled: true,
@@ -18,7 +19,8 @@ Page({
 
   loadUserInfo() {
     const userInfo = wx.getStorageSync('userInfo')
-    this.setData({ userInfo })
+    const isAdmin = userInfo && (userInfo.role === 'ADMIN' || userInfo.role === 'admin')
+    this.setData({ userInfo, isAdmin })
   },
 
   loadSettings() {
@@ -190,6 +192,48 @@ Page({
   handleFeedback() {
     wx.navigateTo({
       url: '/pages/help/help?tab=feedback'
+    })
+  },
+
+  goToAllocationQuota() {
+    wx.navigateTo({
+      url: '/pages/admin-allocation-quota/admin-allocation-quota'
+    })
+  },
+
+  goToAllocationPolicy() {
+    wx.navigateTo({
+      url: '/pages/admin-allocation-policy/admin-allocation-policy'
+    })
+  },
+
+  goToScoreRank() {
+    wx.navigateTo({
+      url: '/pages/admin-score-rank/admin-score-rank'
+    })
+  },
+
+  goToAnnouncement() {
+    wx.navigateTo({
+      url: '/pages/admin-announcement/admin-announcement'
+    })
+  },
+
+  goToHelpDoc() {
+    wx.navigateTo({
+      url: '/pages/admin-help-doc/admin-help-doc'
+    })
+  },
+
+  goToCustomerService() {
+    wx.navigateTo({
+      url: '/pages/admin-customer-service/admin-customer-service'
+    })
+  },
+
+  goToNotification() {
+    wx.navigateTo({
+      url: '/pages/admin-notification/admin-notification'
     })
   },
 
