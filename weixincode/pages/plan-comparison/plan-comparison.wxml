@@ -1,0 +1,63 @@
+<view class="container">
+  <view class="header">
+    <view class="title">方案对比</view>
+    <view class="subtitle">选择两个方案进行综合对比分析</view>
+  </view>
+
+  <view class="selector-section" wx:if="{{plans.length >= 2}}">
+    <view class="selector-row">
+      <view class="selector-label">方案 A</view>
+      <picker mode="selector" range="{{planNames}}" value="{{planAIndex}}" bindchange="onPlanAChange">
+        <view class="picker-value">
+          <text>{{planNames[planAIndex] || '请选择'}}</text>
+          <text class="arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+    <view class="vs-divider">VS</view>
+    <view class="selector-row">
+      <view class="selector-label">方案 B</view>
+      <picker mode="selector" range="{{planNames}}" value="{{planBIndex}}" bindchange="onPlanBChange">
+        <view class="picker-value">
+          <text>{{planNames[planBIndex] || '请选择'}}</text>
+          <text class="arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="empty-tip" wx:if="{{plans.length < 2}}">
+    <view class="empty-icon">📊</view>
+    <view class="empty-text">至少需要两个方案</view>
+    <view class="empty-desc">请先在"志愿"页面创建更多志愿方案</view>
+  </view>
+
+  <view class="compare-btn" wx:if="{{plans.length >= 2}}">
+    <button class="btn-primary" bindtap="doCompare" disabled="{{loading}}">{{loading ? '分析中...' : '开始对比'}}</button>
+  </view>
+
+  <view class="result" wx:if="{{comparisonData && !loading}}">
+    <view class="recommendation" wx:if="{{comparisonData.recommendedPlan}}">
+      <view class="rec-icon">🏆</view>
+      <view class="rec-text">推荐方案：{{comparisonData.recommendedPlan}}</view>
+    </view>
+
+    <view class="compare-table">
+      <view class="table-header">
+        <view class="th col-label">指标</view>
+        <view class="th col-value">方案A</view>
+        <view class="th col-value">方案B</view>
+      </view>
+      <view class="table-row" wx:for="{{comparisonData.metrics}}" wx:key="label">
+        <view class="td col-label">{{item.label}}</view>
+        <view class="td col-value {{item.winner === 'A' ? 'winner' : ''}}">{{item.valueA}}</view>
+        <view class="td col-value {{item.winner === 'B' ? 'winner' : ''}}">{{item.valueB}}</view>
+      </view>
+    </view>
+
+    <view class="summary-section" wx:if="{{comparisonData.summary}}">
+      <view class="section-title">综合分析</view>
+      <view class="summary-text">{{comparisonData.summary}}</view>
+    </view>
+  </view>
+</view>

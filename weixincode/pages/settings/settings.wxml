@@ -42,7 +42,7 @@
   <view class="settings-section">
     <view class="section-title">关于</view>
     <view class="setting-item" bindtap="handleAbout">
-      <view class="setting-label">关于志愿汇</view>
+      <view class="setting-label">关于中考志愿填报</view>
       <view class="setting-value">v{{version}} ›</view>
     </view>
     <view class="setting-item" bindtap="handlePrivacy">
@@ -60,6 +60,6 @@
   </view>
 
   <view class="footer">
-    <view class="footer-text">志愿汇小程序 v{{version}}</view>
+    <view class="footer-text">中考志愿填报 v{{version}}</view>
   </view>
 </view>

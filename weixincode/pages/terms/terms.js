@@ -11,7 +11,7 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: '志愿汇 - 用户协议',
+      title: '中考志愿填报 - 用户协议',
       path: '/pages/index/index'
     }
   }

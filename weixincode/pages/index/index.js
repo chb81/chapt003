@@ -6,6 +6,7 @@ Page({
   data: {
     userInfo: null,
     isLoggedIn: false,
+    avatarLetter: '?',
     loading: true,
     stats: {
       totalSchools: 0,
@@ -58,7 +59,8 @@ Page({
       const userInfo = wx.getStorageSync('userInfo')
       this.setData({
         isLoggedIn: true,
-        userInfo: userInfo
+        userInfo: userInfo,
+        avatarLetter: this.getAvatarLetter(userInfo)
       })
       return
     }
@@ -71,7 +73,8 @@ Page({
         const userInfo = wx.getStorageSync('userInfo')
         this.setData({
           isLoggedIn: true,
-          userInfo: userInfo
+          userInfo: userInfo,
+          avatarLetter: this.getAvatarLetter(userInfo)
         })
       }
     } catch (error) {
@@ -128,6 +131,7 @@ Page({
 
   onQuickAction(e) {
     const { url } = e.currentTarget.dataset
+    const self = this
 
     if (!this.data.isLoggedIn) {
       wx.showModal({
@@ -135,13 +139,12 @@ Page({
         content: '请先登录后再使用此功能',
         success: function(res) {
           if (res.confirm) {
-            // 尝试微信静默登录
             var app = getApp()
             app.autoWechatLogin()
               .then(function(loginResult) {
                 if (loginResult.success) {
                   var userInfo = wx.getStorageSync('userInfo')
-                  self.setData({ isLoggedIn: true, userInfo: userInfo })
+                  self.setData({ isLoggedIn: true, userInfo: userInfo, avatarLetter: self.getAvatarLetter(userInfo) })
                   wx.switchTab({ url: url })
                 } else {
                   wx.navigateTo({ url: '/pages/login/login' })
@@ -198,5 +201,11 @@ Page({
     if (days < 7) return `${days}天前`
 
     return `${date.getMonth() + 1}月${date.getDate()}日`
+  },
+
+  getAvatarLetter(userInfo) {
+    if (!userInfo) return '?'
+    var name = userInfo.nickname || userInfo.email || userInfo.username || '用户'
+    return name.charAt(0)
   }
 })

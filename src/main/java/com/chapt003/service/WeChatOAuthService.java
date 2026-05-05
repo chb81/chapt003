@@ -126,16 +126,28 @@ public class WeChatOAuthService {
     private User createWeChatUser(String openid) {
         User user = new User();
         
+        // 生成唯一的用户名，使用 "wx_" 前缀 + openid 的部分字符
+        String usernamePrefix = openid.length() >= 10 ? openid.substring(0, 10) : openid;
+        String uniqueUsername = "wx_" + usernamePrefix + "_" + System.currentTimeMillis();
+        
         String emailPrefix = openid.length() >= 8 ? openid.substring(0, 8) : openid;
         String mobileSuffix = openid.length() >= 2 ? openid.substring(0, 2) : openid.substring(0, 1);
         
+        user.setUsername(uniqueUsername);
         user.setEmail("wechat_" + emailPrefix + "@wechat.local");
         user.setMobile("10000000" + mobileSuffix);
         user.setPassword(UUID.randomUUID().toString());
         user.setWechatOpenId(openid);
         user.setStatus(UserStatus.ACTIVE);
         user.setRole(UserRole.USER);
-        
+        user.setCreatedAt(java.time.LocalDateTime.now());
+        user.setUpdatedAt(java.time.LocalDateTime.now());
+        user.setLastLoginAt(java.time.LocalDateTime.now());
+        user.setDeletedAt(null);
+        user.setEmailVerified(false);
+        user.setMobileVerified(false);
+        user.setOnboardingCompleted(true);
+
         return userRepository.save(user);
     }
 }

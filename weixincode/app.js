@@ -5,7 +5,7 @@ const auth = require('./api/auth')
 
 App({
   globalData: {
-    apiBaseUrl: 'http://localhost:8080/api/v1',
+    apiBaseUrl: 'http://192.168.3.185:8088/api/v1',
     tokenExpireTime: 24 * 60 * 60 * 1000,
     loginTime: null,
     userInfo: null,

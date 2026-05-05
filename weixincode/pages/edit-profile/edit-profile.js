@@ -206,40 +206,33 @@ Page({
       }
       const response = await auth.updateUserProfile(updateData)
       
-      if (response.code === 200) {
-        const updatedUserInfo = response.data
-        
-        wx.setStorageSync('userInfo', updatedUserInfo)
-        
-        this.setData({
-          userInfo: updatedUserInfo,
-          form: {
-            nickname: updatedUserInfo.username || updatedUserInfo.nickname || '',
-            phone: updatedUserInfo.mobile || updatedUserInfo.phone || '',
-            email: updatedUserInfo.email || '',
-            realName: form.realName || '',
-            idCard: form.idCard || '',
-            gender: form.gender || '',
-            birthday: form.birthday || '',
-            address: form.address || '',
-            avatarUrl: form.avatarUrl || ''
-          }
-        })
-        
-        wx.showToast({
-          title: '保存成功',
-          icon: 'success'
-        })
-        
-        setTimeout(() => {
-          wx.navigateBack()
-        }, 1500)
-      } else {
-        wx.showToast({
-          title: response.message || '保存失败',
-          icon: 'error'
-        })
-      }
+      const updatedUserInfo = response.data || response
+      
+      wx.setStorageSync('userInfo', updatedUserInfo)
+      
+      this.setData({
+        userInfo: updatedUserInfo,
+        form: {
+          nickname: updatedUserInfo.username || updatedUserInfo.nickname || '',
+          phone: updatedUserInfo.mobile || updatedUserInfo.phone || '',
+          email: updatedUserInfo.email || '',
+          realName: form.realName || '',
+          idCard: form.idCard || '',
+          gender: form.gender || '',
+          birthday: form.birthday || '',
+          address: form.address || '',
+          avatarUrl: form.avatarUrl || ''
+        }
+      })
+      
+      wx.showToast({
+        title: '保存成功',
+        icon: 'success'
+      })
+      
+      setTimeout(() => {
+        wx.navigateBack()
+      }, 1500)
     } catch (error) {
       console.error('保存个人资料失败:', error)
       wx.showToast({

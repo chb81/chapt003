@@ -2,13 +2,14 @@ package com.chapt003.controller;
 
 import com.chapt003.dto.AllocationPolicyResponse;
 import com.chapt003.dto.AllocationQuotaResponse;
+import com.chapt003.entity.User;
+import com.chapt003.repository.UserRepository;
 import com.chapt003.response.ApiResponse;
 import com.chapt003.service.AllocationPolicyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -22,6 +23,9 @@ public class AllocationPolicyController {
     @Autowired
     private AllocationPolicyService allocationPolicyService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/schools/{schoolId}/quotas")
     @Operation(summary = "查看目标高中的分配生名额", description = "查看某所高中对各初中的分配生/指标生名额分配")
     public ResponseEntity<ApiResponse<List<AllocationQuotaResponse>>> getQuotasBySchool(
@@ -34,7 +38,6 @@ public class AllocationPolicyController {
     @GetMapping("/source-school")
     @Operation(summary = "查看学生所在初中的分配生机会", description = "根据学生所在初中查询可用的分配生名额")
     public ResponseEntity<ApiResponse<List<AllocationQuotaResponse>>> getQuotasBySourceSchool(
-            Principal principal,
             @RequestParam String sourceSchoolName,
             @RequestParam(required = false) Integer year) {
         List<AllocationQuotaResponse> quotas = allocationPolicyService.getQuotasBySourceSchool(sourceSchoolName, year);
@@ -47,8 +50,9 @@ public class AllocationPolicyController {
         if (principal == null) {
             return ResponseEntity.status(401).body(ApiResponse.error(401, "请先登录"));
         }
+        Long userId = getUserIdFromPrincipal(principal);
         return ResponseEntity.ok(ApiResponse.success("获取分配生选择成功",
-                allocationPolicyService.getStudentAllocationOptions(null)));
+                allocationPolicyService.getStudentAllocationOptions(userId)));
     }
 
     @GetMapping("/policies")
@@ -69,7 +73,17 @@ public class AllocationPolicyController {
         if (principal == null) {
             return ResponseEntity.status(401).body(ApiResponse.error(401, "请先登录"));
         }
+        Long userId = getUserIdFromPrincipal(principal);
         return ResponseEntity.ok(ApiResponse.success("检查完成",
-                allocationPolicyService.hasAllocationAdvantage(null, schoolId)));
+                allocationPolicyService.hasAllocationAdvantage(userId, schoolId)));
+    }
+
+    private Long getUserIdFromPrincipal(Principal principal) {
+        if (principal == null) {
+            return null;
+        }
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElse(null);
+        return user != null ? user.getId() : null;
     }
 }

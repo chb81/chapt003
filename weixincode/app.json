@@ -13,7 +13,13 @@
     "pages/verify-mobile/verify-mobile",
     "pages/verify-email/verify-email",
     "pages/privacy/privacy",
-    "pages/terms/terms"
+    "pages/terms/terms",
+    "pages/risk-assessment/risk-assessment",
+    "pages/plan-comparison/plan-comparison",
+    "pages/score-rank/score-rank",
+    "pages/password-reset-request/password-reset-request",
+    "pages/password-reset-verify/password-reset-verify",
+    "pages/profile-edit/profile-edit"
   ],
   "permission": {
     "scope.userLocation": {

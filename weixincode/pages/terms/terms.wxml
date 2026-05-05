@@ -1,31 +1,32 @@
 <scroll-view scroll-y class="container">
   <view class="content">
     <view class="title">用户服务协议</view>
-    <view class="update-time">更新时间：2024年1月1日</view>
+    <view class="update-time">更新时间：2025年1月1日</view>
     
     <view class="section">
       <view class="section-title">1. 协议的接受</view>
       <view class="text">
-        欢迎使用志愿汇小程序！本协议是您与志愿汇之间就使用志愿汇服务所订立的协议。通过使用我们的服务，您表示同意接受本协议的全部条款。
+        欢迎使用中考志愿填报系统！本协议是您与中考志愿填报系统之间就使用本平台服务所订立的协议。通过使用我们的服务，您表示同意接受本协议的全部条款。
       </view>
     </view>
 
     <view class="section">
       <view class="section-title">2. 服务内容</view>
       <view class="text">
-        志愿汇是一个连接志愿者与志愿活动的平台，提供以下服务：
+        中考志愿填报系统是一个为中考考生提供志愿填报辅助服务的平台，提供以下功能：
       </view>
-      <view class="list-item">• 志愿活动信息发布和浏览</view>
-      <view class="list-item">• 志愿活动申请和管理</view>
-      <view class="list-item">• 志愿时长记录和统计</view>
-      <view class="list-item">• 志愿者证书生成</view>
-      <view class="list-item">• 社区交流和互动</view>
+      <view class="list-item">• 学校信息查询与对比</view>
+      <view class="list-item">• 历年录取分数线及招生计划查询</view>
+      <view class="list-item">• 智能志愿推荐与录取概率预测</view>
+      <view class="list-item">• 志愿方案创建、管理与风险评估</view>
+      <view class="list-item">• 分数位次换算与分配生政策查询</view>
+      <view class="list-item">• 方案分享与对比分析</view>
     </view>
 
     <view class="section">
       <view class="section-title">3. 用户注册</view>
       <view class="text">
-        3.1 您需要提供真实、准确、完整的个人信息进行注册。
+        3.1 您需要提供真实、准确、完整的个人信息进行注册，包括但不限于手机号、邮箱等。
       </view>
       <view class="text">
         3.2 您应妥善保管您的账户信息，不得将账户转让或借给他人使用。
@@ -48,28 +49,25 @@
     </view>
 
     <view class="section">
-      <view class="section-title">5. 志愿活动规范</view>
+      <view class="section-title">5. 数据准确性声明</view>
       <view class="text">
-        5.1 申请志愿活动前，请仔细阅读活动要求，确保自己符合条件。
+        5.1 本平台提供的学校数据、录取分数线、招生计划等信息来源于公开渠道，我们尽力确保数据的准确性和时效性，但不对数据的绝对准确性做出保证。
       </view>
       <view class="text">
-        5.2 获得批准后，请按时参加活动，遵守活动组织者的安排。
+        5.2 录取概率预测结果仅作为志愿填报参考，不构成任何录取承诺或保证。实际录取结果以官方公布为准。
       </view>
       <view class="text">
-        5.3 如因特殊情况无法参加，请提前通知组织者取消报名。
-      </view>
-      <view class="text">
-        5.4 活动结束后，请配合完成活动签到和评价。
+        5.3 用户应结合自身实际情况和官方发布的最新信息进行志愿填报决策。
       </view>
     </view>
 
     <view class="section">
       <view class="section-title">6. 知识产权</view>
       <view class="text">
-        6.1 平台上的所有内容（包括但不限于文字、图片、视频、软件等）均受知识产权法保护。
+        6.1 平台上的所有内容（包括但不限于文字、图片、数据、算法、软件等）均受知识产权法保护。
       </view>
       <view class="text">
-        6.2 您上传的内容，您仍保留知识产权，但授予我们使用、展示、传播的权利。
+        6.2 您上传的个人成绩等信息，您仍保留所有权，但授予我们用于提供服务的必要使用权。
       </view>
       <view class="text">
         6.3 未经授权，不得复制、传播、修改平台内容。
@@ -79,16 +77,16 @@
     <view class="section">
       <view class="section-title">7. 免责声明</view>
       <view class="text">
-        7.1 平台仅提供信息发布和交流服务，不保证信息的真实性和准确性。
+        7.1 本平台仅提供志愿填报辅助服务，不对最终录取结果承担任何责任。
       </view>
       <view class="text">
-        7.2 用户参与志愿活动产生的风险由用户自行承担。
+        7.2 因数据更新延迟或第三方信息源变更导致的分析偏差，平台不承担责任。
       </view>
       <view class="text">
         7.3 因不可抗力导致的服务中断，平台不承担责任。
       </view>
       <view class="text">
-        7.4 第三方链接的内容由第三方负责，平台不承担连带责任。
+        7.4 用户基于本平台信息做出的任何决策，由用户自行承担全部责任。
       </view>
     </view>
 
@@ -106,33 +104,43 @@
     </view>
 
     <view class="section">
-      <view class="section-title">9. 争议解决</view>
+      <view class="section-title">9. 隐私保护</view>
       <view class="text">
-        9.1 因本协议引起的争议，双方应友好协商解决。
+        9.1 我们重视用户隐私保护，具体隐私保护措施请参见《隐私政策》。
       </view>
       <view class="text">
-        9.2 协商不成的，任何一方可向平台所在地人民法院提起诉讼。
-      </view>
-      <view class="text">
-        9.3 本协议的订立、执行和解释均适用中华人民共和国法律。
+        9.2 未经用户同意，我们不会向第三方披露用户的个人成绩、志愿方案等敏感信息。
       </view>
     </view>
 
     <view class="section">
-      <view class="section-title">10. 其他条款</view>
+      <view class="section-title">10. 争议解决</view>
       <view class="text">
-        10.1 本协议自您注册或使用服务之日起生效。
+        10.1 因本协议引起的争议，双方应友好协商解决。
       </view>
       <view class="text">
-        10.2 如本协议的任何条款被认定为无效，不影响其他条款的效力。
+        10.2 协商不成的，任何一方可向平台所在地人民法院提起诉讼。
       </view>
       <view class="text">
-        10.3 我们保留对本协议的最终解释权。
+        10.3 本协议的订立、执行和解释均适用中华人民共和国法律。
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">11. 其他条款</view>
+      <view class="text">
+        11.1 本协议自您注册或使用服务之日起生效。
+      </view>
+      <view class="text">
+        11.2 如本协议的任何条款被认定为无效，不影响其他条款的效力。
+      </view>
+      <view class="text">
+        11.3 我们保留对本协议的最终解释权。
       </view>
     </view>
 
     <view class="footer">
-      志愿汇 © 2024 版权所有
+      中考志愿填报系统 © 2025 版权所有
     </view>
   </view>
 </scroll-view>

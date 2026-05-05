@@ -1,12 +1,12 @@
 <scroll-view scroll-y class="container">
   <view class="content">
     <view class="title">隐私政策</view>
-    <view class="update-time">更新时间：2024年1月1日</view>
+    <view class="update-time">更新时间：2025年1月1日</view>
     
     <view class="section">
       <view class="section-title">1. 引言</view>
       <view class="text">
-        欢迎使用志愿汇小程序！本隐私政策旨在向您说明我们如何收集、使用、存储和保护您的个人信息。使用我们的服务即表示您同意本隐私政策的条款。
+        欢迎使用中考志愿填报系统！本隐私政策旨在向您说明我们如何收集、使用、存储和保护您的个人信息。使用我们的服务即表示您同意本隐私政策的条款。
       </view>
     </view>
 
@@ -15,11 +15,12 @@
       <view class="text">
         我们可能收集以下类型的信息：
       </view>
-      <view class="list-item">• 账户信息：用户名、头像、昵称、手机号、邮箱等</view>
-      <view class="list-item">• 个人信息：真实姓名、身份证号、地址、生日等</view>
-      <view class="list-item">• 活动信息：您参与的志愿活动记录</view>
-      <view class="list-item">• 设备信息：设备型号、操作系统版本等</view>
-      <view class="list-item">• 位置信息：仅在您授权的情况下收集</view>
+      <view class="list-item">• 账户信息：用户名、邮箱、手机号等注册信息</view>
+      <view class="list-item">• 学生信息：真实姓名、所在学校、年级等基本资料</view>
+      <view class="list-item">• 成绩数据：各科成绩、总分、排名等学业信息</view>
+      <view class="list-item">• 志愿数据：您创建的志愿方案、偏好设置等</view>
+      <view class="list-item">• 设备信息：设备型号、操作系统版本、微信版本等</view>
+      <view class="list-item">• 使用记录：页面访问、功能使用、操作日志等</view>
     </view>
 
     <view class="section">
@@ -27,10 +28,15 @@
       <view class="text">
         我们使用收集的信息用于：
       </view>
-      <view class="list-item">• 提供和改进我们的服务</view>
-      <view class="list-item">• 处理您的志愿活动申请</view>
-      <view class="list-item">• 与您沟通服务相关信息</view>
-      <view class="list-item">• 分析和优化用户体验</view>
+      <view class="list-item">• 提供志愿填报辅助和智能推荐服务</view>
+      <view class="list-item">• 计算录取概率和进行风险评估</view>
+      <view class="list-item">• 生成个性化的学校推荐和方案分析</view>
+      <view class="text">
+        以及：
+      </view>
+      <view class="list-item">• 改进和优化我们的服务体验</view>
+      <view class="list-item">• 与您沟通服务相关信息和重要通知</view>
+      <view class="list-item">• 进行数据分析以提升推荐算法准确性</view>
       <view class="list-item">• 防止欺诈和滥用行为</view>
     </view>
 
@@ -39,20 +45,21 @@
       <view class="text">
         我们不会在未经您同意的情况下向第三方共享您的个人信息，以下情况除外：
       </view>
-      <view class="list-item">• 获得您的明确授权</view>
-      <view class="list-item">• 根据法律法规要求</view>
+      <view class="list-item">• 获得您的明确授权（如分享志愿方案）</view>
+      <view class="list-item">• 根据法律法规或政府部门要求</view>
       <view class="list-item">• 为保护我们的合法权益</view>
-      <view class="list-item">• 与经过严格筛选的第三方服务提供商合作</view>
+      <view class="list-item">• 与经过严格筛选的第三方服务提供商合作（仅限必要范围）</view>
     </view>
 
     <view class="section">
-      <view class="section-title">5. 信息存储</view>
+      <view class="section-title">5. 信息存储与安全</view>
       <view class="text">
         我们采用业界标准的安全措施来保护您的信息：
       </view>
-      <view class="list-item">• 使用加密技术保护数据传输</view>
-      <view class="list-item">• 限制对个人信息的访问权限</view>
-      <view class="list-item">• 定期审查和更新安全措施</view>
+      <view class="list-item">• 使用加密技术（如HTTPS）保护数据传输安全</view>
+      <view class="list-item">• 对敏感数据进行加密存储</view>
+      <view class="list-item">• 严格限制对个人信息的访问权限</view>
+      <view class="list-item">• 定期进行安全审计和漏洞扫描</view>
       <view class="list-item">• 在法律规定期限内保存相关信息</view>
     </view>
 
@@ -61,31 +68,41 @@
       <view class="text">
         您对自己的个人信息享有以下权利：
       </view>
-      <view class="list-item">• 访问和查看您的个人信息</view>
-      <view class="list-item">• 更新和修改您的个人信息</view>
-      <view class="list-item">• 删除您的账户和个人信息</view>
+      <view class="list-item">• 访问和查看您的个人信息及成绩数据</view>
+      <view class="list-item">• 更新和修改您的个人资料</view>
+      <view class="list-item">• 删除您的账户、成绩和志愿方案数据</view>
       <view class="list-item">• 撤销之前授予的授权</view>
-      <view class="list-item">• 选择是否接收营销信息</view>
+      <view class="list-item">• 选择是否接收通知消息</view>
     </view>
 
     <view class="section">
-      <view class="section-title">7. Cookie 使用</view>
+      <view class="section-title">7. 数据保留</view>
       <view class="text">
-        我们使用 Cookie 和类似技术来改善用户体验、分析服务使用情况。您可以通过修改设备设置来管理 Cookie。
+        7.1 在您使用服务期间，我们会持续保存您的信息以提供服务。
+      </view>
+      <view class="text">
+        7.2 当您删除账户后，我们将在合理期限内删除或匿名化处理您的个人信息。
+      </view>
+      <view class="text">
+        7.3 法律法规要求必须保留的数据，我们将依法保存。
       </view>
     </view>
 
     <view class="section">
       <view class="section-title">8. 未成年人保护</view>
       <view class="text">
-        我们特别重视未成年人的个人信息保护。如果您是未成年人，请在监护人的指导下使用我们的服务。
+        我们特别重视未成年人的个人信息保护。本平台主要面向中考考生（通常为未成年人），我们承诺：
       </view>
+      <view class="list-item">• 收集的信息仅用于提供志愿填报辅助服务</view>
+      <view class="list-item">• 不会向第三方出售未成年人的个人信息</view>
+      <view class="list-item">• 建议在监护人的指导下使用本平台</view>
+      <view class="list-item">• 监护人有权查阅、修改或删除被监护人的信息</view>
     </view>
 
     <view class="section">
       <view class="section-title">9. 隐私政策变更</view>
       <view class="text">
-        我们可能会不时更新本隐私政策。更新后的政策将在小程序内发布，请您定期查看。
+        我们可能会不时更新本隐私政策。更新后的政策将在小程序内发布，重大变更将通过弹窗或通知方式告知您。请您定期查看。
       </view>
     </view>
 
@@ -94,13 +111,12 @@
       <view class="text">
         如果您对本隐私政策有任何疑问或意见，请通过以下方式联系我们：
       </view>
-      <view class="list-item">• 邮箱：support@zhiyuanhui.com</view>
-      <view class="list-item">• 电话：400-123-4567</view>
-      <view class="list-item">• 地址：北京市朝阳区某某大厦</view>
+      <view class="list-item">• 邮箱：support@zhongkao-zhiyuan.com</view>
+      <view class="list-item">• 在小程序"设置-帮助与反馈"中提交反馈</view>
     </view>
 
     <view class="footer">
-      志愿汇 © 2024 版权所有
+      中考志愿填报系统 © 2025 版权所有
     </view>
   </view>
 </scroll-view>

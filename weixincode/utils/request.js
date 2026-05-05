@@ -67,31 +67,6 @@ const checkNetwork = () => {
   })
 }
 
-// 请求队列
-const requestQueue = []
-let isRequesting = false
-
-const processQueue = () => {
-  if (!isRequesting && requestQueue.length > 0) {
-    isRequesting = true
-    const { resolve, reject } = requestQueue.shift()
-    resolve()
-    setTimeout(() => {
-      isRequesting = false
-      processQueue()
-    }, 100)
-  }
-}
-
-// 添加请求到队列
-const enqueueRequest = (promise) => {
-  return new Promise((resolve, reject) => {
-    requestQueue.push({ resolve, reject })
-    processQueue()
-    promise.then(resolve).catch(reject)
-  })
-}
-
 // 主请求函数
 function request(options = {}) {
   const { 
@@ -103,15 +78,12 @@ function request(options = {}) {
     noToast = false
   } = options
   
-  // 网络检查
   return checkNetwork()
     .then(() => {
-      // 显示加载状态
       if (shouldShowLoading) {
         showLoading(options.loadingTitle)
       }
       
-      // 获取token
       const token = wx.getStorageSync('token')
       const finalHeader = {
         ...requestConfig.header,
@@ -122,7 +94,6 @@ function request(options = {}) {
         finalHeader['Authorization'] = `Bearer ${token}`
       }
       
-      // 构建请求配置
       const requestOptions = {
         url: getBaseURL() + url,
         method: method.toUpperCase(),
@@ -131,8 +102,7 @@ function request(options = {}) {
         timeout: options.timeout || requestConfig.timeout
       }
       
-      // 请求队列控制
-      return enqueueRequest(new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         wx.request({
           ...requestOptions,
           success: (res) => {
@@ -192,7 +162,7 @@ function request(options = {}) {
             reject(new Error(err.errMsg || '网络请求失败'))
           }
         })
-      }))
+      })
     })
     .catch(error => {
       if (!noToast && error.message) {

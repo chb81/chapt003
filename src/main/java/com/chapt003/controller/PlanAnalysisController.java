@@ -3,6 +3,8 @@ package com.chapt003.controller;
 import com.chapt003.dto.PlanComparisonResponse;
 import com.chapt003.dto.RiskAssessmentResponse;
 import com.chapt003.dto.ScoreRankResponse;
+import com.chapt003.entity.User;
+import com.chapt003.repository.UserRepository;
 import com.chapt003.response.ApiResponse;
 import com.chapt003.service.PlanAnalysisService;
 import com.chapt003.service.ScoreRankService;
@@ -27,6 +29,9 @@ public class PlanAnalysisController {
     @Autowired
     private ScoreRankService scoreRankService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/{planId}/risk")
     @Operation(summary = "方案风险评估", description = "评估志愿方案的整体风险等级、滑档概率、保底安全度等")
     public ResponseEntity<ApiResponse<RiskAssessmentResponse>> assessRisk(
@@ -35,8 +40,9 @@ public class PlanAnalysisController {
         if (principal == null) {
             return ResponseEntity.status(401).body(ApiResponse.error(401, "请先登录"));
         }
+        Long userId = getUserIdFromPrincipal(principal);
         return ResponseEntity.ok(ApiResponse.success("风险评估完成",
-                planAnalysisService.assessRisk(null, planId)));
+                planAnalysisService.assessRisk(userId, planId)));
     }
 
     @PostMapping("/compare")
@@ -47,8 +53,9 @@ public class PlanAnalysisController {
         if (principal == null) {
             return ResponseEntity.status(401).body(ApiResponse.error(401, "请先登录"));
         }
+        Long userId = getUserIdFromPrincipal(principal);
         return ResponseEntity.ok(ApiResponse.success("方案对比完成",
-                planAnalysisService.comparePlans(null, planIds)));
+                planAnalysisService.comparePlans(userId, planIds)));
     }
 
     @GetMapping("/score-rank")
@@ -67,8 +74,9 @@ public class PlanAnalysisController {
         if (principal == null) {
             return ResponseEntity.status(401).body(ApiResponse.error(401, "请先登录"));
         }
+        Long userId = getUserIdFromPrincipal(principal);
         return ResponseEntity.ok(ApiResponse.success("获取位次成功",
-                scoreRankService.getStudentRank(null)));
+                scoreRankService.getStudentRank(userId)));
     }
 
     @GetMapping("/score-rank/years")
@@ -76,5 +84,14 @@ public class PlanAnalysisController {
     public ResponseEntity<ApiResponse<List<Integer>>> getAvailableYears(@RequestParam String city) {
         return ResponseEntity.ok(ApiResponse.success("获取可用年份成功",
                 scoreRankService.getAvailableYears(city)));
+    }
+
+    private Long getUserIdFromPrincipal(Principal principal) {
+        if (principal == null) {
+            return null;
+        }
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElse(null);
+        return user != null ? user.getId() : null;
     }
 }

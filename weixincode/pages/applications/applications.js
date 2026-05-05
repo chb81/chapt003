@@ -213,5 +213,17 @@ Page({
     if (!dateString) return ''
     const date = new Date(dateString)
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+  },
+
+  goToRiskAssessment() {
+    wx.navigateTo({ url: '/pages/risk-assessment/risk-assessment' })
+  },
+
+  goToPlanComparison() {
+    wx.navigateTo({ url: '/pages/plan-comparison/plan-comparison' })
+  },
+
+  goToScoreRank() {
+    wx.navigateTo({ url: '/pages/score-rank/score-rank' })
   }
 })

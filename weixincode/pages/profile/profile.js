@@ -5,6 +5,7 @@ Page({
   data: {
     userInfo: null,
     isLoggedIn: false,
+    avatarLetter: '?',
     loading: false,
     menuItems: [
       {
@@ -47,7 +48,8 @@ Page({
     if (token && userInfo) {
       this.setData({
         isLoggedIn: true,
-        userInfo: userInfo
+        userInfo: userInfo,
+        avatarLetter: this.getAvatarLetter(userInfo)
       })
       this.loadUserData()
     } else {
@@ -58,7 +60,8 @@ Page({
           const newUserInfo = wx.getStorageSync('userInfo')
           this.setData({
             isLoggedIn: true,
-            userInfo: newUserInfo
+            userInfo: newUserInfo,
+            avatarLetter: this.getAvatarLetter(newUserInfo)
           })
           this.loadUserData()
         }
@@ -96,7 +99,8 @@ Page({
         const userInfo = wx.getStorageSync('userInfo')
         this.setData({
           isLoggedIn: true,
-          userInfo: userInfo
+          userInfo: userInfo,
+          avatarLetter: this.getAvatarLetter(userInfo)
         })
         this.loadUserData()
       } else {
@@ -135,15 +139,25 @@ Page({
     const { path } = e.currentTarget.dataset
 
     if (path) {
-      wx.navigateTo({
-        url: path,
-        fail: () => {
-          wx.showToast({
-            title: '页面开发中',
-            icon: 'none'
-          })
-        }
-      })
+      const tabBarPaths = [
+        '/pages/index/index',
+        '/pages/projects/projects',
+        '/pages/applications/applications',
+        '/pages/profile/profile'
+      ]
+      if (tabBarPaths.indexOf(path) >= 0) {
+        wx.switchTab({ url: path })
+      } else {
+        wx.navigateTo({
+          url: path,
+          fail: () => {
+            wx.showToast({
+              title: '页面开发中',
+              icon: 'none'
+            })
+          }
+        })
+      }
     }
   },
 
@@ -158,5 +172,11 @@ Page({
       title: '中考志愿填报系统',
       path: '/pages/index/index'
     }
+  },
+
+  getAvatarLetter(userInfo) {
+    if (!userInfo) return '?'
+    var name = userInfo.nickname || userInfo.username || userInfo.email || '用户'
+    return name.charAt(0)
   }
 })

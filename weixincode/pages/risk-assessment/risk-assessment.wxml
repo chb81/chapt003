@@ -1,0 +1,87 @@
+<view class="container">
+  <view class="header">
+    <view class="title">风险评估</view>
+    <view class="subtitle">选择志愿方案，查看风险分析报告</view>
+  </view>
+
+  <view class="plan-selector" wx:if="{{plans.length > 0}}">
+    <view class="section-label">选择方案</view>
+    <picker mode="selector" range="{{planNames}}" value="{{selectedPlanIndex}}" bindchange="onPlanChange">
+      <view class="picker-value">
+        <text>{{planNames[selectedPlanIndex] || '请选择方案'}}</text>
+        <text class="arrow">▼</text>
+      </view>
+    </picker>
+  </view>
+
+  <view class="empty-tip" wx:if="{{plans.length === 0}}">
+    <view class="empty-icon">📋</view>
+    <view class="empty-text">暂无志愿方案</view>
+    <view class="empty-desc">请先在"志愿"页面创建志愿方案</view>
+  </view>
+
+  <view class="loading" wx:if="{{loading}}">
+    <view class="loading-text">分析中...</view>
+  </view>
+
+  <view class="result" wx:if="{{riskData && !loading}}">
+    <view class="risk-overview">
+      <view class="risk-badge risk-level-{{riskData.riskLevel}}">{{riskLevelText}}</view>
+      <view class="risk-score">
+        <view class="score-label">风险评分</view>
+        <view class="score-value">{{riskData.riskScore}}</view>
+        <view class="score-max">/100</view>
+      </view>
+    </view>
+
+    <view class="metrics-card">
+      <view class="metric-item">
+        <view class="metric-label">滑档概率</view>
+        <view class="metric-value {{riskData.slideProbability > 30 ? 'danger' : riskData.slideProbability > 15 ? 'warning' : 'safe'}}">
+          {{riskData.slideProbability}}%
+        </view>
+      </view>
+      <view class="metric-item">
+        <view class="metric-label">保底安全度</view>
+        <view class="metric-value {{riskData.safetyScore < 60 ? 'danger' : riskData.safetyScore < 80 ? 'warning' : 'safe'}}">
+          {{riskData.safetyScore}}
+        </view>
+      </view>
+      <view class="metric-item">
+        <view class="metric-label">冲刺空间</view>
+        <view class="metric-value safe">{{riskData.sprintScore}}</view>
+      </view>
+      <view class="metric-item">
+        <view class="metric-label">方案平衡度</view>
+        <view class="metric-value {{riskData.balanceScore < 60 ? 'warning' : 'safe'}}">
+          {{riskData.balanceScore}}
+        </view>
+      </view>
+    </view>
+
+    <view class="schools-section">
+      <view class="section-title">各学校风险详情</view>
+      <view class="school-risk-item" wx:for="{{riskData.schoolDetails}}" wx:key="schoolName">
+        <view class="school-header">
+          <view class="school-name">{{item.schoolName}}</view>
+          <view class="prob-badge prob-{{item.probabilityLevel}}">{{item.admissionProbability}}%</view>
+        </view>
+        <view class="school-metrics">
+          <view class="sm-item">
+            <text class="sm-label">录取概率</text>
+            <progress percent="{{item.admissionProbability}}" stroke-width="6" activeColor="{{item.admissionProbability > 70 ? '#52c41a' : item.admissionProbability > 40 ? '#faad14' : '#ff4d4f'}}" />
+          </view>
+          <view class="sm-item">
+            <text class="sm-label">分数差距</text>
+            <text class="sm-value">{{item.scoreDiff > 0 ? '+' : ''}}{{item.scoreDiff}}分</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="advice-section" wx:if="{{riskData.advice}}">
+      <view class="section-title">建议</view>
+      <view class="advice-text">{{riskData.advice}}</view>
+    </view>
+  </view>
+</view>

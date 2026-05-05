@@ -11,7 +11,7 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: '志愿汇 - 隐私政策',
+      title: '中考志愿填报 - 隐私政策',
       path: '/pages/index/index'
     }
   }

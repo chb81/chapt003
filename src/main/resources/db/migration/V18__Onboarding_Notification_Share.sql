@@ -1,7 +1,7 @@
--- V18: 用户引导状态 + 通知提醒 + 分享记录
+-- V18: 用户引导状态 + 通知提醒 + 分享记录（幂等版本）
 
 -- 1. 用户引导状态表
-CREATE TABLE user_onboarding (
+CREATE TABLE IF NOT EXISTS user_onboarding (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL COMMENT '用户ID',
     step_completed INT NOT NULL DEFAULT 0 COMMENT '已完成步骤数(0-3)',
@@ -16,7 +16,7 @@ CREATE TABLE user_onboarding (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户引导状态表';
 
 -- 2. 通知提醒表
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL COMMENT '用户ID',
     type VARCHAR(30) NOT NULL COMMENT '通知类型(DEADLINE/REMINDER/SYSTEM/PROMOTION)',
@@ -35,7 +35,7 @@ CREATE TABLE notifications (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='通知提醒表';
 
 -- 3. 分享记录表
-CREATE TABLE share_records (
+CREATE TABLE IF NOT EXISTS share_records (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL COMMENT '分享用户ID',
     share_type VARCHAR(30) NOT NULL COMMENT '分享类型(PLAN/SCHOOL/RECOMMENDATION)',
@@ -51,6 +51,16 @@ CREATE TABLE share_records (
     CONSTRAINT fk_share_user FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='分享记录表';
 
--- 4. 用户表增加引导相关字段
-ALTER TABLE users ADD COLUMN onboarding_completed BIT(1) NOT NULL DEFAULT 0 COMMENT '引导是否完成';
-ALTER TABLE users ADD COLUMN last_login_at TIMESTAMP NULL COMMENT '最后登录时间';
+-- 4. 用户表增加引导相关字段（幂等处理）
+SET @dbname = DATABASE();
+SET @tablename = 'users';
+SET @columnname = 'onboarding_completed';
+SET @preparedStatement = (SELECT IF(
+  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS
+   WHERE TABLE_SCHEMA = @dbname AND TABLE_NAME = @tablename AND COLUMN_NAME = @columnname) > 0,
+  'SELECT 1',
+  'ALTER TABLE users ADD COLUMN onboarding_completed BIT(1) NOT NULL DEFAULT 0 COMMENT ''引导是否完成'''
+));
+PREPARE alterIfNotExists FROM @preparedStatement;
+EXECUTE alterIfNotExists;
+DEALLOCATE PREPARE alterIfNotExists;

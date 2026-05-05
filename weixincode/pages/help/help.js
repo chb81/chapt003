@@ -33,7 +33,8 @@ Page({
     feedbackForm: {
       type: '功能建议',
       content: '',
-      contact: ''
+      contact: '',
+      images: []
     },
     feedbackTypes: [
       '功能建议',
@@ -92,6 +93,65 @@ Page({
     })
   },
 
+  showTypePicker() {
+    const feedbackTypes = this.data.feedbackTypes
+    wx.showActionSheet({
+      itemList: feedbackTypes,
+      success: (res) => {
+        this.setData({
+          'feedbackForm.type': feedbackTypes[res.tapIndex]
+        })
+      }
+    })
+  },
+
+  selectFeedbackType(e) {
+    const index = e.detail.value
+    this.setData({
+      'feedbackForm.type': this.data.feedbackTypes[index]
+    })
+  },
+
+  chooseImage() {
+    const remaining = 3 - this.data.feedbackForm.images.length
+    if (remaining <= 0) {
+      wx.showToast({ title: '最多上传3张图片', icon: 'none' })
+      return
+    }
+    wx.chooseImage({
+      count: remaining,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const images = [...this.data.feedbackForm.images, ...res.tempFilePaths]
+        this.setData({ 'feedbackForm.images': images })
+      }
+    })
+  },
+
+  removeImage(e) {
+    const index = e.currentTarget.dataset.index
+    const images = this.data.feedbackForm.images.filter((_, i) => i !== index)
+    this.setData({ 'feedbackForm.images': images })
+  },
+
+  previewImage(e) {
+    const index = e.currentTarget.dataset.index
+    wx.previewImage({
+      current: this.data.feedbackForm.images[index],
+      urls: this.data.feedbackForm.images
+    })
+  },
+
+  handleContact() {
+    wx.makePhoneCall({
+      phoneNumber: '400-000-0000',
+      fail: () => {
+        wx.showToast({ title: '客服电话复制成功', icon: 'success' })
+      }
+    })
+  },
+
   async submitFeedback() {
     const { content } = this.data.feedbackForm
 
@@ -111,7 +171,7 @@ Page({
     try {
       wx.showToast({ title: '感谢您的反馈', icon: 'success' })
       this.setData({
-        feedbackForm: { type: '功能建议', content: '', contact: '' }
+        feedbackForm: { type: '功能建议', content: '', contact: '', images: [] }
       })
     } catch (error) {
       console.error('提交反馈失败:', error)

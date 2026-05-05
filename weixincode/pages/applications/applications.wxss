@@ -203,3 +203,41 @@
   font-weight: bold;
   box-shadow: 0 4rpx 20rpx rgba(25, 137, 250, 0.4);
 }
+
+.tools-section {
+  margin: 30rpx 0;
+  padding: 30rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
+.tools-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+
+.tools-grid {
+  display: flex;
+  gap: 20rpx;
+}
+
+.tool-item {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 12rpx;
+  background: #f5f7fa;
+  border-radius: 12rpx;
+}
+
+.tool-icon {
+  font-size: 40rpx;
+  margin-bottom: 12rpx;
+}
+
+.tool-name {
+  font-size: 24rpx;
+  color: #666;
+}

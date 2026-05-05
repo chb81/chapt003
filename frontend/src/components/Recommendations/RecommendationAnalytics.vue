@@ -256,7 +256,7 @@ import {
   CircleCheck 
 } from '@element-plus/icons-vue'
 import { apiService } from '@/utils/api'
-import * as echarts from 'echarts'
+import { echarts } from '@/utils/echarts'
 
 interface KPI {
   key: string

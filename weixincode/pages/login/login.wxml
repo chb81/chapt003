@@ -1,7 +1,7 @@
 <view class="login-container">
   <!-- 顶部Logo区域 -->
   <view class="logo-section">
-    <image class="logo" src="/images/logo.png" mode="aspectFit"></image>
+    <view class="logo-text">志愿</view>
     <text class="app-name">中考志愿填报</text>
     <text class="app-slogan">智能填报，科学择校</text>
   </view>
@@ -10,11 +10,10 @@
   <view class="wechat-login-section">
     <button 
       class="wechat-login-btn {{loading ? 'loading' : ''}}" 
-      open-type="getUserInfo"
-      bindgetuserinfo="handleWechatLogin"
+      bindtap="handleWechatLogin"
       disabled="{{loading}}"
     >
-      <image class="wechat-icon" src="/images/wechat-icon.png" mode="aspectFit"></image>
+      <text class="wechat-icon-text">微</text>
       <text wx:if="{{!loading}}">微信一键登录</text>
       <text wx:else>登录中...</text>
     </button>

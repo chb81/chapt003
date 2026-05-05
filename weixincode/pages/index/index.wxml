@@ -2,7 +2,7 @@
   <view class="user-header">
     <view class="user-info">
       <view class="avatar-wrap">
-        <view class="avatar-text">{{isLoggedIn ? (userInfo.nickname || userInfo.email || '用户')[0] : '?'}}</view>
+        <view class="avatar-text">{{avatarLetter}}</view>
       </view>
       <view class="user-details">
         <view class="username">{{isLoggedIn ? (userInfo.nickname || userInfo.email || '用户') : '未登录'}}</view>

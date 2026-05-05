@@ -65,6 +65,9 @@ public class User implements UserDetails {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Column(name = "onboarding_completed", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private Boolean onboardingCompleted = true;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -213,5 +216,13 @@ public class User implements UserDetails {
 
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
+    }
+
+    public Boolean getOnboardingCompleted() {
+        return onboardingCompleted;
+    }
+
+    public void setOnboardingCompleted(Boolean onboardingCompleted) {
+        this.onboardingCompleted = onboardingCompleted;
     }
 }

@@ -83,13 +83,4 @@
       </view>
     </view>
   </scroll-view>
-
-  <picker 
-    mode="selector" 
-    range="{{feedbackTypes}}" 
-    value="{{feedbackTypes.indexOf(feedbackForm.type)}}" 
-    bindchange="selectFeedbackType"
-    wx:if="{{showTypePicker}}"
-  >
-  </picker>
 </view>

@@ -2,7 +2,7 @@
   <view class="header-section">
     <view class="user-info-card" wx:if="{{isLoggedIn}}">
       <view class="user-avatar" bindtap="handleEditProfile">
-        <view class="avatar-text">{{(userInfo.nickname || userInfo.username || userInfo.email || '用户')[0]}}</view>
+        <view class="avatar-text">{{avatarLetter}}</view>
         <view class="edit-icon">✏️</view>
       </view>
       <view class="user-details">

@@ -3,6 +3,8 @@ package com.chapt003.controller;
 import com.chapt003.dto.OnboardingStatusResponse;
 import com.chapt003.dto.ShareResponse;
 import com.chapt003.dto.NotificationResponse;
+import com.chapt003.entity.User;
+import com.chapt003.repository.UserRepository;
 import com.chapt003.response.ApiResponse;
 import com.chapt003.service.NotificationService;
 import com.chapt003.service.ShareService;
@@ -32,11 +34,15 @@ public class UserExperienceController {
     @Autowired
     private ShareService shareService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/onboarding/status")
     @Operation(summary = "获取引导状态", description = "查看当前用户的引导完成进度")
     public ResponseEntity<ApiResponse<OnboardingStatusResponse>> getOnboardingStatus(Principal principal) {
+        Long userId = getUserIdFromPrincipal(principal);
         return ResponseEntity.ok(ApiResponse.success("获取引导状态成功",
-                onboardingService.getOnboardingStatus(null)));
+                onboardingService.getOnboardingStatus(userId)));
     }
 
     @PostMapping("/onboarding/complete-step")
@@ -44,9 +50,10 @@ public class UserExperienceController {
     public ResponseEntity<ApiResponse<OnboardingStatusResponse>> completeStep(
             Principal principal,
             @RequestBody Map<String, Integer> body) {
+        Long userId = getUserIdFromPrincipal(principal);
         Integer step = body.get("step");
         return ResponseEntity.ok(ApiResponse.success("步骤完成",
-                onboardingService.completeStep(null, step)));
+                onboardingService.completeStep(userId, step)));
     }
 
     @GetMapping("/notifications")
@@ -55,35 +62,40 @@ public class UserExperienceController {
             Principal principal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
+        Long userId = getUserIdFromPrincipal(principal);
         return ResponseEntity.ok(ApiResponse.success("获取通知成功",
-                notificationService.getNotifications(null, page, size)));
+                notificationService.getNotifications(userId, page, size)));
     }
 
     @GetMapping("/notifications/unread")
     @Operation(summary = "获取未读通知", description = "获取所有未读通知")
     public ResponseEntity<ApiResponse<List<NotificationResponse>>> getUnreadNotifications(Principal principal) {
+        Long userId = getUserIdFromPrincipal(principal);
         return ResponseEntity.ok(ApiResponse.success("获取未读通知成功",
-                notificationService.getUnreadNotifications(null)));
+                notificationService.getUnreadNotifications(userId)));
     }
 
     @GetMapping("/notifications/unread-count")
     @Operation(summary = "未读通知数", description = "获取未读通知数量")
     public ResponseEntity<ApiResponse<Long>> getUnreadCount(Principal principal) {
+        Long userId = getUserIdFromPrincipal(principal);
         return ResponseEntity.ok(ApiResponse.success("获取成功",
-                notificationService.getUnreadCount(null)));
+                notificationService.getUnreadCount(userId)));
     }
 
     @PostMapping("/notifications/{id}/read")
     @Operation(summary = "标记已读", description = "标记某条通知为已读")
     public ResponseEntity<ApiResponse<Void>> markAsRead(Principal principal, @PathVariable Long id) {
-        notificationService.markAsRead(id, null);
+        Long userId = getUserIdFromPrincipal(principal);
+        notificationService.markAsRead(id, userId);
         return ResponseEntity.ok(ApiResponse.success("已标记为已读", null));
     }
 
     @PostMapping("/notifications/read-all")
     @Operation(summary = "全部标记已读", description = "将所有未读通知标记为已读")
     public ResponseEntity<ApiResponse<Void>> markAllAsRead(Principal principal) {
-        notificationService.markAllAsRead(null);
+        Long userId = getUserIdFromPrincipal(principal);
+        notificationService.markAllAsRead(userId);
         return ResponseEntity.ok(ApiResponse.success("全部已标记为已读", null));
     }
 
@@ -92,13 +104,14 @@ public class UserExperienceController {
     public ResponseEntity<ApiResponse<ShareResponse>> createShare(
             Principal principal,
             @RequestBody Map<String, String> body) {
+        Long userId = getUserIdFromPrincipal(principal);
         String shareType = body.get("shareType");
         String targetIdStr = body.get("targetId");
         String title = body.get("title");
         String description = body.get("description");
         Long targetId = targetIdStr != null ? Long.parseLong(targetIdStr) : null;
         return ResponseEntity.ok(ApiResponse.success("分享创建成功",
-                shareService.createShare(null, shareType, targetId, title, description)));
+                shareService.createShare(userId, shareType, targetId, title, description)));
     }
 
     @GetMapping("/share/{shareCode}")
@@ -106,5 +119,14 @@ public class UserExperienceController {
     public ResponseEntity<ApiResponse<ShareResponse>> getShare(@PathVariable String shareCode) {
         return ResponseEntity.ok(ApiResponse.success("获取分享成功",
                 shareService.getShareByCode(shareCode)));
+    }
+
+    private Long getUserIdFromPrincipal(Principal principal) {
+        if (principal == null) {
+            return null;
+        }
+        String email = principal.getName();
+        User user = userRepository.findByEmail(email).orElse(null);
+        return user != null ? user.getId() : null;
     }
 }

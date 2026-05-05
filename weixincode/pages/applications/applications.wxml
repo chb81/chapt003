@@ -66,4 +66,22 @@
   <view class="create-btn-wrap">
     <view class="create-btn" bindtap="onCreateNew">+ 创建新方案</view>
   </view>
+
+  <view class="tools-section">
+    <view class="tools-title">方案工具</view>
+    <view class="tools-grid">
+      <view class="tool-item" bindtap="goToRiskAssessment">
+        <view class="tool-icon">🛡️</view>
+        <view class="tool-name">风险评估</view>
+      </view>
+      <view class="tool-item" bindtap="goToPlanComparison">
+        <view class="tool-icon">⚖️</view>
+        <view class="tool-name">方案对比</view>
+      </view>
+      <view class="tool-item" bindtap="goToScoreRank">
+        <view class="tool-icon">📊</view>
+        <view class="tool-name">位次换算</view>
+      </view>
+    </view>
+  </view>
 </view>
