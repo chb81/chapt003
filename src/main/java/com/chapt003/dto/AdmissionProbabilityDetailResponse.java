@@ -17,6 +17,9 @@ public class AdmissionProbabilityDetailResponse {
     @JsonProperty("student_total_score")
     private BigDecimal studentTotalScore;
 
+    @JsonProperty("student_rank")
+    private Integer studentRank;
+
     @JsonProperty("school_admission_score_year1")
     private BigDecimal schoolAdmissionScoreYear1;
 
@@ -26,8 +29,20 @@ public class AdmissionProbabilityDetailResponse {
     @JsonProperty("school_admission_score_year3")
     private BigDecimal schoolAdmissionScoreYear3;
 
+    @JsonProperty("predicted_score")
+    private BigDecimal predictedScore;
+
+    @JsonProperty("enrollment_quota")
+    private Integer enrollmentQuota;
+
+    @JsonProperty("allocation_quota")
+    private Integer allocationQuota;
+
     @JsonProperty("admission_rate")
     private BigDecimal admissionRate;
+
+    @JsonProperty("rank_competition_ratio")
+    private BigDecimal rankCompetitionRatio;
 
     @JsonProperty("probability")
     private Integer probability;
@@ -49,4 +64,13 @@ public class AdmissionProbabilityDetailResponse {
 
     @JsonProperty("message")
     private String message;
+
+    @JsonProperty("school_name")
+    private String schoolName;
+
+    @JsonProperty("school_rank")
+    private Integer schoolRank;
+
+    @JsonProperty("data_source")
+    private String dataSource;
 }

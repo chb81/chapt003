@@ -2,15 +2,16 @@ package com.chapt003.service;
 
 import com.chapt003.dto.PlanComparisonResponse;
 import com.chapt003.dto.RiskAssessmentResponse;
-import com.chapt003.entity.School;
+import com.chapt003.entity.TbSchool;
 import com.chapt003.entity.StudentScore;
 import com.chapt003.entity.VolunteerApplication;
 import com.chapt003.entity.VolunteerApplicationItem;
-import com.chapt003.repository.SchoolRepository;
+import com.chapt003.repository.TbSchoolRepository;
 import com.chapt003.repository.StudentScoreRepository;
 import com.chapt003.repository.VolunteerApplicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -33,10 +34,11 @@ public class PlanAnalysisService {
     private StudentScoreRepository studentScoreRepository;
 
     @Autowired
-    private SchoolRepository schoolRepository;
+    private TbSchoolRepository tbSchoolRepository;
 
+    @Transactional(readOnly = true)
     public RiskAssessmentResponse assessRisk(Long userId, Long planId) {
-        Optional<VolunteerApplication> planOpt = volunteerApplicationRepository.findById(planId);
+        Optional<VolunteerApplication> planOpt = volunteerApplicationRepository.findByIdWithItems(planId);
         if (!planOpt.isPresent()) {
             return RiskAssessmentResponse.builder()
                     .planId(planId)
@@ -63,10 +65,15 @@ public class PlanAnalysisService {
         BigDecimal minProb = new BigDecimal("100");
 
         for (VolunteerApplicationItem item : items) {
-            Long schoolId = item.getSchool() != null ? item.getSchool().getId() : null;
-            BigDecimal probability = admissionProbabilityService.calculateAdmissionProbability(
-                    getStudentScore(userId), item.getSchool()
-            );
+            TbSchool school = item.getSchool();
+            Long schoolId = school != null ? school.getId() : null;
+            BigDecimal probability;
+            try {
+                probability = admissionProbabilityService.calculateAdmissionProbability(
+                        getStudentScore(userId), school);
+            } catch (Exception e) {
+                probability = BigDecimal.ZERO;
+            }
             if (probability == null) probability = BigDecimal.ZERO;
 
             totalProbability = totalProbability.add(probability);
@@ -81,7 +88,7 @@ public class PlanAnalysisService {
             String level = getProbabilityLevel(probability);
             String tag = getRiskTag(order, probability, items.size());
 
-            String schoolName = item.getSchool() != null ? item.getSchool().getName() : "未知学校";
+            String schoolName = school != null ? school.getName() : "未知学校";
             schoolRisks.add(RiskAssessmentResponse.SchoolRiskDetail.builder()
                     .schoolId(schoolId)
                     .schoolName(schoolName)
@@ -124,6 +131,7 @@ public class PlanAnalysisService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public PlanComparisonResponse comparePlans(Long userId, List<Long> planIds) {
         if (planIds == null || planIds.size() < 2) {
             return PlanComparisonResponse.builder()

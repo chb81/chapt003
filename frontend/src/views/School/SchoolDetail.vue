@@ -10,31 +10,32 @@
             {{ typeLabel }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="学校等级">
-          <el-tag v-if="school.schoolLevel" type="warning">{{ school.schoolLevel }}</el-tag>
+        <el-descriptions-item label="学校性质">
+          <el-tag v-if="school.schoolNature" type="warning">{{ school.schoolNature }}</el-tag>
           <span v-else>-</span>
         </el-descriptions-item>
         <el-descriptions-item label="所在城市">{{ school.city || '-' }}</el-descriptions-item>
         <el-descriptions-item label="所在区县">{{ school.district || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="学校排名" v-if="school.schoolRank">
+          第{{ school.schoolRank }}名
+        </el-descriptions-item>
         <el-descriptions-item label="学校地址">{{ school.address || '-' }}</el-descriptions-item>
         <el-descriptions-item label="联系电话">{{ school.phone || '-' }}</el-descriptions-item>
         <el-descriptions-item label="招生计划">{{ school.enrollmentQuota ? school.enrollmentQuota + '人' : '-' }}</el-descriptions-item>
-        <el-descriptions-item label="学费范围">{{ school.tuitionRange || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="住宿条件">{{ school.boardingType || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="高考本科率">{{ school.collegeAdmissionRate ? school.collegeAdmissionRate + '%' : '-' }}</el-descriptions-item>
-        <el-descriptions-item label="一本率">{{ school.firstTierRate ? school.firstTierRate + '%' : '-' }}</el-descriptions-item>
-        <el-descriptions-item label="硬件评分">{{ school.facilitiesScore ? school.facilitiesScore + '/10' : '-' }}</el-descriptions-item>
-        <el-descriptions-item label="交通信息" :span="2">{{ school.transportation || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="学校等级" v-if="school.schoolLevel">
+          <el-tag type="warning">{{ school.schoolLevel }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="学校代码" v-if="school.schoolCode">{{ school.schoolCode }}</el-descriptions-item>
       </el-descriptions>
-
-      <div v-if="school.specialClasses" style="margin-top: 16px">
-        <h4>特色班/实验班</h4>
-        <p>{{ school.specialClasses }}</p>
-      </div>
 
       <div v-if="school.features" style="margin-top: 16px">
         <h4>学校特色</h4>
         <p>{{ school.features }}</p>
+      </div>
+
+      <div v-if="school.schoolRemark" style="margin-top: 16px">
+        <h4>备注</h4>
+        <p>{{ school.schoolRemark }}</p>
       </div>
 
       <div v-if="school.description" style="margin-top: 16px">

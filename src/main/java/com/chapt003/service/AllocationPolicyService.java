@@ -6,12 +6,12 @@ import com.chapt003.dto.AllocationPolicyRequest;
 import com.chapt003.dto.AllocationPolicyResponse;
 import com.chapt003.entity.AllocationPolicy;
 import com.chapt003.entity.AllocationQuota;
-import com.chapt003.entity.School;
+import com.chapt003.entity.TbSchool;
 import com.chapt003.entity.StudentProfile;
 import com.chapt003.entity.StudentScore;
 import com.chapt003.repository.AllocationPolicyRepository;
 import com.chapt003.repository.AllocationQuotaRepository;
-import com.chapt003.repository.SchoolRepository;
+import com.chapt003.repository.TbSchoolRepository;
 import com.chapt003.repository.StudentProfileRepository;
 import com.chapt003.repository.StudentScoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class AllocationPolicyService {
     private AllocationPolicyRepository allocationPolicyRepository;
 
     @Autowired
-    private SchoolRepository schoolRepository;
+    private TbSchoolRepository tbSchoolRepository;
 
     @Autowired
     private StudentProfileRepository studentProfileRepository;
@@ -51,8 +51,8 @@ public class AllocationPolicyService {
             year = Year.now().getValue();
         }
         List<AllocationQuota> quotas = allocationQuotaRepository.findBySchoolIdAndYear(schoolId, year);
-        String schoolName = schoolRepository.findById(schoolId)
-                .map(School::getName).orElse("");
+        String schoolName = tbSchoolRepository.findById(schoolId)
+                .map(TbSchool::getSchoolName).orElse("");
 
         return quotas.stream().map(q -> AllocationQuotaResponse.builder()
                 .id(q.getId())
@@ -77,8 +77,8 @@ public class AllocationPolicyService {
         }
         List<AllocationQuota> quotas = allocationQuotaRepository.findBySourceSchoolNameAndYear(sourceSchoolName, year);
         return quotas.stream().map(q -> {
-            String schoolName = schoolRepository.findById(q.getSchoolId())
-                    .map(School::getName).orElse("");
+            String schoolName = tbSchoolRepository.findById(q.getSchoolId())
+                    .map(TbSchool::getSchoolName).orElse("");
             return AllocationQuotaResponse.builder()
                     .id(q.getId())
                     .schoolId(q.getSchoolId())
@@ -197,8 +197,8 @@ public class AllocationPolicyService {
         List<AllocationQuota> quotas = allocationQuotaRepository
                 .findBySourceSchoolNameAndYear(profileOpt.get().getSchool(), currentYear);
         return quotas.stream().map(q -> {
-            String schoolName = schoolRepository.findById(q.getSchoolId())
-                    .map(School::getName).orElse("");
+            String schoolName = tbSchoolRepository.findById(q.getSchoolId())
+                    .map(TbSchool::getSchoolName).orElse("");
             boolean advantage = q.getScoreDifference() != null && q.getScoreDifference().compareTo(BigDecimal.ZERO) > 0;
             return AllocationQuotaResponse.builder()
                     .id(q.getId())
@@ -231,8 +231,8 @@ public class AllocationPolicyService {
                 .policyRule(request.getPolicyRule())
                 .build();
         quota = allocationQuotaRepository.save(quota);
-        String schoolName = schoolRepository.findById(request.getSchoolId())
-                .map(School::getName).orElse("");
+        String schoolName = tbSchoolRepository.findById(request.getSchoolId())
+                .map(TbSchool::getSchoolName).orElse("");
         return AllocationQuotaResponse.builder()
                 .id(quota.getId())
                 .schoolId(quota.getSchoolId())
@@ -264,8 +264,8 @@ public class AllocationPolicyService {
         quota.setScoreDifference(request.getScoreDifference());
         quota.setPolicyRule(request.getPolicyRule());
         quota = allocationQuotaRepository.save(quota);
-        String schoolName = schoolRepository.findById(request.getSchoolId())
-                .map(School::getName).orElse("");
+        String schoolName = tbSchoolRepository.findById(request.getSchoolId())
+                .map(TbSchool::getSchoolName).orElse("");
         return AllocationQuotaResponse.builder()
                 .id(quota.getId())
                 .schoolId(quota.getSchoolId())
@@ -301,8 +301,8 @@ public class AllocationPolicyService {
             page = allocationQuotaRepository.findAll(pageable);
         }
         return page.map(q -> {
-            String schoolName = schoolRepository.findById(q.getSchoolId())
-                    .map(School::getName).orElse("");
+            String schoolName = tbSchoolRepository.findById(q.getSchoolId())
+                    .map(TbSchool::getSchoolName).orElse("");
             return AllocationQuotaResponse.builder()
                     .id(q.getId())
                     .schoolId(q.getSchoolId())

@@ -26,7 +26,7 @@ public class BusinessMetricsController {
     private UserRepository userRepository;
 
     @Autowired
-    private SchoolRepository schoolRepository;
+    private TbSchoolRepository tbSchoolRepository;
 
     @Autowired
     private VolunteerApplicationRepository volunteerApplicationRepository;
@@ -42,7 +42,7 @@ public class BusinessMetricsController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> getBusinessMetrics() {
         Map<String, Object> metrics = new HashMap<>();
         metrics.put("totalUsers", userRepository.count());
-        metrics.put("totalSchools", schoolRepository.count());
+        metrics.put("totalSchools", tbSchoolRepository.count());
         metrics.put("totalApplications", volunteerApplicationRepository.count());
         metrics.put("totalStudentProfiles", studentProfileRepository.count());
         metrics.put("totalHistoricalData", historicalAdmissionDataRepository.count());

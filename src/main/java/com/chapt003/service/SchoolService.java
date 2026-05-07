@@ -4,10 +4,9 @@ import com.chapt003.dto.SchoolListRequest;
 import com.chapt003.dto.SchoolListResponse;
 import com.chapt003.dto.SchoolRequest;
 import com.chapt003.dto.SchoolResponse;
-import com.chapt003.entity.School;
-import com.chapt003.entity.enums.SchoolType;
+import com.chapt003.entity.TbSchool;
 import com.chapt003.exception.BusinessException;
-import com.chapt003.repository.SchoolRepository;
+import com.chapt003.repository.TbSchoolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,17 +24,17 @@ import java.util.stream.Collectors;
 public class SchoolService {
 
     @Autowired
-    private SchoolRepository schoolRepository;
+    private TbSchoolRepository tbSchoolRepository;
 
     public SchoolListResponse getSchoolList(SchoolListRequest request) {
         Sort sort = buildSort(request.getSortBy(), request.getSortDirection());
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), sort);
 
-        Page<School> schoolPage = schoolRepository.searchSchools(
+        Page<TbSchool> schoolPage = tbSchoolRepository.searchSchools(
                 request.getKeyword(),
                 request.getCity(),
                 request.getDistrict(),
-                request.getType(),
+                request.getSchoolType(),
                 request.getMinScore(),
                 request.getMaxScore(),
                 pageable
@@ -56,24 +55,24 @@ public class SchoolService {
 
     @Cacheable(value = "schoolDetail", key = "#id")
     public SchoolResponse getSchoolById(Long id) {
-        School school = schoolRepository.findById(id)
+        TbSchool school = tbSchoolRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(404, "学校不存在"));
         return convertToResponse(school);
     }
 
     @Cacheable(value = "cities")
     public List<String> getAllCities() {
-        return schoolRepository.findAllCities();
+        return tbSchoolRepository.findAllCities();
     }
 
     @Cacheable(value = "districts", key = "#city")
     public List<String> getDistrictsByCity(String city) {
-        return schoolRepository.findDistrictsByCity(city);
+        return tbSchoolRepository.findDistrictsByCity(city);
     }
 
     @Transactional(readOnly = true)
     public List<SchoolResponse> exportAllSchools() {
-        return schoolRepository.findAll().stream()
+        return tbSchoolRepository.findAll().stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
@@ -81,91 +80,114 @@ public class SchoolService {
     @Transactional
     @CacheEvict(value = {"schools", "schoolDetail", "cities", "districts"}, allEntries = true)
     public SchoolResponse createSchool(SchoolRequest request) {
-        if (schoolRepository.existsByName(request.getName())) {
+        if (tbSchoolRepository.existsBySchoolName(request.getName())) {
             throw new BusinessException(400, "学校名称已存在");
         }
 
-        School school = School.builder()
-                .name(request.getName())
-                .type(request.getType())
+        TbSchool school = TbSchool.builder()
+                .schoolName(request.getName())
+                .schoolCode(request.getSchoolCode())
+                .schoolType(request.getSchoolType())
+                .schoolNature(request.getSchoolNature())
                 .city(request.getCity())
                 .district(request.getDistrict())
+                .areaCode(request.getAreaCode())
+                .schoolRank(request.getSchoolRank())
                 .admissionScoreYear1(request.getAdmissionScoreYear1())
                 .admissionScoreYear2(request.getAdmissionScoreYear2())
                 .admissionScoreYear3(request.getAdmissionScoreYear3())
                 .description(request.getDescription())
                 .features(request.getFeatures())
                 .enrollmentQuota(request.getEnrollmentQuota())
+                .applicantCount(request.getApplicantCount())
                 .phone(request.getPhone())
                 .address(request.getAddress())
+                .schoolLevel(request.getSchoolLevel())
+                .schoolRemark(request.getSchoolRemark())
+                .deleted(false)
                 .build();
 
-        School savedSchool = schoolRepository.save(school);
+        TbSchool savedSchool = tbSchoolRepository.save(school);
         return convertToResponse(savedSchool);
     }
 
     @Transactional
     @CacheEvict(value = {"schools", "schoolDetail", "cities", "districts"}, allEntries = true)
     public SchoolResponse updateSchool(Long id, SchoolRequest request) {
-        School school = schoolRepository.findById(id)
+        TbSchool school = tbSchoolRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(404, "学校不存在"));
 
-        if (!school.getName().equals(request.getName()) && schoolRepository.existsByName(request.getName())) {
+        if (!school.getSchoolName().equals(request.getName()) && tbSchoolRepository.existsBySchoolName(request.getName())) {
             throw new BusinessException(400, "学校名称已存在");
         }
 
-        school.setName(request.getName());
-        school.setType(request.getType());
+        school.setSchoolName(request.getName());
+        school.setSchoolCode(request.getSchoolCode());
+        school.setSchoolType(request.getSchoolType());
+        school.setSchoolNature(request.getSchoolNature());
         school.setCity(request.getCity());
         school.setDistrict(request.getDistrict());
+        school.setAreaCode(request.getAreaCode());
+        school.setSchoolRank(request.getSchoolRank());
         school.setAdmissionScoreYear1(request.getAdmissionScoreYear1());
         school.setAdmissionScoreYear2(request.getAdmissionScoreYear2());
         school.setAdmissionScoreYear3(request.getAdmissionScoreYear3());
         school.setDescription(request.getDescription());
         school.setFeatures(request.getFeatures());
         school.setEnrollmentQuota(request.getEnrollmentQuota());
+        school.setApplicantCount(request.getApplicantCount());
         school.setPhone(request.getPhone());
         school.setAddress(request.getAddress());
+        school.setSchoolLevel(request.getSchoolLevel());
+        school.setSchoolRemark(request.getSchoolRemark());
 
-        School updatedSchool = schoolRepository.save(school);
+        TbSchool updatedSchool = tbSchoolRepository.save(school);
         return convertToResponse(updatedSchool);
     }
 
     @Transactional
     @CacheEvict(value = {"schools", "schoolDetail", "cities", "districts"}, allEntries = true)
     public void deleteSchool(Long id) {
-        if (!schoolRepository.existsById(id)) {
+        if (!tbSchoolRepository.existsById(id)) {
             throw new BusinessException(404, "学校不存在");
         }
-        schoolRepository.deleteById(id);
+        tbSchoolRepository.deleteById(id);
     }
 
     @Transactional
     @CacheEvict(value = {"schools", "schoolDetail", "cities", "districts"}, allEntries = true)
     public void importSchools(List<SchoolRequest> schoolRequests) {
         for (SchoolRequest request : schoolRequests) {
-            if (!schoolRepository.existsByName(request.getName())) {
-                School school = School.builder()
-                        .name(request.getName())
-                        .type(request.getType())
+            if (!tbSchoolRepository.existsBySchoolName(request.getName())) {
+                TbSchool school = TbSchool.builder()
+                        .schoolName(request.getName())
+                        .schoolCode(request.getSchoolCode())
+                        .schoolType(request.getSchoolType())
+                        .schoolNature(request.getSchoolNature())
                         .city(request.getCity())
                         .district(request.getDistrict())
+                        .areaCode(request.getAreaCode())
+                        .schoolRank(request.getSchoolRank())
                         .admissionScoreYear1(request.getAdmissionScoreYear1())
                         .admissionScoreYear2(request.getAdmissionScoreYear2())
                         .admissionScoreYear3(request.getAdmissionScoreYear3())
                         .description(request.getDescription())
                         .features(request.getFeatures())
                         .enrollmentQuota(request.getEnrollmentQuota())
+                        .applicantCount(request.getApplicantCount())
                         .phone(request.getPhone())
                         .address(request.getAddress())
+                        .schoolLevel(request.getSchoolLevel())
+                        .schoolRemark(request.getSchoolRemark())
+                        .deleted(false)
                         .build();
-                schoolRepository.save(school);
+                tbSchoolRepository.save(school);
             }
         }
     }
 
     private Sort buildSort(String sortBy, String sortDirection) {
-        String sortField = sortBy != null ? sortBy : "name";
+        String sortField = sortBy != null ? sortBy : "schoolName";
         Sort.Direction direction = Sort.Direction.ASC;
 
         if ("desc".equalsIgnoreCase(sortDirection)) {
@@ -174,26 +196,38 @@ public class SchoolService {
 
         if ("admissionScore".equalsIgnoreCase(sortField)) {
             sortField = "admissionScoreYear1";
+        } else if ("name".equalsIgnoreCase(sortField)) {
+            sortField = "schoolName";
+        } else if ("schoolRank".equalsIgnoreCase(sortField)) {
+            sortField = "schoolRank";
         }
 
         return Sort.by(direction, sortField);
     }
 
-    private SchoolResponse convertToResponse(School school) {
+    private SchoolResponse convertToResponse(TbSchool school) {
         return SchoolResponse.builder()
                 .id(school.getId())
-                .name(school.getName())
-                .type(school.getType())
+                .schoolCode(school.getSchoolCode())
+                .name(school.getSchoolName())
+                .schoolType(school.getSchoolType())
+                .schoolNature(school.getSchoolNature())
+                .type(school.getTypeName())
                 .city(school.getCity())
                 .district(school.getDistrict())
+                .areaCode(school.getAreaCode())
+                .schoolRank(school.getSchoolRank())
                 .admissionScoreYear1(school.getAdmissionScoreYear1())
                 .admissionScoreYear2(school.getAdmissionScoreYear2())
                 .admissionScoreYear3(school.getAdmissionScoreYear3())
                 .description(school.getDescription())
                 .features(school.getFeatures())
                 .enrollmentQuota(school.getEnrollmentQuota())
+                .applicantCount(school.getApplicantCount())
                 .phone(school.getPhone())
                 .address(school.getAddress())
+                .schoolLevel(school.getSchoolLevel())
+                .schoolRemark(school.getSchoolRemark())
                 .createdAt(school.getCreatedAt())
                 .updatedAt(school.getUpdatedAt())
                 .build();

@@ -1,13 +1,13 @@
 package com.chapt003.service;
 
 import com.chapt003.dto.*;
-import com.chapt003.entity.School;
+import com.chapt003.entity.TbSchool;
 import com.chapt003.entity.User;
 import com.chapt003.entity.VolunteerApplication;
 import com.chapt003.entity.VolunteerApplicationItem;
 import com.chapt003.entity.enums.VolunteerApplicationStatus;
 import com.chapt003.exception.BusinessException;
-import com.chapt003.repository.SchoolRepository;
+import com.chapt003.repository.TbSchoolRepository;
 import com.chapt003.repository.StudentScoreRepository;
 import com.chapt003.repository.UserRepository;
 import com.chapt003.repository.VolunteerApplicationItemRepository;
@@ -38,7 +38,7 @@ public class VolunteerApplicationService {
     private VolunteerApplicationItemRepository itemRepository;
 
     @Autowired
-    private SchoolRepository schoolRepository;
+    private TbSchoolRepository tbSchoolRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -103,7 +103,7 @@ public class VolunteerApplicationService {
         User user = getUserByEmail(email);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<VolunteerApplication> applicationPage = volunteerApplicationRepository
-                .findByUserIdAndStatus(user.getId(), VolunteerApplicationStatus.DRAFT, pageable);
+                .findAllByUserId(user.getId(), pageable);
 
         List<VolunteerApplicationListResponse.VolunteerApplicationSummary> summaries = applicationPage.getContent().stream()
                 .map(this::convertToSummary)
@@ -277,7 +277,7 @@ public class VolunteerApplicationService {
     }
 
     private void addItemToApplication(VolunteerApplication application, VolunteerApplicationItemRequest request) {
-        School school = schoolRepository.findById(request.getSchoolId())
+        TbSchool school = tbSchoolRepository.findById(request.getSchoolId())
                 .orElseThrow(() -> new BusinessException(404, "学校不存在"));
 
         BigDecimal probability = calculateAdmissionProbability(application.getUser().getId(), school);
@@ -293,7 +293,7 @@ public class VolunteerApplicationService {
         itemRepository.save(item);
     }
 
-    private BigDecimal calculateAdmissionProbability(Long userId, School school) {
+    private BigDecimal calculateAdmissionProbability(Long userId, TbSchool school) {
         return studentScoreRepository.findByUserId(userId)
                 .map(score -> {
                     BigDecimal studentScore = score.getTotalScore();
@@ -324,7 +324,7 @@ public class VolunteerApplicationService {
                 .orElse(new BigDecimal("50.00"));
     }
 
-    private BigDecimal calculateAverageAdmissionScore(School school) {
+    private BigDecimal calculateAverageAdmissionScore(TbSchool school) {
         BigDecimal sum = BigDecimal.ZERO;
         int count = 0;
 
@@ -367,12 +367,12 @@ public class VolunteerApplicationService {
     }
 
     private VolunteerApplicationItemResponse convertItemToResponse(VolunteerApplicationItem item) {
-        School school = item.getSchool();
+        TbSchool school = item.getSchool();
         return VolunteerApplicationItemResponse.builder()
                 .id(item.getId())
                 .schoolId(school.getId())
-                .schoolName(school.getName())
-                .schoolType(school.getType() != null ? school.getType().name() : null)
+                .schoolName(school.getSchoolName())
+                .schoolType(school.getTypeName())
                 .city(school.getCity())
                 .district(school.getDistrict())
                 .admissionScoreYear1(school.getAdmissionScoreYear1())

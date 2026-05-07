@@ -29,7 +29,7 @@ public class VolunteerApplicationItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_id", nullable = false)
-    private School school;
+    private TbSchool school;
 
     @Column(nullable = false)
     private Integer priority;
@@ -74,11 +74,11 @@ public class VolunteerApplicationItem {
         this.volunteerApplication = volunteerApplication;
     }
 
-    public School getSchool() {
+    public TbSchool getSchool() {
         return school;
     }
 
-    public void setSchool(School school) {
+    public void setSchool(TbSchool school) {
         this.school = school;
     }
 

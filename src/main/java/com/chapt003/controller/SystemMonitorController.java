@@ -1,7 +1,7 @@
 package com.chapt003.controller;
 
 import com.chapt003.dto.SystemPerformanceResponse;
-import com.chapt003.repository.SchoolRepository;
+import com.chapt003.repository.TbSchoolRepository;
 import com.chapt003.repository.UserRepository;
 import com.chapt003.repository.VolunteerApplicationRepository;
 import com.chapt003.response.ApiResponse;
@@ -32,7 +32,7 @@ public class SystemMonitorController {
     private UserRepository userRepository;
 
     @Autowired
-    private SchoolRepository schoolRepository;
+    private TbSchoolRepository tbSchoolRepository;
 
     @Autowired
     private VolunteerApplicationRepository volunteerApplicationRepository;
@@ -73,7 +73,7 @@ public class SystemMonitorController {
                         ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .activeThreads(threadBean.getThreadCount())
                 .totalUsers(userRepository.count())
-                .totalSchools(schoolRepository.count())
+                .totalSchools(tbSchoolRepository.count())
                 .totalApplications(volunteerApplicationRepository.count())
                 .build();
 

@@ -1,6 +1,5 @@
 package com.chapt003.dto;
 
-import com.chapt003.entity.enums.SchoolType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +18,7 @@ public class SchoolListRequest {
 
     private String district;
 
-    private SchoolType type;
+    private String schoolType;
 
     private BigDecimal minScore;
 

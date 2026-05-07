@@ -1,0 +1,20 @@
+/*ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS city VARCHAR(50);
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS district VARCHAR(50);
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS admission_score_year1 DECIMAL(5,2);
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS admission_score_year2 DECIMAL(5,2);
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS admission_score_year3 DECIMAL(5,2);
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS enrollment_quota INT;
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS applicant_count INT;
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS address VARCHAR(200);
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS school_level VARCHAR(30);
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS features TEXT;
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+ALTER TABLE tb_school ADD COLUMN IF NOT EXISTS deleted TINYINT(1) DEFAULT 0;
+
+CREATE INDEX IF NOT EXISTS idx_tb_school_city ON tb_school(city);
+CREATE INDEX IF NOT EXISTS idx_tb_school_type ON tb_school(school_type);
+CREATE INDEX IF NOT EXISTS idx_tb_school_city_district ON tb_school(city, district);
+*/

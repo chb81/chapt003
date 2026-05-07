@@ -6,7 +6,7 @@ import com.chapt003.dto.SchoolResponse;
 import com.chapt003.dto.UserListResponse;
 import com.chapt003.entity.AuditLog;
 import com.chapt003.entity.HistoricalAdmissionData;
-import com.chapt003.entity.School;
+import com.chapt003.entity.TbSchool;
 import com.chapt003.entity.User;
 import com.chapt003.repository.*;
 import com.chapt003.response.ApiResponse;

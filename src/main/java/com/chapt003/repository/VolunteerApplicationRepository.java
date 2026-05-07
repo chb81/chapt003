@@ -29,6 +29,9 @@ public interface VolunteerApplicationRepository extends JpaRepository<VolunteerA
     @Query("SELECT va FROM VolunteerApplication va WHERE va.user.id = :userId AND va.status = :status")
     Page<VolunteerApplication> findByUserIdAndStatus(@Param("userId") Long userId, @Param("status") VolunteerApplicationStatus status, Pageable pageable);
 
+    @Query("SELECT va FROM VolunteerApplication va WHERE va.user.id = :userId ORDER BY va.createdAt DESC")
+    Page<VolunteerApplication> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
+
     @Query("SELECT va FROM VolunteerApplication va WHERE va.user.id = :userId AND va.status = 'SIMULATION' ORDER BY va.createdAt DESC")
     Page<VolunteerApplication> findSimulationsByUserId(@Param("userId") Long userId, Pageable pageable);
 
@@ -39,6 +42,6 @@ public interface VolunteerApplicationRepository extends JpaRepository<VolunteerA
 
     long countByUserId(Long userId);
 
-    @Query("SELECT va FROM VolunteerApplication va LEFT JOIN FETCH va.items WHERE va.id = :id")
+    @Query("SELECT va FROM VolunteerApplication va LEFT JOIN FETCH va.items i LEFT JOIN FETCH i.school WHERE va.id = :id")
     Optional<VolunteerApplication> findByIdWithItems(@Param("id") Long id);
 }

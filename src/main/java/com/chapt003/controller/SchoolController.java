@@ -43,7 +43,7 @@ public class SchoolController {
                 .keyword(keyword)
                 .city(city)
                 .district(district)
-                .type(type != null ? com.chapt003.entity.enums.SchoolType.valueOf(type) : null)
+                .schoolType(type)
                 .minScore(minScore != null ? java.math.BigDecimal.valueOf(minScore) : null)
                 .maxScore(maxScore != null ? java.math.BigDecimal.valueOf(maxScore) : null)
                 .sortBy(sortBy)

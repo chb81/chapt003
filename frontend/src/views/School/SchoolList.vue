@@ -37,9 +37,9 @@
         </el-form-item>
         <el-form-item label="类型">
           <el-select v-model="searchForm.type" placeholder="学校类型" clearable>
-            <el-option label="重点高中" value="KEY_HIGH_SCHOOL" />
-            <el-option label="普通高中" value="REGULAR_HIGH_SCHOOL" />
-            <el-option label="职业高中" value="VOCATIONAL_HIGH_SCHOOL" />
+            <el-option label="重点高中" value="重点高中" />
+            <el-option label="普通高中" value="普通高中" />
+            <el-option label="职业高中" value="职业高中" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -56,8 +56,8 @@
         </el-table-column>
         <el-table-column prop="type" label="类型" width="100">
           <template #default="{ row }">
-            <el-tag :type="row.type === 'KEY' ? 'danger' : row.type === 'REGULAR' ? '' : 'warning'" size="small">
-              {{ row.type === 'KEY' ? '重点' : row.type === 'REGULAR' ? '普通' : '职高' }}
+            <el-tag :type="row.type === 'KEY_HIGH_SCHOOL' ? 'danger' : row.type === 'REGULAR_HIGH_SCHOOL' ? '' : 'warning'" size="small">
+              {{ row.type === 'KEY_HIGH_SCHOOL' ? '重点' : row.type === 'REGULAR_HIGH_SCHOOL' ? '普通' : '职高' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -105,11 +105,19 @@
         <el-form-item label="学校名称" prop="name">
           <el-input v-model="schoolForm.name" placeholder="请输入学校名称" />
         </el-form-item>
-        <el-form-item label="学校类型" prop="type">
-          <el-select v-model="schoolForm.type" placeholder="请选择学校类型">
-            <el-option label="重点高中" value="KEY_HIGH_SCHOOL" />
-            <el-option label="普通高中" value="REGULAR_HIGH_SCHOOL" />
-            <el-option label="职业高中" value="VOCATIONAL_HIGH_SCHOOL" />
+        <el-form-item label="学校类型" prop="schoolType">
+          <el-select v-model="schoolForm.schoolType" placeholder="请选择学校类型">
+            <el-option label="高中" value="高中" />
+            <el-option label="完全中学" value="完全中学" />
+            <el-option label="职业高中" value="职业高中" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="学校性质">
+          <el-select v-model="schoolForm.schoolNature" placeholder="请选择学校性质">
+            <el-option label="省级示范性" value="省级示范性" />
+            <el-option label="市级示范性" value="市级示范性" />
+            <el-option label="重点" value="重点" />
+            <el-option label="普通" value="普通" />
           </el-select>
         </el-form-item>
         <el-row :gutter="20">
@@ -168,7 +176,7 @@
     <el-dialog v-model="importDialogVisible" title="批量导入学校" width="700px" destroy-on-close>
       <el-alert type="info" :closable="false" style="margin-bottom: 16px">
         <p>请粘贴 JSON 数组格式的学校数据，每条记录包含以下字段：</p>
-        <p>name（必填）, type（必填: KEY/REGULAR/VOCATIONAL）, city, district, admissionScoreYear1, admissionScoreYear2, admissionScoreYear3, enrollmentQuota, phone, address, description, features</p>
+        <p>name（必填）, schoolType, schoolNature, city, district, admissionScoreYear1, admissionScoreYear2, admissionScoreYear3, enrollmentQuota, phone, address, description, features</p>
       </el-alert>
       <el-input
         v-model="importJson"
@@ -177,9 +185,10 @@
         placeholder='[
   {
     "name": "示例中学",
-    "type": "KEY",
-    "city": "北京",
-    "district": "海淀区",
+    "schoolType": "高中",
+    "schoolNature": "省级示范性",
+    "city": "石家庄",
+    "district": "长安区",
     "admissionScoreYear1": 580,
     "enrollmentQuota": 500
   }
@@ -223,7 +232,8 @@ const schoolFormRef = ref()
 
 const schoolForm = reactive({
   name: '',
-  type: '',
+  schoolType: '',
+  schoolNature: '',
   city: '',
   district: '',
   admissionScoreYear1: undefined as number | undefined,
@@ -238,7 +248,7 @@ const schoolForm = reactive({
 
 const schoolRules = {
   name: [{ required: true, message: '请输入学校名称', trigger: 'blur' }],
-  type: [{ required: true, message: '请选择学校类型', trigger: 'change' }]
+  schoolType: [{ required: true, message: '请选择学校类型', trigger: 'change' }]
 }
 
 const importDialogVisible = ref(false)
@@ -271,7 +281,7 @@ const handleExport = async () => {
 
 const resetSchoolForm = () => {
   Object.assign(schoolForm, {
-    name: '', type: '', city: '', district: '',
+    name: '', schoolType: '', schoolNature: '', city: '', district: '',
     admissionScoreYear1: undefined, admissionScoreYear2: undefined, admissionScoreYear3: undefined,
     enrollmentQuota: undefined, phone: '', address: '', description: '', features: ''
   })
@@ -289,13 +299,14 @@ const showEditDialog = (row: any) => {
   editingId.value = row.id
   Object.assign(schoolForm, {
     name: row.name || '',
-    type: row.type || '',
+    schoolType: row.schoolType || '',
+    schoolNature: row.schoolNature || '',
     city: row.city || '',
     district: row.district || '',
-    admissionScoreYear1: row.admission_score_year1 || row.admissionScoreYear1,
-    admissionScoreYear2: row.admission_score_year2 || row.admissionScoreYear2,
-    admissionScoreYear3: row.admission_score_year3 || row.admissionScoreYear3,
-    enrollmentQuota: row.enrollment_quota || row.enrollmentQuota,
+    admissionScoreYear1: row.admissionScoreYear1,
+    admissionScoreYear2: row.admissionScoreYear2,
+    admissionScoreYear3: row.admissionScoreYear3,
+    enrollmentQuota: row.enrollmentQuota,
     phone: row.phone || '',
     address: row.address || '',
     description: row.description || '',
